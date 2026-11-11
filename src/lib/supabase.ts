@@ -557,13 +557,11 @@ export async function uploadMenuDocumentToStorage(
       }
     }
 
-    // PATH 2: Direct Browser-to-Supabase Storage Upload via Supabase JS SDK
-    if (client) {
-      console.log(`[MENU STORAGE] Attempting direct browser upload to Supabase Storage via client SDK...`);
+    // PATH 2: Direct Client SDK Upload (only attempted if user is authenticated)
+    if (client && authUserId) {
+      console.log(`[MENU STORAGE] Attempting direct browser upload to Supabase Storage via client SDK for authenticated user...`);
       onProgress?.(20);
 
-      // Only attempt actual target buckets for menus: targetBucket (menu-cards) and documents.
-      // Do NOT retry unrelated buckets (branding-images, food-images, gallery-images).
       const menuBuckets = Array.from(new Set([targetBucket, 'documents']));
 
       for (const b of menuBuckets) {
@@ -606,67 +604,7 @@ export async function uploadMenuDocumentToStorage(
       }
     }
 
-    // PATH 3: Direct Chunked 3MB Transfer (Prevents Vercel 4.5MB Payload Limits & Supabase Storage RLS)
-    console.log(`[MENU STORAGE] Supabase storage direct upload unavailable. Initiating chunked transfer (3MB slices)...`);
-    onProgress?.(30);
-
-    try {
-      const CHUNK_SIZE = 3 * 1024 * 1024; // 3MB chunks (strictly below Vercel's 4.5MB limit)
-      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-      const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-
-      let reassemblyResult: any = null;
-
-      for (let i = 0; i < totalChunks; i++) {
-        const start = i * CHUNK_SIZE;
-        const end = Math.min(file.size, start + CHUNK_SIZE);
-        const chunkBlob = file.slice(start, end);
-
-        const formData = new FormData();
-        formData.append('chunk', chunkBlob, file.name);
-        formData.append('sessionId', sessionId);
-        formData.append('chunkIndex', String(i));
-        formData.append('totalChunks', String(totalChunks));
-        formData.append('fileName', file.name);
-        formData.append('mimeType', file.type || 'application/pdf');
-
-        const chunkPct = Math.min(95, Math.round(30 + ((i + 1) / totalChunks) * 65));
-        onProgress?.(chunkPct);
-
-        const chunkRes = await fetch('/api/storage/chunk-upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!chunkRes.ok) {
-          const errText = await chunkRes.text().catch(() => '');
-          throw new Error(`Chunk ${i + 1}/${totalChunks} upload failed (HTTP ${chunkRes.status}): ${errText}`);
-        }
-
-        const chunkJson = await chunkRes.json();
-        if (chunkJson.complete) {
-          reassemblyResult = chunkJson;
-        }
-      }
-
-      if (reassemblyResult && reassemblyResult.localTempPath) {
-        console.log(`[MENU STORAGE] Chunked upload successfully completed at: ${reassemblyResult.localTempPath}`);
-        onProgress?.(100);
-        return {
-          success: true,
-          localTempFile: {
-            path: reassemblyResult.localTempPath,
-            sessionId: reassemblyResult.sessionId,
-            fileName: file.name,
-          },
-        };
-      }
-    } catch (chunkErr: any) {
-      lastErrors.push({ path: 'chunk-upload', error: chunkErr?.message });
-      console.warn(`[MENU STORAGE] Chunked upload failed:`, chunkErr);
-    }
-
-    // 4. Send telemetry report to /api/storage/diagnostic-log
+    // Send safe telemetry report to /api/storage/diagnostic-log
     try {
       fetch('/api/storage/diagnostic-log', {
         method: 'POST',
@@ -682,7 +620,7 @@ export async function uploadMenuDocumentToStorage(
       }).catch(() => {});
     } catch {}
 
-    // 5. If file is small, allow base64 fallback
+    // For files under 4MB, allow base64 fallback
     if (file.size <= 4 * 1024 * 1024) {
       return {
         success: false,

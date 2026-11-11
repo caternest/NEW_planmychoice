@@ -8,18 +8,14 @@ import os from "os";
 import multer from "multer";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { createRequire } from "module";
 import zlib from "zlib";
 import { execSync } from "child_process";
+import * as pdfParseModule from "pdf-parse";
 
-let PDFParse: any = null;
-try {
-  const req = typeof require !== "undefined" ? require : createRequire(import.meta.url);
-  const _pdfPkg = req("pdf-parse");
-  PDFParse = _pdfPkg?.PDFParse || _pdfPkg?.default || _pdfPkg;
-} catch (pdfLoadErr) {
-  console.warn("[SERVER] Notice: pdf-parse optional module load:", pdfLoadErr);
-}
+const PDFParse: any =
+  (pdfParseModule as any)?.PDFParse ||
+  (pdfParseModule as any)?.default ||
+  pdfParseModule;
 
 import {
   sendWhatsAppMessage,
@@ -32,6 +28,24 @@ import {
 dotenv.config();
 
 const app = express();
+
+// Path normalizer middleware for Vercel Serverless Functions
+// Restores original request URL when Vercel rewrites forward /api/(.*) to /api/index
+app.use((req: any, res: any, next: any) => {
+  const queryPath = req.query?.__path ? String(req.query.__path) : null;
+  const forwardedUrl =
+    (queryPath ? `/api/${queryPath.replace(/^\/+/, "")}` : null) ||
+    req.headers["x-forwarded-url"] ||
+    req.headers["x-forwarded-uri"] ||
+    (req.headers["x-now-route-matches"]
+      ? `/api/${decodeURIComponent(String(req.headers["x-now-route-matches"]).replace(/^1=/, ""))}`
+      : null);
+
+  if (forwardedUrl && typeof forwardedUrl === "string" && forwardedUrl !== "/api/index" && forwardedUrl !== "/api") {
+    req.url = forwardedUrl;
+  }
+  next();
+});
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -540,10 +554,14 @@ app.post("/api/notifications/order-approved", async (req: any, res: any) => {
 // API routes
 const upload = multer({ storage: multer.memoryStorage() });
 
+const VERIFIED_BUCKETS = new Set<string>(["documents", "menu-cards", "branding-images", "food-images", "gallery-images"]);
+
 async function ensureBucketExists(supabase: any, bucketName: string, isPublic: boolean = false) {
+  if (VERIFIED_BUCKETS.has(bucketName)) return;
   try {
     const { data: buckets, error: listErr } = await supabase.storage.listBuckets();
     if (!listErr && buckets) {
+      buckets.forEach((b: any) => VERIFIED_BUCKETS.add(b.name));
       const exists = buckets.some((b: any) => b.name === bucketName);
       if (!exists) {
         console.log(`[STORAGE] Bucket "${bucketName}" not found. Creating bucket (public: ${isPublic})...`);
@@ -551,9 +569,8 @@ async function ensureBucketExists(supabase: any, bucketName: string, isPublic: b
           public: isPublic,
           fileSizeLimit: 52428800, // 50MB
         });
-        if (createErr) {
-          console.warn(`[STORAGE] Could not create bucket "${bucketName}":`, createErr.message);
-        } else {
+        if (!createErr) {
+          VERIFIED_BUCKETS.add(bucketName);
           console.log(`[STORAGE] Successfully created bucket "${bucketName}"`);
         }
       }
@@ -563,7 +580,7 @@ async function ensureBucketExists(supabase: any, bucketName: string, isPublic: b
   }
 }
 
-app.post("/api/storage/sign", async (req: any, res: any) => {
+app.post(["/api/storage/sign", "/storage/sign"], async (req: any, res: any) => {
   try {
     const rawBucket = String(req.body?.bucket || "documents").trim();
     const rawFilePath = String(req.body?.filePath || "").trim();
@@ -789,7 +806,7 @@ app.get("/api/storage/diagnostic", async (req: any, res: any) => {
 });
 
 // Endpoint for receiving client-side upload diagnostic telemetry
-app.post("/api/storage/diagnostic-log", async (req: any, res: any) => {
+app.post(["/api/storage/diagnostic-log", "/storage/diagnostic-log"], async (req: any, res: any) => {
   const { event, details, error, bucket, fileName, fileSize, mimeType, timestamp } = req.body || {};
   console.warn(`[CLIENT STORAGE DIAGNOSTIC] Event: "${event}"`, {
     bucket,
@@ -804,7 +821,7 @@ app.post("/api/storage/diagnostic-log", async (req: any, res: any) => {
 });
 
 // Chunked direct upload endpoint for large files (PDFs > 4MB) to prevent Vercel 4.5MB payload limit
-app.post("/api/storage/chunk-upload", upload.single("chunk") as any, async (req: any, res: any) => {
+app.post(["/api/storage/chunk-upload", "/storage/chunk-upload"], upload.single("chunk") as any, async (req: any, res: any) => {
   try {
     const { sessionId, chunkIndex, totalChunks, fileName, mimeType } = req.body;
     const file = req.file;
@@ -5223,11 +5240,11 @@ const saveMenuHandler = async (req: any, res: any) => {
   }
 };
 
-app.post("/api/parse-menu", parseMenuHandler);
-app.post("/api/scan-menu", parseMenuHandler);
-app.post("/api/extract-menu", parseMenuHandler);
-app.post("/api/process-menu", parseMenuHandler);
-app.post("/api/save-menu", saveMenuHandler);
+app.post(["/api/parse-menu", "/parse-menu"], parseMenuHandler);
+app.post(["/api/scan-menu", "/scan-menu"], parseMenuHandler);
+app.post(["/api/extract-menu", "/extract-menu"], parseMenuHandler);
+app.post(["/api/process-menu", "/process-menu"], parseMenuHandler);
+app.post(["/api/save-menu", "/save-menu"], saveMenuHandler);
 
 const IMAGES_FILE_PATH = path.join(
   process.cwd(),
@@ -6330,13 +6347,29 @@ app.post("/api/register/finalize", async (req: any, res: any) => {
   }
 });
 
-// Seed data immediately on module load if not in serverless environment
-try {
-  if (!process.env.VERCEL) {
-    seedFoodImagesOnStartup();
+// Fallback 404 handler for unmatched API routes (passes non-API routes to Vite SPA middlewares)
+app.use((req: any, res: any, next: any) => {
+  const isApi = req.url.startsWith("/api/") || req.originalUrl?.startsWith("/api/");
+  if (isApi) {
+    return res.status(404).json({
+      success: false,
+      error: `API route not found: ${req.method} ${req.originalUrl || req.url}`,
+      code: "ROUTE_NOT_FOUND",
+    });
   }
-} catch (e) {
-  console.warn("Notice: Startup food library seeding skipped:", e);
-}
+  next();
+});
+
+// Fallback 500 error handler to ensure clean JSON response on unexpected error
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error("[SERVER ERROR] Uncaught exception:", err?.message || err);
+  if (!res.headersSent) {
+    return res.status(500).json({
+      success: false,
+      error: err?.message || "Internal server error",
+      code: "INTERNAL_SERVER_ERROR",
+    });
+  }
+});
 
 export default app;
