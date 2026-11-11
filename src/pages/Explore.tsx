@@ -1,0 +1,2005 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  Search, 
+  MapPin, 
+  ChevronRight, 
+  ChevronLeft, 
+  Star, 
+  ChefHat, 
+  Tag, 
+  CheckCircle2, 
+  ImageIcon, 
+  Heart, 
+  Users, 
+  Calendar, 
+  Sparkles,
+  Smartphone,
+  ArrowRight,
+  ShieldCheck,
+  Award,
+  Filter,
+  X,
+  Clock
+} from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { HYDERABAD_AREAS, DEMO_CATERERS, DEMO_REVIEWS } from '../data';
+import { cn, safeSaveRegistrations } from '../lib/utils';
+import { useAuth } from '../contexts/AuthContext';
+import { useCatererFilters } from '../contexts/CatererFilterContext';
+import { getSupabase } from '../lib/supabase';
+import { MapPickerModal } from '../components/MapPickerModal';
+import { calculateDistanceKm, estimateDrivingTimeMinutes, searchLocations } from '../lib/locationIntelligence';
+import { fetchCatererBadgesMap } from '../lib/badgeApi';
+import { PlatformBadge, STYLE_VARIANT_CONFIG, BadgeStyleVariant, getBadgeIconComponent } from '../lib/badgeUtils';
+
+// Helper to return beautiful, premium fallback images for caterers
+export function getCatererImagesFallback(name: string, images?: string[]): string[] {
+  const defaultImages = [
+    'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800', // Party catering table
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800', // Assorted food
+    'https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&q=80&w=800', // Indian buffet
+    'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800'  // Premium dining
+  ];
+
+  // Clean the existing images array of any falsy or broken placeholder values
+  const cleanImages = (images || []).filter(img => 
+    img && 
+    typeof img === 'string' && 
+    img.trim() !== '' && 
+    !img.includes('placeholder') && 
+    !img.includes('broken') &&
+    (img.startsWith('http') || img.startsWith('data:image/'))
+  );
+
+  if (cleanImages.length > 0) {
+    return cleanImages;
+  }
+
+  // Assign high quality specific images based on caterer name keywords
+  const lowerName = (name || '').toLowerCase();
+  if (lowerName.includes('south') || lowerName.includes('venue')) {
+    return [
+      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80&w=800', // South Indian traditional spread
+      'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&q=80&w=800'  // South Indian delicacies
+    ];
+  }
+  if (lowerName.includes('elite')) {
+    return [
+      'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800', // Luxury wedding buffet
+      'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&q=80&w=800'
+    ];
+  }
+  if (lowerName.includes('grand') || lowerName.includes('feast')) {
+    return [
+      'https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&q=80&w=800'
+    ];
+  }
+  if (lowerName.includes('royal') || lowerName.includes('flavour')) {
+    return [
+      'https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800'
+    ];
+  }
+  if (lowerName.includes('spice') || lowerName.includes('affair')) {
+    return [
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800'
+    ];
+  }
+
+  // Dynamic assignment based on string hash to vary fallbacks nicely
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % defaultImages.length;
+  return [defaultImages[index], defaultImages[(index + 1) % defaultImages.length]];
+}
+
+// Reusable Image component that handles error fallbacks elegantly without broken placeholder icons
+export function SafeImage({ src, alt, className, style, fallbackType = 'catering' }: { 
+  src: string | null | undefined; 
+  alt: string; 
+  className?: string; 
+  style?: React.CSSProperties;
+  fallbackType?: 'catering' | 'occasion' | 'cuisine' | 'avatar' | 'logo'
+}) {
+  const getFallback = () => {
+    if (fallbackType === 'cuisine') {
+      return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=60&w=400';
+    }
+    if (fallbackType === 'occasion') {
+      return 'https://images.unsplash.com/photo-1531058020387-3be344559be6?auto=format&fit=crop&q=60&w=400';
+    }
+    if (fallbackType === 'avatar') {
+      return 'https://i.pravatar.cc/150?u=fallback';
+    }
+    if (fallbackType === 'logo') {
+      return '';
+    }
+    return 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800'; // luxury wedding buffet
+  };
+
+  const initialSrc = src && typeof src === 'string' && src.trim() !== '' ? src : getFallback();
+  const [imgSrc, setImgSrc] = useState(initialSrc);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    if (src && typeof src === 'string' && src.trim() !== '') {
+      setImgSrc(src);
+      setHasError(false);
+    } else {
+      setImgSrc(getFallback());
+    }
+  }, [src, fallbackType]);
+
+  if (fallbackType === 'logo' && (!src || src.trim() === '')) {
+    return null; // Let the text-based circle logo render instead
+  }
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      className={className}
+      style={style}
+      referrerPolicy="no-referrer"
+      onError={() => {
+        if (!hasError) {
+          setHasError(true);
+          setImgSrc(getFallback());
+        }
+      }}
+    />
+  );
+}
+
+function GoldOrnamentalCorner({ position }: { position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' }) {
+  const rotationClass = {
+    'top-left': 'top-2.5 left-2.5',
+    'top-right': 'top-2.5 right-2.5 rotate-90',
+    'bottom-left': 'bottom-2.5 left-2.5 -rotate-90',
+    'bottom-right': 'bottom-2.5 right-2.5 rotate-180',
+  }[position];
+
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      className={cn("absolute w-10 h-10 md:w-12 md:h-12 text-[#DEAA38]/80 pointer-events-none select-none z-10", rotationClass)}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {/* Outer corner frame line */}
+      <path d="M 6,90 L 6,10 C 6,7 7,6 10,6 L 90,6" strokeWidth="1.2" />
+      <path d="M 14,90 L 14,14 L 90,14" strokeWidth="0.8" opacity="0.5" />
+      
+      {/* Elegant scroll curls */}
+      <path d="M 6,6 C 18,6 26,14 26,26 C 26,38 14,32 20,20 C 24,12 34,6 48,6" strokeWidth="1" />
+      <path d="M 6,6 C 6,18 14,26 26,26 C 38,26 32,14 20,20 C 12,24 6,34 6,48" strokeWidth="1" />
+      
+      {/* Inner accent fleur-de-lis style leaf */}
+      <path d="M 14,14 L 32,32" strokeWidth="0.8" />
+      <path d="M 32,32 C 34,28 34,22 28,24 Z" fill="currentColor" opacity="0.15" />
+      <path d="M 32,32 C 28,34 22,34 24,28 Z" fill="currentColor" opacity="0.15" />
+      
+      {/* Tiny ornamental dots */}
+      <circle cx="14" cy="14" r="1.5" fill="currentColor" />
+      <circle cx="21" cy="21" r="1.2" fill="currentColor" />
+      <circle cx="27" cy="27" r="0.9" fill="currentColor" />
+    </svg>
+  );
+}
+
+const OCCASIONS = [
+  { name: 'Wedding', img: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Reception', img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Birthday', img: 'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Housewarming', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Corporate', img: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Engagement', img: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Baby Shower', img: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Festival', img: 'https://images.unsplash.com/photo-1605152276897-4f618f831968?auto=format&fit=crop&q=80&w=600' }
+];
+
+const CUISINES = [
+  { name: 'Hyderabadi', img: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&q=60&w=400' },
+  { name: 'South Indian', img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=60&w=400' },
+  { name: 'North Indian', img: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&q=60&w=400' },
+  { name: 'Chinese', img: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&q=60&w=400' },
+  { name: 'Continental', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=60&w=400' },
+  { name: 'Live Counters', img: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=60&w=400' },
+  { name: 'Desserts', img: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=60&w=400' },
+  { name: 'Multi Cuisine', img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=60&w=400' }
+];
+
+// Horizontal Image Slider for Caterer Cards
+function CardImageSlider({ images, name }: { images: string[]; name: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Clean and prepare valid images list using our helper
+  const fallbackList = getCatererImagesFallback(name, images);
+  const [validImages, setValidImages] = useState<string[]>(fallbackList);
+
+  useEffect(() => {
+    setValidImages(getCatererImagesFallback(name, images));
+    setCurrentIndex(0);
+  }, [images, name]);
+
+  const handleImageError = (index: number) => {
+    const updated = [...validImages];
+    if (updated.length > 1) {
+      updated.splice(index, 1);
+      setValidImages(updated);
+      if (currentIndex >= updated.length) {
+        setCurrentIndex(0);
+      }
+    } else {
+      // Fallback to beautiful default single images based on name
+      setValidImages(['https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800']);
+      setCurrentIndex(0);
+    }
+  };
+
+  if (!validImages || validImages.length === 0) {
+    return (
+      <div className="w-full h-full bg-slate-150 flex items-center justify-center">
+        <ImageIcon className="text-slate-300 w-12 h-12" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full group overflow-hidden">
+      <img
+        src={validImages[currentIndex]}
+        alt={name}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+        referrerPolicy="no-referrer"
+        onError={() => handleImageError(currentIndex)}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+      
+      {validImages.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentIndex((prev) => (prev - 1 + validImages.length) % validImages.length);
+            }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/90 hover:bg-white rounded-full flex items-center justify-center text-slate-800 shadow-sm opacity-0 group-hover:opacity-100 transition-all z-10"
+          >
+            <ChevronLeft size={14} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentIndex((prev) => (prev + 1) % validImages.length);
+            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/90 hover:bg-white rounded-full flex items-center justify-center text-slate-800 shadow-sm opacity-0 group-hover:opacity-100 transition-all z-10"
+          >
+            <ChevronRight size={14} />
+          </button>
+
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+            {validImages.slice(0, 5).map((_, idx) => (
+              <span
+                key={idx}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  currentIndex === idx ? "w-3 bg-brand-gold-500" : "w-1.5 bg-white/60"
+                )}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function Explore() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  
+  // Search Form State
+  const [searchLocation, setSearchLocation] = useState('Hyderabad');
+  const [searchOccasion, setSearchOccasion] = useState('');
+  const [searchGuests, setSearchGuests] = useState('');
+  const [searchBudget, setSearchBudget] = useState('');
+
+  // Customer Precise Location States for intelligence/filtering
+  const [customerLat, setCustomerLat] = useState<number | null>(null);
+  const [customerLng, setCustomerLng] = useState<number | null>(null);
+  const [isExploreMapOpen, setIsExploreMapOpen] = useState(false);
+
+  // Caterers & Filtering State
+  const [caterers, setCaterers] = useState<any[]>([]);
+  const [filteredCaterers, setFilteredCaterers] = useState<any[]>([]);
+  const [activeOrders, setActiveOrders] = useState<any[]>([]);
+  
+  // Active Filter States provided by session-scoped CatererFilterContext
+  const {
+    cuisineFilter,
+    occasionFilter,
+    budgetFilter,
+    guestsFilter,
+    sortOption,
+    isLiveCounters,
+    isVerifiedOnly,
+    ratingFilter,
+    searchKeyword,
+    setCuisineFilter,
+    setOccasionFilter,
+    toggleOccasionFilter,
+    setBudgetFilter,
+    setGuestsFilter,
+    setSortOption,
+    setIsLiveCounters,
+    setIsVerifiedOnly,
+    setRatingFilter,
+    setSearchKeyword,
+    clearAllFilters,
+  } = useCatererFilters();
+
+  useEffect(() => {
+    const qSearch = searchParams.get('search');
+    const qLocation = searchParams.get('location') || 'Hyderabad';
+    const qBudget = searchParams.get('budget');
+    const qGuests = searchParams.get('guests');
+
+    const qDiet = searchParams.get('diet') || searchParams.get('cuisine');
+    const qOccasion = searchParams.get('occasion');
+
+    if (qDiet !== null && qDiet !== undefined) {
+      if (qDiet.toLowerCase().includes('non')) {
+        setCuisineFilter('Non-Veg');
+      } else if (qDiet.toLowerCase().includes('veg')) {
+        setCuisineFilter('Veg');
+      }
+    }
+
+    if (qOccasion !== null && qOccasion !== undefined) {
+      setOccasionFilter(qOccasion ? [qOccasion] : []);
+    }
+
+    if (qSearch !== null && qSearch !== undefined) {
+      setSearchKeyword(qSearch);
+      const matchedOcc = ['Wedding', 'Reception', 'Birthday', 'Corporate', 'Housewarming', 'Engagement', 'Baby Shower', 'Festival'].find(
+        o => o.toLowerCase() === qSearch.toLowerCase() || qSearch.toLowerCase().includes(o.toLowerCase())
+      );
+      if (matchedOcc && !qOccasion) {
+        setOccasionFilter([matchedOcc]);
+      }
+    }
+
+    if (qLocation) {
+      setSearchLocation(qLocation);
+    }
+    const qLat = searchParams.get('lat');
+    const qLng = searchParams.get('lng');
+    if (qLat && qLng) {
+      setCustomerLat(parseFloat(qLat));
+      setCustomerLng(parseFloat(qLng));
+    } else {
+      const savedLat = localStorage.getItem('customer_lat');
+      const savedLng = localStorage.getItem('customer_lng');
+      const savedAddr = localStorage.getItem('customer_address');
+      if (savedLat && savedLng) {
+        setCustomerLat(parseFloat(savedLat));
+        setCustomerLng(parseFloat(savedLng));
+        if (savedAddr) setSearchLocation(savedAddr);
+      }
+    }
+    if (qBudget !== null && qBudget !== undefined) {
+      setSearchBudget(qBudget);
+      if (qBudget === '300-400') setBudgetFilter(400);
+      else if (qBudget === '400-600') setBudgetFilter(600);
+      else if (qBudget === '600-800') setBudgetFilter(800);
+      else if (qBudget === '800+') setBudgetFilter(1000);
+    }
+    if (qGuests !== null && qGuests !== undefined) {
+      setSearchGuests(qGuests);
+      if (qGuests === 'Upto 50') setGuestsFilter(['Upto 50']);
+      else if (qGuests === '50-100') setGuestsFilter(['50 - 105']);
+      else if (qGuests === '100-200') setGuestsFilter(['100 - 200']);
+      else if (qGuests === '200-500') setGuestsFilter(['200 - 500']);
+      else if (qGuests === '500-1000') setGuestsFilter(['500 - 1000']);
+      else if (qGuests === '1000+') setGuestsFilter(['1000+']);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (searchParams.get('scroll') === 'true') {
+      const timer = setTimeout(() => {
+        const element = document.getElementById('explore-marketplace');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          
+          const newParams = new URLSearchParams(window.location.search);
+          newParams.delete('scroll');
+          const newSearch = newParams.toString();
+          navigate({
+            pathname: window.location.pathname,
+            search: newSearch ? `?${newSearch}` : '',
+          }, { replace: true });
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, navigate]);
+
+  // Accordion Open states
+  const [openCuisine, setOpenCuisine] = useState(true);
+  const [openOccasion, setOpenOccasion] = useState(true);
+  const [openBudget, setOpenBudget] = useState(true);
+  const [openGuests, setOpenGuests] = useState(true);
+  const [openMoreFilters, setOpenMoreFilters] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+  const moreFiltersRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (moreFiltersRef.current && !moreFiltersRef.current.contains(event.target as Node)) {
+        setOpenMoreFilters(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch active customer orders
+  const fetchCustomerActiveOrders = async () => {
+    if (!user) return;
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          const filtered = data.filter((o: any) => 
+            o.userId === user.id || 
+            (o.customerEmail && o.customerEmail.toLowerCase() === user.email.toLowerCase()) ||
+            o.customerName === user.name
+          );
+          setActiveOrders(filtered);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      try {
+        const raw = localStorage.getItem('orders') || '[]';
+        const parsed = JSON.parse(raw);
+        const filtered = parsed.filter((o: any) => 
+          o.userId === user.id || 
+          (o.customerEmail && o.customerEmail.toLowerCase() === user.email.toLowerCase()) ||
+          o.customerName === user.name
+        );
+        setActiveOrders(filtered);
+      } catch(e) {}
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomerActiveOrders();
+
+    const supabase = getSupabase();
+    if (supabase) {
+      const channel = supabase
+        .channel('explore-active-orders-channel-upgraded')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'orders' },
+          () => {
+            fetchCustomerActiveOrders();
+          }
+        )
+        .subscribe();
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user]);
+
+  // Fetch approved caterers
+  useEffect(() => {
+    const fetchCaterersData = async () => {
+      let allCaterers: any[] = [];
+      const supabase = getSupabase();
+      
+      // Load dynamic caterer badge mappings
+      let badgesMap: Record<string, PlatformBadge[]> = {};
+      try {
+        badgesMap = await fetchCatererBadgesMap();
+      } catch (e) {
+        console.warn("[EXPLORE] Failed to fetch caterer badges map:", e);
+      }
+      
+      const formatCatererRecord = (r: any) => {
+        const assignedBadges = (badgesMap && badgesMap[r.id]) ? badgesMap[r.id].filter(b => b.is_active) : [];
+        const isVerifiedBadge = assignedBadges.some(b => b.slug === 'verified' && b.is_active);
+        const isPremiumBadge = assignedBadges.some(b => b.slug === 'premium-partner' && b.is_active);
+
+        return {
+          id: r.id,
+          name: r.businessName || 'Premium Caterer',
+          location: r.address || r.location || 'Hyderabad', 
+          type: r.type || 'Veg + Non-Veg',
+          startingPrice: Number(r.startingPrice) || 350,
+          rating: typeof r.rating === 'number' ? r.rating : 5.0,
+          reviewCount: typeof r.reviewCount === 'number' ? r.reviewCount : 0,
+          description: r.description || 'Welcome to our premium catering service.',
+          images: getCatererImagesFallback(r.businessName || 'Premium Caterer', r.galleryPhotos || r.gallery || r.images || []),
+          logo: r.logo || null,
+          coverBanner: r.coverBanner || null,
+          address: r.address || 'Hyderabad, Telangana',
+          phone: r.phone || '+91 00000 00000',
+          isVerified: isVerifiedBadge || r.isVerified || false,
+          isPremium: isPremiumBadge || r.isPremium || false,
+          badges: assignedBadges,
+          latitude: r.latitude ? Number(r.latitude) : null,
+          longitude: r.longitude ? Number(r.longitude) : null,
+          serviceRadiusKm: r.serviceRadiusKm ? Number(r.serviceRadiusKm) : 15,
+          createdAt: r.created_at || r.createdAt || new Date(0).toISOString(),
+          updatedAt: r.updated_at || r.updatedAt || new Date(0).toISOString(),
+        };
+      };
+
+      let isSupabaseAuthoritative = false;
+
+      if (supabase) {
+        try {
+          // Query only explicitly approved records from Supabase
+          const { data, error } = await supabase
+            .from('caterer_registrations')
+            .select('*')
+            .or('status.eq.Approved,status.eq.approved')
+            .order('created_at', { ascending: false });
+          
+          if (!error && Array.isArray(data)) {
+            isSupabaseAuthoritative = true;
+            allCaterers = data.map((r: any) => formatCatererRecord(r));
+
+            // Synchronize localStorage cache with Supabase: purge any deleted/trashed/stale approved records
+            try {
+              const rawLocal = localStorage.getItem('registrations');
+              if (rawLocal) {
+                const localList = JSON.parse(rawLocal);
+                if (Array.isArray(localList)) {
+                  const remoteApprovedIds = new Set(data.map((r: any) => r.id));
+                  const sanitizedLocal = localList.filter((r: any) => {
+                    if (!r || !r.id) return false;
+                    const st = (r.status || '').toLowerCase().trim();
+                    // Permanently drop trashed, rejected, hidden, suspended, or deleted records
+                    if (st === 'trashed' || st === 'suspended' || st === 'hidden' || st === 'rejected' || r.deleted === true || r.is_deleted === true) {
+                      return false;
+                    }
+                    // For records claiming to be approved, verify they exist in remote approved records
+                    if (st === 'approved') {
+                      return remoteApprovedIds.has(r.id);
+                    }
+                    return true;
+                  });
+                  safeSaveRegistrations(sanitizedLocal);
+                }
+              }
+            } catch (cacheErr) {
+              console.warn("[EXPLORE] Failed to sanitize local storage cache:", cacheErr);
+            }
+          }
+        } catch (e) {
+          console.error("[EXPLORE] Failed to fetch from Supabase:", e);
+        }
+      }
+
+      // Offline fallback ONLY: If Supabase connection is unavailable or returned an error,
+      // load strictly approved records from localStorage without resurrecting trashed/deleted items.
+      if (!isSupabaseAuthoritative) {
+        const raw = localStorage.getItem('registrations');
+        if (raw) {
+          try {
+            const allRegs = JSON.parse(raw);
+            if (Array.isArray(allRegs)) {
+              const approved = allRegs.filter((r: any) => {
+                if (!r || !r.id) return false;
+                const st = (r.status || '').toLowerCase().trim();
+                // Must be explicitly approved
+                if (st !== 'approved') return false;
+                // Exclude any deleted, trashed, hidden, suspended, or rejected
+                if (st === 'trashed' || st === 'hidden' || st === 'suspended' || st === 'rejected' || r.deleted === true || r.is_deleted === true) {
+                  return false;
+                }
+                return true;
+              });
+              allCaterers = approved.map((r: any) => formatCatererRecord(r));
+            }
+          } catch (e) {
+            console.error("[EXPLORE] Failed parsing local registrations:", e);
+          }
+        }
+      }
+
+      // Sort newest approved/registered caterers first using actual timestamp field
+      allCaterers.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+      setCaterers(allCaterers);
+    };
+
+    fetchCaterersData();
+  }, []);
+
+  // Filter & Sort Logic
+  useEffect(() => {
+    let result = [...caterers];
+
+    // Compute distances if customer location is set
+    if (customerLat !== null && customerLng !== null) {
+      result = result.map(c => {
+        if (c.latitude !== null && c.longitude !== null) {
+          const dist = calculateDistanceKm(customerLat, customerLng, c.latitude, c.longitude);
+          const time = estimateDrivingTimeMinutes(dist);
+          return { ...c, distanceKm: dist, drivingTimeMins: time };
+        }
+        return { ...c, distanceKm: null, drivingTimeMins: null };
+      });
+
+      // Filter: Show caterers whose service radius includes the customer's location
+      result = result.filter(c => c.distanceKm === null || c.distanceKm <= (c.serviceRadiusKm || 15));
+    }
+
+    // Food Type Preference (Veg / Non-Veg only)
+    if (cuisineFilter === 'Veg') {
+      result = result.filter(c => c.type?.toLowerCase() === 'veg' || c.type?.toLowerCase().includes('pure veg'));
+    } else if (cuisineFilter === 'Non-Veg') {
+      result = result.filter(c => c.type?.toLowerCase().includes('non-veg') || c.type?.toLowerCase().includes('both') || c.type?.toLowerCase().includes('+'));
+    }
+
+    // Occasion Filters
+    if (occasionFilter.length > 0) {
+      result = result.filter(c => {
+        const desc = (c.description || '').toLowerCase();
+        const name = (c.name || '').toLowerCase();
+        return occasionFilter.some(occ => desc.includes(occ.toLowerCase()) || name.includes(occ.toLowerCase()) || occ.toLowerCase() === 'wedding');
+      });
+    }
+
+    // Budget range Filter
+    result = result.filter(c => (c.startingPrice || 300) <= budgetFilter);
+
+    // Live Counters toggle
+    if (isLiveCounters) {
+      result = result.filter(c => (c.description || '').toLowerCase().includes('live') || c.name.toLowerCase().includes('elite') || c.name.toLowerCase().includes('spice'));
+    }
+
+    // Verified only toggle
+    if (isVerifiedOnly) {
+      result = result.filter(c => (c.badges && c.badges.some((b: any) => b.slug === 'verified' && b.is_active)) || c.isVerified);
+    }
+
+    // Rating filter
+    if (ratingFilter > 0) {
+      result = result.filter(c => (c.rating || 5) >= ratingFilter);
+    }
+
+    // Search keyword pre-filter if typed in search panel
+    if (searchKeyword.trim() !== '') {
+      const kw = searchKeyword.toLowerCase();
+      result = result.filter(c => c.name.toLowerCase().includes(kw) || c.description.toLowerCase().includes(kw) || c.location.toLowerCase().includes(kw));
+    }
+
+    // Sort options
+    if (sortOption === 'Price: Low to High') {
+      result.sort((a, b) => a.startingPrice - b.startingPrice);
+    } else if (sortOption === 'Price: High to Low') {
+      result.sort((a, b) => b.startingPrice - a.startingPrice);
+    } else if (sortOption === 'Newest First') {
+      result.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    } else if (sortOption === 'Highest Rated') {
+      result.sort((a, b) => {
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      });
+    } else if (sortOption === 'Popularity') {
+      // Sort newest approved/registered caterers first using actual timestamp field, breaking ties by rating
+      result.sort((a, b) => {
+        const timeDiff = new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        if (timeDiff !== 0) return timeDiff;
+        return (b.rating || 0) - (a.rating || 0);
+      });
+    } else if (sortOption === 'Nearest First' || sortOption === 'Lowest Delivery Distance') {
+      result.sort((a, b) => {
+        if (a.distanceKm === null && b.distanceKm === null) return 0;
+        if (a.distanceKm === null) return 1;
+        if (b.distanceKm === null) return -1;
+        return a.distanceKm - b.distanceKm;
+      });
+    } else if (sortOption === 'Fastest Arrival') {
+      result.sort((a, b) => {
+        if (a.drivingTimeMins === null && b.drivingTimeMins === null) return 0;
+        if (a.drivingTimeMins === null) return 1;
+        if (b.drivingTimeMins === null) return -1;
+        return a.drivingTimeMins - b.drivingTimeMins;
+      });
+    } else if (sortOption === 'Highest Rated Nearby') {
+      result.sort((a, b) => {
+        const aInRadius = a.distanceKm !== null && a.distanceKm <= (a.serviceRadiusKm || 15);
+        const bInRadius = b.distanceKm !== null && b.distanceKm <= (b.serviceRadiusKm || 15);
+        if (aInRadius && !bInRadius) return -1;
+        if (!aInRadius && bInRadius) return 1;
+        return b.rating - a.rating;
+      });
+    }
+
+    setFilteredCaterers(result);
+  }, [caterers, cuisineFilter, occasionFilter, budgetFilter, isLiveCounters, isVerifiedOnly, ratingFilter, sortOption, searchKeyword, customerLat, customerLng]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // For Explore page, search can be handled inline directly by updating filter keyword
+    if (searchKeyword) {
+      setSearchKeyword(searchKeyword);
+    } else if (searchOccasion) {
+      setSearchKeyword(searchOccasion);
+    }
+    const el = document.getElementById('explore-marketplace');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Check if viewport is mobile (< 768px)
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mediaQuery.matches);
+
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  if (isMobile) {
+    return (
+      <div className="w-full bg-[#FFFDFB] font-sans overflow-x-hidden min-h-screen pb-20 px-4 text-left">
+        
+        {/* 1. Mobile Header with Location selector */}
+        <div className="pt-6 pb-4">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest leading-none block mb-1">
+                Event Location
+              </span>
+              <button 
+                type="button"
+                onClick={() => setIsExploreMapOpen(true)}
+                className="flex items-center gap-1.5 text-left bg-slate-50 border border-slate-200/60 rounded-full px-3.5 py-1.5 shadow-2xs hover:bg-slate-100/50 transition-all cursor-pointer"
+              >
+                <MapPin size={14} className="text-[#DEAA38] shrink-0" />
+                <span className="text-xs font-bold text-slate-800 max-w-[200px] truncate">
+                  {searchLocation || "Select Location"}
+                </span>
+                <ChevronRight size={10} className="rotate-90 text-slate-400 shrink-0" />
+              </button>
+            </div>
+
+            {/* Premium Logo / Subtitle avatar */}
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#051410] to-[#032a1e] flex items-center justify-center border border-[#DEAA38]/30">
+              <ChefHat size={16} className="text-[#DEAA38]" />
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Premium Hero Banner */}
+        <div 
+          className="relative w-full rounded-2xl overflow-hidden mb-5 shadow-md"
+          style={{
+            background: 'radial-gradient(ellipse 90% 80% at 50% 25%, #053D2E 0%, #03281E 60%, #021B14 100%)',
+            height: '180px'
+          }}
+        >
+          <div className="absolute inset-0 p-5 flex flex-col justify-center text-left">
+            <h1 
+              className="text-xl sm:text-2xl font-display font-bold text-white tracking-tight leading-tight mb-1"
+              style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
+            >
+              Explore <span className="text-[#DEAA38]">Caterers</span>
+            </h1>
+            <p className="text-white/80 text-[11px] max-w-xs font-sans leading-relaxed">
+              Discover verified caterers, compare customizable packages, and filter menus for your special occasion.
+            </p>
+          </div>
+        </div>
+
+        {/* 3. Floating Search Card */}
+        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-[0_12px_30px_rgba(3,19,14,0.08)] p-5 mb-6 flex flex-col gap-4 text-left">
+          {/* Location field */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Event Location</label>
+            <button 
+              type="button"
+              onClick={() => setIsExploreMapOpen(true)}
+              className="flex items-center gap-2 w-full bg-slate-50 border border-slate-150 rounded-xl px-4 py-3 text-left hover:bg-slate-100/50 transition-all cursor-pointer"
+            >
+              <MapPin size={14} className="text-[#DEAA38] shrink-0" />
+              <span className="text-xs font-bold text-slate-700 truncate">
+                {searchLocation || "Select Location"}
+              </span>
+            </button>
+          </div>
+
+          {/* Occasion select */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Occasion</label>
+            <div className="relative flex items-center">
+              <Sparkles size={14} className="absolute left-4 text-[#DEAA38] pointer-events-none" />
+              <select 
+                value={searchOccasion} 
+                onChange={(e) => {
+                  setSearchOccasion(e.target.value);
+                  if (e.target.value) {
+                    setOccasionFilter([e.target.value]);
+                  } else {
+                    setOccasionFilter([]);
+                  }
+                }}
+                className="w-full bg-slate-50 border border-slate-150 rounded-xl pl-10 pr-10 py-3 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer appearance-none"
+              >
+                <option value="">Select Occasion</option>
+                {['Wedding', 'Reception', 'Birthday Party', 'Corporate Events', 'House Warming', 'Engagement', 'Baby Shower', 'Festival'].map(occ => (
+                  <option key={occ} value={occ}>{occ}</option>
+                ))}
+              </select>
+              <ChevronRight size={12} className="absolute right-4 rotate-90 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Grid for Guests & Budget side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Guests Capacity */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Guests</label>
+              <div className="relative flex items-center">
+                <Users size={14} className="absolute left-4.5 text-[#DEAA38] pointer-events-none" />
+                <select 
+                  value={searchGuests} 
+                  onChange={(e) => {
+                    setSearchGuests(e.target.value);
+                    if (e.target.value) {
+                      setGuestsFilter([e.target.value]);
+                    } else {
+                      setGuestsFilter([]);
+                    }
+                  }}
+                  className="w-full bg-slate-50 border border-slate-150 rounded-xl pl-10 pr-9 py-3 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer appearance-none"
+                >
+                  <option value="">Guests</option>
+                  {['Upto 50', '50 - 105', '100 - 200', '200 - 500', '500 - 1000', '1000+'].map(cap => (
+                    <option key={cap} value={cap}>{cap}</option>
+                  ))}
+                </select>
+                <ChevronRight size={10} className="absolute right-3.5 rotate-90 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Budget Per Plate */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Budget</label>
+              <div className="relative flex items-center">
+                <Tag size={14} className="absolute left-4.5 text-[#DEAA38] pointer-events-none" />
+                <select 
+                  value={searchBudget} 
+                  onChange={(e) => {
+                    setSearchBudget(e.target.value);
+                    if (e.target.value === '300-400') setBudgetFilter(400);
+                    else if (e.target.value === '400-600') setBudgetFilter(600);
+                    else if (e.target.value === '600-800') setBudgetFilter(800);
+                    else if (e.target.value === '800+') setBudgetFilter(1000);
+                    else setBudgetFilter(1000);
+                  }}
+                  className="w-full bg-slate-50 border border-slate-150 rounded-xl pl-10 pr-9 py-3 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer appearance-none"
+                >
+                  <option value="">Budget</option>
+                  <option value="300-400">₹300 - ₹400</option>
+                  <option value="400-600">₹400 - ₹600</option>
+                  <option value="600-800">₹600 - ₹800</option>
+                  <option value="800+">₹800+</option>
+                </select>
+                <ChevronRight size={10} className="absolute right-3.5 rotate-90 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* Large Find Caterers Button */}
+          <button 
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('explore-marketplace');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="w-full mt-2 bg-[#051410] hover:bg-[#102e25] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+          >
+            <span>Find Caterers</span>
+            <Search size={14} className="text-[#DEAA38]" />
+          </button>
+        </div>
+
+        {/* 4. Popular Searches */}
+        <div className="mb-6 text-left">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2.5">Popular Searches</span>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { name: 'Wedding Catering', keyword: 'Wedding' },
+              { name: 'Birthday Party', keyword: 'Birthday' },
+              { name: 'Corporate Events', keyword: 'Corporate' },
+              { name: 'House Warming', keyword: 'Housewarming' },
+              { name: 'Engagement', keyword: 'Engagement' }
+            ].map((chip) => (
+              <button
+                key={chip.name}
+                type="button"
+                onClick={() => {
+                  setSearchKeyword(chip.keyword);
+                  toggleOccasionFilter(chip.keyword);
+                  const el = document.getElementById('explore-marketplace');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/60 rounded-full text-[11px] font-bold text-slate-600 transition-colors cursor-pointer"
+              >
+                {chip.name}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* 7. Premium Caterers Listing Section */}
+        <div id="explore-marketplace" className="py-4 border-t border-slate-100 text-left">
+          <div className="flex flex-col gap-1.5 mb-5">
+            <h2 className="text-xl font-display font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
+              Explore <span className="text-[#DEAA38]">Premium</span> Caterers
+            </h2>
+            <div className="flex items-center justify-between text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+              <span>Hyderabad, Telangana, India</span>
+              <span className="text-slate-500">{filteredCaterers.length} Caterers Found</span>
+            </div>
+          </div>
+
+          {/* Sticky Filter & Sort Row on Mobile */}
+          <div className="flex gap-2.5 mb-5">
+            {/* Filter Toggle Button */}
+            <button 
+              type="button"
+              onClick={() => setIsMobileFiltersOpen(true)}
+              className="flex-1 py-3 bg-[#051410] hover:bg-[#112921] text-white rounded-xl font-bold text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-2 border border-[#DEAA38]/10 cursor-pointer active:scale-95"
+            >
+              <Filter size={14} className="text-[#DEAA38]" />
+              <span>FILTERS</span>
+              {(occasionFilter.length > 0 || budgetFilter < 1000 || isVerifiedOnly || isLiveCounters || ratingFilter > 0 || cuisineFilter !== '') && (
+                <span className="w-4.5 h-4.5 bg-[#DEAA38] text-[#051410] rounded-full text-[9px] font-black flex items-center justify-center">
+                  {Number(occasionFilter.length > 0) + Number(budgetFilter < 1000) + Number(isVerifiedOnly) + Number(isLiveCounters) + Number(ratingFilter > 0) + Number(cuisineFilter !== '')}
+                </span>
+              )}
+            </button>
+
+            {/* Sort Selector */}
+            <div className="relative flex items-center bg-white border border-slate-200 rounded-xl px-3 flex-1 shadow-3xs">
+              <span className="text-[10px] text-slate-400 font-extrabold uppercase mr-1 whitespace-nowrap">Sort:</span>
+              <select 
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="text-xs font-bold text-slate-700 focus:outline-none bg-transparent cursor-pointer flex-1 appearance-none pr-5 py-3"
+              >
+                <option value="Popularity">Popularity</option>
+                <option value="Newest First">Newest First</option>
+                <option value="Price: Low to High">Price: Low to High</option>
+                <option value="Price: High to Low">Price: High to Low</option>
+                <option value="Highest Rated">Highest Rated</option>
+              </select>
+              <ChevronRight size={10} className="absolute right-3 rotate-90 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Active Filter Badges */}
+          {(occasionFilter.length > 0 || budgetFilter < 1000 || isVerifiedOnly || isLiveCounters || ratingFilter > 0 || cuisineFilter !== '') && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {cuisineFilter && (
+                <span className="px-2.5 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded-full flex items-center gap-1">
+                  Food: {cuisineFilter} <button type="button" onClick={() => setCuisineFilter('')} className="text-slate-400 hover:text-slate-600"><X size={10} /></button>
+                </span>
+              )}
+              {occasionFilter.map((occ) => (
+                <span key={occ} className="px-2.5 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded-full flex items-center gap-1">
+                  {occ} <button type="button" onClick={() => toggleOccasionFilter(occ)} className="text-slate-400 hover:text-slate-600"><X size={10} /></button>
+                </span>
+              ))}
+              {budgetFilter < 1000 && (
+                <span className="px-2.5 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded-full flex items-center gap-1">
+                  ≤ ₹{budgetFilter} <button type="button" onClick={() => setBudgetFilter(1000)} className="text-slate-400 hover:text-slate-600"><X size={10} /></button>
+                </span>
+              )}
+              {isVerifiedOnly && (
+                <span className="px-2.5 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded-full flex items-center gap-1">
+                  Verified <button type="button" onClick={() => setIsVerifiedOnly(false)} className="text-slate-400 hover:text-slate-600"><X size={10} /></button>
+                </span>
+              )}
+              {isLiveCounters && (
+                <span className="px-2.5 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded-full flex items-center gap-1">
+                  Live Counter <button type="button" onClick={() => setIsLiveCounters(false)} className="text-slate-400 hover:text-slate-600"><X size={10} /></button>
+                </span>
+              )}
+              {ratingFilter > 0 && (
+                <span className="px-2.5 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded-full flex items-center gap-1">
+                  ⭐️ {ratingFilter}+ <button type="button" onClick={() => setRatingFilter(0)} className="text-slate-400 hover:text-slate-600"><X size={10} /></button>
+                </span>
+              )}
+              <button type="button" onClick={clearAllFilters} className="text-[10px] font-bold text-rose-600 hover:underline">Clear All</button>
+            </div>
+          )}
+
+          {/* Caterers Cards List */}
+          <div className="space-y-5">
+            {filteredCaterers.length === 0 ? (
+              <div className="bg-white rounded-3xl p-10 text-center border border-slate-150 max-w-sm mx-auto shadow-3xs">
+                <ChefHat className="text-slate-300 w-10 h-10 mx-auto mb-3" />
+                <h3 className="text-sm font-bold text-slate-900 mb-1">No matching caterers</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">Try adjusting filters or typing a different search term.</p>
+                <button 
+                  type="button"
+                  onClick={clearAllFilters} 
+                  className="mt-4 px-4.5 py-2 bg-[#051410] text-white font-bold text-xs rounded-xl active:bg-[#0f2922] transition-colors"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              filteredCaterers.map((caterer) => (
+                <div 
+                  key={caterer.id}
+                  className="bg-white rounded-3xl border border-slate-150 hover:border-[#DEAA38]/40 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden relative"
+                >
+                  {/* Image/Slider Header */}
+                  <div className="relative h-[200px] w-full overflow-hidden shrink-0">
+                    <CardImageSlider images={caterer.images} name={caterer.name} />
+                    
+                    {/* Brand logo overlapping on bottom-left */}
+                    <div className="absolute bottom-3 left-3 w-12 h-12 bg-white rounded-full p-0.5 border border-[#DEAA38] shadow-md z-10 flex items-center justify-center overflow-hidden">
+                      {caterer.logo ? (
+                        <SafeImage src={caterer.logo} alt="Logo" className="w-full h-full object-contain rounded-full" fallbackType="avatar" />
+                      ) : (
+                        <div className="w-full h-full bg-amber-50 rounded-full flex items-center justify-center">
+                          <span className="font-display font-black text-[#DEAA38] text-xs uppercase">
+                            {(caterer.name || 'CR').substring(0, 2)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Dynamic Platform Badges */}
+                    {caterer.badges && caterer.badges.length > 0 ? (
+                      <div className="absolute top-3 left-3 flex flex-wrap gap-1 z-10 max-w-[85%]">
+                        {caterer.badges.filter((b: any) => b.is_active).map((b: any) => {
+                          const styleCfg = STYLE_VARIANT_CONFIG[b.style_variant as BadgeStyleVariant] || STYLE_VARIANT_CONFIG.emerald;
+                          const BadgeIcon = getBadgeIconComponent(b.icon);
+                          return (
+                            <span
+                              key={b.id || b.slug}
+                              className={cn(
+                                styleCfg.mobileClasses,
+                                "backdrop-blur-xs px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wide shadow-sm flex items-center gap-0.5"
+                              )}
+                            >
+                              <BadgeIcon size={8} className="shrink-0 stroke-[2.5]" />
+                              <span>{b.label}</span>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="absolute top-3 left-3 flex flex-wrap gap-1 z-10">
+                        {caterer.isVerified && (
+                          <span className="bg-emerald-500/90 backdrop-blur-xs text-white px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wide shadow-sm">
+                            ✓ Verified
+                          </span>
+                        )}
+                        {caterer.isPremium && (
+                          <span className="bg-[#DEAA38]/95 backdrop-blur-xs text-white px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wide shadow-sm">
+                            ✦ Premium
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Wishlist button */}
+                    <button type="button" className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-full flex justify-center items-center text-slate-400 hover:text-rose-500 transition-colors shadow-sm z-10">
+                      <Heart size={14} />
+                    </button>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="p-4 pt-5 text-left flex flex-col justify-between flex-1">
+                    <div>
+                      {/* Name & Rating Row */}
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <h3 className="text-base font-display font-extrabold text-slate-900 leading-snug flex items-center gap-1">
+                          {caterer.name}
+                          <span className="w-3.5 h-3.5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[7px] font-bold shrink-0">✓</span>
+                        </h3>
+                        <div className="flex items-center gap-0.5 text-xs font-bold text-slate-800 shrink-0">
+                          <Star size={12} className="text-[#DEAA38] fill-[#DEAA38]" />
+                          <span>{Number(caterer.rating).toFixed(1)}</span>
+                          <span className="text-slate-400 font-normal">({caterer.reviewCount})</span>
+                        </div>
+                      </div>
+
+                      {/* Location & Distance */}
+                      <div className="flex items-center gap-1 text-slate-500 text-xs mb-3">
+                        <MapPin size={11} className="text-slate-400 shrink-0" />
+                        <span className="truncate max-w-[180px]">{caterer.location}</span>
+                        {caterer.distanceKm !== undefined && caterer.distanceKm !== null && (
+                          <span className="text-[#b47a00] bg-amber-500/5 px-1.5 py-0.5 rounded font-mono text-[9px] shrink-0">
+                            📍 {caterer.distanceKm.toFixed(1)} KM
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Dietary tags */}
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="px-2 py-0.5 text-[8px] font-black tracking-wider uppercase bg-slate-50 text-slate-500 rounded border border-slate-150 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Veg
+                        </span>
+                        <span className="px-2 py-0.5 text-[8px] font-black tracking-wider uppercase bg-slate-50 text-slate-500 rounded border border-slate-150 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Non-Veg
+                        </span>
+                        <span className="px-2 py-0.5 text-[8px] font-black tracking-wider uppercase bg-slate-50 text-slate-500 rounded border border-slate-150 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#DEAA38]" /> Live Counter
+                        </span>
+                      </div>
+
+                      {/* Events/Years performance metrics */}
+                      <div className="flex items-center gap-3.5 text-[11px] font-bold text-slate-500 mb-3 border-b border-slate-100 pb-2.5">
+                        <div className="flex items-center gap-1"><Users size={11} className="text-slate-400" /> 800+ Events</div>
+                        <div className="flex items-center gap-1"><Award size={11} className="text-slate-400" /> {caterer.years || '5+ Years'}</div>
+                      </div>
+                    </div>
+
+                    {/* Bottom CTA Row: Starting Price & Stacking Buttons */}
+                    <div className="mt-2 pt-2 border-t border-slate-100 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-0.5">Starting from</p>
+                          <p className="font-extrabold text-base text-slate-900 leading-none">
+                            ₹{caterer.startingPrice} <span className="text-[10px] font-normal text-slate-400">/ plate</span>
+                          </p>
+                        </div>
+                        <p className="text-[9px] text-slate-400 font-bold">Min. {caterer.minimumGuests || 50} Plates</p>
+                      </div>
+
+                      {/* Single Full-Width CTA Button */}
+                      <div className="w-full">
+                        <button 
+                          type="button"
+                          onClick={() => navigate(`/caterer/${caterer.id}?tab=menu`)}
+                          className="w-full py-3 bg-[#051410] text-white rounded-lg text-xs font-bold hover:bg-[#112921] transition-colors shadow-sm flex items-center justify-center gap-1 cursor-pointer active:scale-95"
+                        >
+                          <span>View Menu</span>
+                          <ArrowRight size={11} className="text-[#DEAA38]" />
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* 8. Filters Bottom Sheet / Drawer */}
+        <AnimatePresence>
+          {isMobileFiltersOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileFiltersOpen(false)}
+                className="fixed inset-0 bg-black/60 z-50 backdrop-blur-xs"
+              />
+              {/* Sheet */}
+              <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[32px] max-h-[85vh] overflow-y-auto z-50 p-6 shadow-2xl flex flex-col text-left"
+              >
+                {/* Header indicator */}
+                <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-5 shrink-0" />
+
+                <div className="flex justify-between items-center mb-6 shrink-0">
+                  <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: 'Playfair Display, Georgia, serif' }}>
+                    Filter <span className="text-[#DEAA38]">Caterers</span>
+                  </h3>
+                  <button 
+                    type="button"
+                    onClick={() => setIsMobileFiltersOpen(false)}
+                    className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                {/* Content list */}
+                <div className="space-y-6 flex-1 overflow-y-auto pb-6 pr-1">
+                  {/* 1. Cuisine Preference */}
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 leading-none">Cuisine Preference</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Veg', 'Non-Veg'].map((option) => {
+                        const isSelected = cuisineFilter === option;
+                        return (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => setCuisineFilter(prev => prev === option ? '' : option)}
+                            className={cn(
+                              "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer",
+                              isSelected 
+                                ? "bg-[#032a1e] text-white border-[#032a1e]" 
+                                : "bg-slate-50 text-slate-700 border-slate-100 hover:bg-slate-100/50"
+                            )}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 2. Occasion */}
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 leading-none">Occasion</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Wedding', 'Reception', 'Birthday Party', 'Corporate Events', 'House Warming', 'Engagement', 'Baby Shower', 'Festival'].map((occ) => {
+                        const isSelected = occasionFilter.includes(occ);
+                        return (
+                          <button
+                            key={occ}
+                            type="button"
+                            onClick={() => toggleOccasionFilter(occ)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer",
+                              isSelected 
+                                ? "bg-[#032a1e] text-white border-[#032a1e]" 
+                                : "bg-slate-50 text-slate-700 border-slate-100 hover:bg-slate-100/50"
+                            )}
+                          >
+                            {occ}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 3. Budget slider */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2.5">
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Max Budget (per plate)</h4>
+                      <span className="text-xs font-extrabold text-slate-800">₹{budgetFilter === 1000 ? "Any" : `≤ ₹${budgetFilter}`}</span>
+                    </div>
+                    <input 
+                      type="range"
+                      min="300"
+                      max="1000"
+                      step="50"
+                      value={budgetFilter}
+                      onChange={(e) => setBudgetFilter(Number(e.target.value))}
+                      className="w-full accent-[#DEAA38] cursor-pointer mb-2"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-400 font-bold leading-none mb-3">
+                      <span>₹300</span>
+                      <span>₹650</span>
+                      <span>₹1000+</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[400, 600, 800, 1000].map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => setBudgetFilter(v)}
+                          className={cn(
+                            "py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer text-center",
+                            budgetFilter === v 
+                              ? "bg-[#032a1e] border-transparent text-white" 
+                              : "bg-slate-50 border-slate-150 text-slate-600 hover:border-slate-300"
+                          )}
+                        >
+                          ₹{v}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. Guests Capacity */}
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 leading-none">Guests Capacity</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Upto 50', '50 - 105', '100 - 200', '200 - 500', '500 - 1000', '1000+'].map((cap) => {
+                        const isSelected = guestsFilter.includes(cap);
+                        return (
+                          <button
+                            key={cap}
+                            type="button"
+                            onClick={() => {
+                              setGuestsFilter(prev => prev.includes(cap) ? prev.filter(g => g !== cap) : [...prev, cap]);
+                            }}
+                            className={cn(
+                              "px-3 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer",
+                              isSelected 
+                                ? "bg-[#032a1e] text-white border-[#032a1e]" 
+                                : "bg-slate-50 text-slate-700 border-slate-100 hover:bg-slate-100/50"
+                            )}
+                          >
+                            {cap}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 5. Cuisines */}
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 leading-none">Cuisines</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {CUISINES.map((cui) => {
+                        const isSelected = searchKeyword === cui.name;
+                        return (
+                          <button
+                            key={cui.name}
+                            type="button"
+                            onClick={() => setSearchKeyword(isSelected ? '' : cui.name)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer",
+                              isSelected 
+                                ? "bg-[#032a1e] text-white border-[#032a1e]" 
+                                : "bg-slate-50 text-slate-700 border-slate-100 hover:bg-slate-100/50"
+                            )}
+                          >
+                            {cui.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 6. Rating Filter */}
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 leading-none">Minimum Rating</h4>
+                    <div className="flex gap-2">
+                      {[0, 4.0, 4.5, 4.8].map((ratingVal) => (
+                        <button
+                          key={ratingVal}
+                          type="button"
+                          onClick={() => setRatingFilter(ratingVal)}
+                          className={cn(
+                            "flex-1 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-1",
+                            ratingFilter === ratingVal
+                              ? "bg-[#032a1e] border-transparent text-white"
+                              : "bg-slate-50 border-slate-150 text-slate-600 hover:border-slate-300"
+                          )}
+                        >
+                          {ratingVal === 0 ? "Any" : (
+                            <>
+                              <span>{ratingVal}</span>
+                              <Star size={10} className="fill-[#DEAA38] text-[#DEAA38]" />
+                            </>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 7. Sort Options */}
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 leading-none">Sort By</h4>
+                    <div className="relative flex items-center">
+                      <select
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-150 rounded-xl px-4 py-3 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer appearance-none"
+                      >
+                        <option value="Popularity">Popularity</option>
+                        <option value="Newest First">Newest First</option>
+                        <option value="Price: Low to High">Price: Low to High</option>
+                        <option value="Price: High to Low">Price: High to Low</option>
+                        <option value="Highest Rated">Highest Rated</option>
+                      </select>
+                      <ChevronRight size={12} className="absolute right-4 rotate-90 text-slate-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* 8. More toggle options (Verified / Live counters) */}
+                  <div className="space-y-4 pt-4 border-t border-slate-100">
+                    <label className="flex items-center justify-between cursor-pointer select-none">
+                      <div>
+                        <p className="text-xs font-bold text-slate-800 leading-tight">Verified Caterers Only</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5 leading-none">Show only trusted and verified vendors</p>
+                      </div>
+                      <input 
+                        type="checkbox" 
+                        checked={isVerifiedOnly}
+                        onChange={(e) => setIsVerifiedOnly(e.target.checked)}
+                        className="w-5 h-5 rounded border-slate-300 text-brand-gold-500 focus:ring-brand-gold-500/20 cursor-pointer"
+                      />
+                    </label>
+
+                    <label className="flex items-center justify-between cursor-pointer select-none">
+                      <div>
+                        <p className="text-xs font-bold text-slate-800 leading-tight">Live Counters Available</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5 leading-none">Show vendors with live cooking stalls</p>
+                      </div>
+                      <input 
+                        type="checkbox" 
+                        checked={isLiveCounters}
+                        onChange={(e) => setIsLiveCounters(e.target.checked)}
+                        className="w-5 h-5 rounded border-slate-300 text-brand-gold-500 focus:ring-brand-gold-500/20 cursor-pointer"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-4 border-t border-slate-100 flex gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearAllFilters();
+                      setIsMobileFiltersOpen(false);
+                    }}
+                    className="flex-1 py-3.5 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl active:bg-slate-50 transition-colors cursor-pointer"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileFiltersOpen(false)}
+                    className="flex-1 py-3.5 bg-[#032a1e] text-white font-bold text-xs rounded-xl hover:bg-[#05402e] transition-colors shadow-md cursor-pointer"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Map selection Modal */}
+        <MapPickerModal
+          isOpen={isExploreMapOpen}
+          onClose={() => setIsExploreMapOpen(false)}
+          initialLat={customerLat || 17.3850}
+          initialLng={customerLng || 78.4867}
+          initialAddress={searchLocation === 'Hyderabad' ? '' : searchLocation}
+          onSave={(data) => {
+            setSearchLocation(data.address);
+            setCustomerLat(data.latitude);
+            setCustomerLng(data.longitude);
+            if (data.latitude) localStorage.setItem('customer_lat', String(data.latitude));
+            if (data.longitude) localStorage.setItem('customer_lng', String(data.longitude));
+            if (data.address) localStorage.setItem('customer_address', data.address);
+            setIsExploreMapOpen(false);
+          }}
+          title="Choose Your Event Venue Location"
+        />
+
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FFFDFB] font-sans pt-14 sm:pt-[58px]">
+      
+      {/* 1. Explore Page Header: Clean & Solid Deep Emerald Green Header (No obsolete photo background or separate builder) */}
+      <div 
+        className="relative w-full py-6 md:py-8 overflow-hidden text-center select-none"
+        style={{
+          background: 'radial-gradient(ellipse 90% 80% at 50% 25%, #053D2E 0%, #03281E 60%, #021B14 100%)'
+        }}
+      >
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+          <h1 
+            className="text-2xl sm:text-3xl md:text-[32px] font-display font-bold text-white tracking-tight leading-[1.2] mb-1.5"
+            style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
+          >
+            Explore <span className="text-[#DEAA38]">Caterers</span>
+          </h1>
+          <p className="text-white/85 text-xs sm:text-[13px] max-w-lg mx-auto font-sans font-medium">
+            Discover verified caterers, compare customizable packages, and filter menus for your special occasion.
+          </p>
+        </div>
+      </div>
+
+      {/* 2. Explore Premium Caterers Section - 1:1 Design Layout with Left Sidebar & Horizontal Cards */}
+      <section id="explore-marketplace" className="py-5 sm:py-6 bg-white border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div 
+            className="flex flex-col md:flex-row md:items-end justify-between mb-3 pb-2 border-b border-slate-100"
+          >
+            <div>
+              <h2 className="text-lg md:text-xl font-display font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                Explore <span className="text-[#DEAA38]">Premium</span> Caterers
+              </h2>
+              <p className="text-slate-400 text-[10.5px] font-bold mt-0.5">Hyderabad, Telangana, India</p>
+            </div>
+            
+            <div className="flex items-center gap-2.5 mt-2 md:mt-0 justify-between md:justify-end w-full md:w-auto">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{filteredCaterers.length} Caterers Found</span>
+              <div className="flex items-center relative">
+                <span className="text-[11px] font-bold text-slate-500 mr-1.5 whitespace-nowrap">Sort by:</span>
+                 <select 
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="appearance-none bg-slate-50 border border-slate-200 rounded-full px-3 py-1 pr-7 text-[11px] font-bold text-slate-700 focus:outline-none cursor-pointer hover:border-brand-gold-500/50 transition-colors"
+                >
+                  <option value="Popularity">Popularity</option>
+                  <option value="Newest First">Newest First</option>
+                  <option value="Price: Low to High">Price: Low to High</option>
+                  <option value="Price: High to Low">Price: High to Low</option>
+                  <option value="Highest Rated">Highest Rated</option>
+                  {customerLat !== null && customerLng !== null && (
+                    <>
+                      <option value="Nearest First">Nearest First</option>
+                      <option value="Lowest Delivery Distance">Lowest Delivery Distance</option>
+                      <option value="Highest Rated Nearby">Highest Rated Nearby</option>
+                      <option value="Fastest Arrival">Fastest Arrival</option>
+                    </>
+                  )}
+                </select>
+                <ChevronRight size={11} className="absolute right-2.5 rotate-90 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* Polished Premium Horizontal Filter Bar matching Image */}
+          <div 
+            className="flex flex-wrap items-center justify-between gap-2 mb-3.5 bg-white p-1.5 sm:px-3 sm:py-1.5 rounded-lg md:rounded-full border border-slate-200/90 shadow-2xs"
+            style={{ marginTop: '-12px' }}
+          >
+            {/* Primary Filters (Left Group) */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+              
+              {/* 1. Cuisine Pills */}
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button 
+                  type="button"
+                  onClick={() => setCuisineFilter(prev => prev === 'Veg' ? '' : 'Veg')}
+                  className={cn(
+                    "px-3.5 py-1.5 text-xs font-bold rounded-full border flex items-center gap-1.5 transition-all cursor-pointer select-none",
+                    cuisineFilter === 'Veg'
+                      ? "bg-emerald-50 border-emerald-400 text-emerald-900 shadow-2xs font-bold"
+                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                  )}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span>Veg</span>
+                </button>
+                
+                <button 
+                  type="button"
+                  onClick={() => setCuisineFilter(prev => prev === 'Non-Veg' ? '' : 'Non-Veg')}
+                  className={cn(
+                    "px-3.5 py-1.5 text-xs font-bold rounded-full border flex items-center gap-1.5 transition-all cursor-pointer select-none",
+                    cuisineFilter === 'Non-Veg'
+                      ? "bg-rose-50 border-rose-400 text-rose-900 shadow-2xs font-bold"
+                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                  )}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+                  <span>Non-Veg</span>
+                </button>
+              </div>
+
+              {/* Vertical subtle divider */}
+              <div className="w-px h-5 bg-slate-200 mx-1 hidden lg:block" />
+
+              {/* 2. Budget (per plate) Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-600 whitespace-nowrap hidden sm:inline">Budget (per plate)</span>
+                <div className="relative flex items-center">
+                  <select 
+                    value={budgetFilter}
+                    onChange={(e) => setBudgetFilter(Number(e.target.value))}
+                    className={cn(
+                      "appearance-none bg-white border border-slate-200 rounded-full px-4 py-1.5 pr-8 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer hover:border-slate-300 transition-colors shadow-2xs",
+                      budgetFilter < 1000 && "border-[#DEAA38] bg-[#FCF8EE]/70 text-slate-900"
+                    )}
+                  >
+                    <option value={1000}>All Budgets</option>
+                    <option value={400}>₹300 - ₹400</option>
+                    <option value={600}>₹400 - ₹600</option>
+                    <option value={800}>₹300 - ₹800</option>
+                    <option value={1200}>₹800+</option>
+                  </select>
+                  <ChevronRight size={11} className="absolute right-3 rotate-90 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* 3. Guests Capacity Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-600 whitespace-nowrap hidden sm:inline">Guests Capacity</span>
+                <div className="relative flex items-center">
+                  <select 
+                    value={guestsFilter[0] || ""}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setGuestsFilter([e.target.value]);
+                      } else {
+                        setGuestsFilter([]);
+                      }
+                    }}
+                    className={cn(
+                      "appearance-none bg-white border border-slate-200 rounded-full px-4 py-1.5 pr-8 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer hover:border-slate-300 transition-colors shadow-2xs",
+                      guestsFilter.length > 0 && "border-[#DEAA38] bg-[#FCF8EE]/70 text-slate-900"
+                    )}
+                  >
+                    <option value="">All Guests</option>
+                    <option value="Upto 50">Upto 50</option>
+                    <option value="50 - 105">50 - 105</option>
+                    <option value="100 - 200">100 - 200</option>
+                    <option value="200 - 500">200 - 500</option>
+                    <option value="500 - 1000">500 - 1000</option>
+                    <option value="1000+">1000+</option>
+                  </select>
+                  <ChevronRight size={11} className="absolute right-3 rotate-90 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* 4. More Filters Toggle */}
+              <div className="relative" ref={moreFiltersRef}>
+                <button 
+                  type="button"
+                  onClick={() => setOpenMoreFilters(!openMoreFilters)}
+                  className={cn(
+                    "px-3.5 py-1.5 text-xs font-bold rounded-full border bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer flex items-center gap-1 shadow-2xs select-none",
+                    (occasionFilter.length > 0 || isVerifiedOnly || isLiveCounters || ratingFilter > 0) && "border-[#DEAA38] bg-[#FCF8EE] text-slate-900"
+                  )}
+                >
+                  <span>More Filters</span>
+                  <ChevronRight size={11} className={cn("transition-transform text-slate-400", openMoreFilters && "rotate-90")} />
+                </button>
+
+                {openMoreFilters && (
+                  <div className="absolute left-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 z-40 space-y-3.5 animate-in fade-in zoom-in-95">
+                    {/* Occasion select */}
+                    <div>
+                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Occasion</label>
+                      <select 
+                        value={occasionFilter[0] || ""}
+                        onChange={(e) => {
+                          if (e.target.value) setOccasionFilter([e.target.value]);
+                          else setOccasionFilter([]);
+                        }}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                      >
+                        <option value="">All Occasions</option>
+                        {['Wedding', 'Reception', 'Birthday Party', 'Corporate Events', 'House Warming', 'Engagement', 'Baby Shower', 'Festival'].map((occ) => (
+                          <option key={occ} value={occ}>{occ}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Verified & Live Counters Toggles */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                      <label className="flex items-center justify-between text-xs text-slate-700 font-bold cursor-pointer select-none">
+                        <span>Verified Caterers Only</span>
+                        <input 
+                          type="checkbox" 
+                          checked={isVerifiedOnly}
+                          onChange={(e) => setIsVerifiedOnly(e.target.checked)}
+                          className="w-4 h-4 rounded border-slate-300 text-brand-gold-500 focus:ring-brand-gold-500/20 cursor-pointer"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between text-xs text-slate-700 font-bold cursor-pointer select-none">
+                        <span>Live Counters Available</span>
+                        <input 
+                          type="checkbox" 
+                          checked={isLiveCounters}
+                          onChange={(e) => setIsLiveCounters(e.target.checked)}
+                          className="w-4 h-4 rounded border-slate-300 text-brand-gold-500 focus:ring-brand-gold-500/20 cursor-pointer"
+                        />
+                      </label>
+                    </div>
+
+                    {/* Minimum Rating */}
+                    <div className="pt-2 border-t border-slate-100">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Rating</span>
+                        <span className="text-xs font-bold text-slate-700">{ratingFilter > 0 ? `${ratingFilter}+ Stars` : 'Any'}</span>
+                      </div>
+                      <div className="flex gap-1.5">
+                        {[0, 4, 4.5].map((rt) => (
+                          <button
+                            key={rt}
+                            type="button"
+                            onClick={() => setRatingFilter(rt)}
+                            className={cn(
+                              "flex-1 py-1 text-xs font-bold rounded-lg border transition-all cursor-pointer",
+                              ratingFilter === rt
+                                ? "bg-[#051410] border-[#051410] text-white"
+                                : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                            )}
+                          >
+                            {rt === 0 ? 'Any' : `${rt}★`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            {/* Action Buttons (Right Group) */}
+            <div className="flex items-center gap-3 shrink-0 ml-auto">
+              {(occasionFilter.length > 0 || guestsFilter.length > 0 || budgetFilter < 1000 || isVerifiedOnly || isLiveCounters || ratingFilter > 0 || cuisineFilter !== '' || (searchKeyword && searchKeyword.trim() !== '')) && (
+                <button 
+                  type="button"
+                  onClick={clearAllFilters}
+                  className="text-xs font-bold text-rose-600 hover:text-rose-800 transition-colors cursor-pointer px-2 py-1 select-none whitespace-nowrap"
+                >
+                  Clear All
+                </button>
+              )}
+
+              <button 
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('explore-marketplace');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-6 py-2 text-xs font-bold text-white bg-[#051410] hover:bg-[#0f2922] rounded-full transition-all shadow-sm cursor-pointer uppercase tracking-wider border border-[#DEAA38]/20 active:scale-95 whitespace-nowrap"
+              >
+                APPLY FILTERS
+              </button>
+            </div>
+
+          </div>
+
+          {/* Active filter badge tags */}
+          {(occasionFilter.length > 0 || guestsFilter.length > 0 || budgetFilter < 1000 || isVerifiedOnly || isLiveCounters || ratingFilter > 0 || cuisineFilter !== '') && (
+            <div className="flex flex-wrap items-center gap-2 mb-6 text-xs text-slate-600 font-bold">
+              <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mr-1">Active:</span>
+              {cuisineFilter && (
+                <span key="cuisine" className="px-3 py-1 bg-amber-500/10 border border-[#DEAA38]/40 text-slate-800 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  Food: {cuisineFilter} <button type="button" onClick={() => setCuisineFilter('')} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={12} /></button>
+                </span>
+              )}
+              {occasionFilter.map((occ) => (
+                <span key={occ} className="px-3 py-1 bg-amber-500/10 border border-[#DEAA38]/40 text-slate-800 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  Occasion: {occ} <button type="button" onClick={() => toggleOccasionFilter(occ)} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={12} /></button>
+                </span>
+              ))}
+              {guestsFilter.map((gst) => (
+                <span key={gst} className="px-3 py-1 bg-amber-500/10 border border-[#DEAA38]/40 text-slate-800 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  Guests: {gst} <button type="button" onClick={() => setGuestsFilter([])} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={12} /></button>
+                </span>
+              ))}
+              {budgetFilter < 1000 && (
+                <span key="budget" className="px-3 py-1 bg-amber-500/10 border border-[#DEAA38]/40 text-slate-800 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  Budget: ≤ ₹{budgetFilter} <button type="button" onClick={() => setBudgetFilter(1000)} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={12} /></button>
+                </span>
+              )}
+              {isVerifiedOnly && (
+                <span key="verified" className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  Verified Only <button type="button" onClick={() => setIsVerifiedOnly(false)} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={12} /></button>
+                </span>
+              )}
+              {isLiveCounters && (
+                <span key="live" className="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  Live Counters <button type="button" onClick={() => setIsLiveCounters(false)} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={12} /></button>
+                </span>
+              )}
+              {ratingFilter > 0 && (
+                <span key="rating" className="px-3 py-1 bg-slate-100 border border-slate-200 text-slate-700 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  ⭐ {ratingFilter}+ <button type="button" onClick={() => setRatingFilter(0)} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={12} /></button>
+                </span>
+              )}
+              <button type="button" onClick={clearAllFilters} className="text-rose-600 hover:underline hover:text-rose-700 ml-1.5 cursor-pointer">
+                Clear All
+              </button>
+            </div>
+          )}
+
+          {/* Caterers Cards List - Full Width Horizontal Cards */}
+          <div className="w-full space-y-2.5">
+              {filteredCaterers.length === 0 ? (
+                <div className="bg-[#FFFDFB] rounded-2xl p-8 text-center border border-slate-100 max-w-md mx-auto">
+                  <ChefHat className="text-slate-300 w-10 h-10 mx-auto mb-2" />
+                  <h3 className="text-sm font-display font-extrabold text-slate-900 mb-0.5">No matching caterers found</h3>
+                  <p className="text-slate-400 text-xs font-semibold">Try adjusting your budget slider or occasion filters.</p>
+                  <button 
+                    type="button"
+                    onClick={clearAllFilters} 
+                    className="mt-3 px-4 py-1.5 bg-[#0f2922] text-white font-bold text-xs rounded-lg hover:bg-[#173D32] transition-colors"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              ) : (
+                filteredCaterers.map((caterer) => (
+                  <div 
+                    key={caterer.id}
+                    className="bg-white rounded-xl border border-slate-200/80 hover:border-brand-gold-500/60 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col md:flex-row overflow-hidden relative group max-h-none md:max-h-[175px]"
+                  >
+                    {/* Image Column */}
+                    <div className="relative w-full md:w-[185px] h-32 md:h-auto shrink-0 overflow-hidden">
+                      <CardImageSlider images={caterer.images} name={caterer.name} />
+                      
+                      {/* Overlapping circular brand logo placed on the image like Image 1 */}
+                      <div className="absolute bottom-2 left-2 w-9 h-9 bg-white rounded-full p-0.5 border border-[#DEAA38] shadow-sm z-10 flex items-center justify-center overflow-hidden">
+                        {caterer.logo ? (
+                          <SafeImage src={caterer.logo} alt="Logo" className="w-full h-full object-contain rounded-full" fallbackType="avatar" />
+                        ) : (
+                          <span className="font-display font-black text-[#DEAA38] text-[10px] uppercase">
+                            {(caterer.name || 'CR').substring(0, 2)}
+                          </span>
+                        )}
+                      </div>
+
+                      <button type="button" className="absolute top-2 right-2 w-6 h-6 bg-white/90 backdrop-blur-md rounded-full flex justify-center items-center text-slate-400 hover:text-rose-500 transition-colors shadow-2xs z-10">
+                        <Heart size={11} />
+                      </button>
+                    </div>
+
+                    {/* Middle Column Details */}
+                    <div className="flex-1 p-2.5 md:p-3 flex flex-col justify-between text-left md:pr-2.5">
+                      <div>
+                        {/* Dynamic Platform Badges/Tags */}
+                        {caterer.badges && caterer.badges.length > 0 ? (
+                          <div className="flex flex-wrap gap-1 mb-1 items-center">
+                            {caterer.badges.filter((b: any) => b.is_active).map((b: any) => {
+                              const styleCfg = STYLE_VARIANT_CONFIG[b.style_variant as BadgeStyleVariant] || STYLE_VARIANT_CONFIG.emerald;
+                              const BadgeIcon = getBadgeIconComponent(b.icon);
+                              return (
+                                <span
+                                  key={b.id || b.slug}
+                                  className={cn(
+                                    styleCfg.desktopClasses,
+                                    "px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider flex items-center gap-0.5 shadow-2xs"
+                                  )}
+                                >
+                                  <BadgeIcon size={8} className="shrink-0 stroke-[2.5]" />
+                                  <span>{b.label}</span>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap gap-1 mb-1 items-center">
+                            {caterer.isVerified && (
+                              <span className="bg-emerald-50 text-emerald-800 border border-emerald-100 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">
+                                ✓ Verified
+                              </span>
+                            )}
+                            {caterer.isPremium && (
+                              <span className="bg-amber-50 text-amber-800 border border-amber-100 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">
+                                ✦ Premium Partner
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Title with verified check icon */}
+                        <h3 className="text-sm md:text-[15px] font-display font-extrabold text-slate-900 group-hover:text-brand-gold-600 transition-colors leading-tight mb-0.5 flex items-center gap-1">
+                          {caterer.name}
+                          <span className="w-3.5 h-3.5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[7px] font-bold shadow-xs shrink-0">✓</span>
+                        </h3>
+
+                        {/* Rating, Reviews & Location info */}
+                        <div className="flex flex-wrap items-center text-slate-500 text-[10.5px] font-semibold mb-1 gap-1.5">
+                          <span className="flex items-center gap-0.5">
+                            <Star size={10} className="text-[#DEAA38] fill-[#DEAA38]" /> 
+                            <span>{Number(caterer.rating).toFixed(1)}</span>
+                            <span className="text-slate-400 font-normal text-[10px]">({caterer.reviewCount.toLocaleString()})</span>
+                          </span>
+                          <span className="text-slate-300">|</span>
+                          <span className="flex items-center gap-0.5 text-[10px]"><MapPin size={10} className="text-slate-400" /> {caterer.location}</span>
+                          {caterer.distanceKm !== undefined && caterer.distanceKm !== null && (
+                            <>
+                              <span className="text-slate-300">|</span>
+                              <span className="flex items-center gap-0.5 text-[#b47a00] bg-amber-500/5 px-1.5 py-0.5 rounded-full font-mono border border-amber-500/10 text-[9.5px]">
+                                📍 {caterer.distanceKm.toFixed(1)} KM • {caterer.drivingTimeMins}m
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Dietary preferences pills */}
+                        <div className="flex flex-wrap gap-1 mb-1">
+                          <span className="px-1 py-0.5 text-[7.5px] font-bold tracking-wider uppercase bg-slate-50 text-slate-600 rounded border border-slate-150 flex items-center gap-0.5">
+                            <div className="w-1 h-1 rounded-full bg-emerald-500" /> Veg
+                          </span>
+                          <span className="px-1 py-0.5 text-[7.5px] font-bold tracking-wider uppercase bg-slate-50 text-slate-600 rounded border border-slate-150 flex items-center gap-0.5">
+                            <div className="w-1 h-1 rounded-full bg-rose-500" /> Non-Veg
+                          </span>
+                          <span className="px-1 py-0.5 text-[7.5px] font-bold tracking-wider uppercase bg-slate-50 text-slate-600 rounded border border-slate-150 flex items-center gap-0.5">
+                            <div className="w-1 h-1 rounded-full bg-[#DEAA38]" /> Live Counters
+                          </span>
+                        </div>
+
+                        {/* Micro performance indicators */}
+                        <div className="flex items-center gap-2.5 text-[9.5px] font-bold text-slate-500 mb-1">
+                          <div className="flex items-center gap-0.5"><Users size={10} className="text-slate-400" /> 800+ Events</div>
+                          <div className="flex items-center gap-0.5"><Award size={10} className="text-slate-400" /> {caterer.years || '5+ Years'}</div>
+                        </div>
+                      </div>
+
+                      <p className="text-slate-400 text-[9px] font-bold uppercase tracking-wider line-clamp-1 border-t border-slate-100 pt-1">
+                        Speciality: <span className="text-slate-600 font-semibold">Hyderabadi, North Indian, Chinese</span>
+                      </p>
+                    </div>
+
+                    {/* Right Column: Pricing & Action buttons */}
+                    <div className="w-full md:w-[140px] p-2.5 md:p-3 bg-slate-50/50 md:border-l border-dashed border-slate-200 flex flex-col sm:flex-row md:flex-col justify-between md:justify-center items-center md:text-center shrink-0 gap-2 md:gap-0">
+                      <div className="text-left md:text-center flex sm:flex-col justify-between sm:justify-start items-center sm:items-start md:items-center w-full sm:w-auto md:w-full mb-0 md:mb-2">
+                        <div>
+                          <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-0.5">Starting from</p>
+                          <p className="font-display font-extrabold text-lg md:text-xl text-slate-900 leading-none">
+                            ₹{caterer.startingPrice} 
+                            <span className="text-[9px] font-sans font-medium text-slate-400 inline-block ml-0.5">/ plate</span>
+                          </p>
+                        </div>
+                        <p className="text-[8.5px] text-slate-400 font-semibold mt-0.5 whitespace-nowrap">Min. {caterer.minimumGuests || 50} Plates</p>
+                      </div>
+
+                      <div className="w-full">
+                        <button 
+                          type="button"
+                          onClick={() => navigate(`/caterer/${caterer.id}?tab=menu`)} 
+                          className="w-full py-2 bg-[#0f2922] hover:bg-[#173D32] text-white rounded-md font-bold text-[10.5px] uppercase tracking-wider transition-all cursor-pointer flex justify-center items-center min-h-[32px] active:scale-95 shadow-2xs"
+                        >
+                          View Menu
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                ))
+              )}
+            </div>
+        </div>
+      </section>
+
+      <MapPickerModal
+        isOpen={isExploreMapOpen}
+        onClose={() => setIsExploreMapOpen(false)}
+        initialLat={customerLat || 17.3850}
+        initialLng={customerLng || 78.4867}
+        initialAddress={searchLocation === 'Hyderabad' ? '' : searchLocation}
+        onSave={(data) => {
+          setSearchLocation(data.address);
+          setCustomerLat(data.latitude);
+          setCustomerLng(data.longitude);
+          if (data.latitude) localStorage.setItem('customer_lat', String(data.latitude));
+          if (data.longitude) localStorage.setItem('customer_lng', String(data.longitude));
+          if (data.address) localStorage.setItem('customer_address', data.address);
+          setIsExploreMapOpen(false);
+        }}
+        title="Choose Your Event Venue Location"
+      />
+
+    </div>
+  );
+}

@@ -1,0 +1,2688 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Package, Activity, ChefHat, Bell, TrendingUp, CalendarDays, CheckCircle, CheckCircle2, XCircle, RefreshCw, Clock, Settings, ShoppingBag, CreditCard, User, Image as ImageIcon, MapPin, Search, Menu as MenuIcon, Edit, ChevronRight, X, Save, UploadCloud, ChevronLeft, Star, Trash2, Printer, Phone, Mail } from 'lucide-react';
+import { cn, compressImageFile } from '../lib/utils';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from '../components/Toast';
+import CatererMenuBuilder from '../components/CatererMenuBuilder';
+import CatererMobileDashboard from '../components/CatererMobileDashboard';
+import { getSupabase, uploadToSupabaseBucket } from '../lib/supabase';
+import { 
+  performOrderStatusUpdate, 
+  storeNotification, 
+  normalizeStatus, 
+  getStatusBadgeColor, 
+  getStatusLabel 
+} from '../lib/orderUtils';
+
+interface ImageUploaderProps {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  placeholder: string;
+}
+
+const ImageUploaderField: React.FC<ImageUploaderProps> = ({ label, value, onChange, placeholder }) => {
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert("Please select an image file.");
+      return;
+    }
+    try {
+      const supabase = getSupabase();
+      if (supabase) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}.${fileExt}`;
+        const publicUrl = await uploadToSupabaseBucket('branding-images', fileName, file, file.type);
+        if (publicUrl) {
+          onChange(publicUrl);
+          return;
+        }
+      }
+    } catch (storageErr) {
+      console.warn("Supabase storage upload failed, fallback to local:", storageErr);
+    }
+
+    compressImageFile(file, 600, 600, 0.75)
+      .then(base64 => onChange(base64))
+      .catch(err => {
+        console.error("Error compressing image", err);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            onChange(e.target.result as string);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+  };
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFile(file);
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const isBase64 = value && value.startsWith('data:image/');
+
+  return (
+    <div className="space-y-2 text-left">
+      <label className="block text-sm font-semibold text-slate-700">{label}</label>
+      
+      <div 
+        onDragEnter={handleDrag}
+        onDragOver={handleDrag}
+        onDragLeave={handleDrag}
+        onDrop={handleDrop}
+        className={cn(
+          "border-2 border-dashed rounded-2xl p-4 transition-all flex flex-col items-center justify-center min-h-[160px] bg-slate-50 relative overflow-hidden",
+          dragActive ? "border-brand-gold-500 bg-brand-gold-50/20" : "border-slate-200 hover:border-slate-300",
+          value ? "border-brand-gold-300 bg-white" : ""
+        )}
+      >
+        {value ? (
+          <div className="relative w-full h-[140px] flex items-center justify-center group rounded-xl overflow-hidden bg-white">
+            <img 
+              src={value} 
+              alt="Preview" 
+              className="max-h-full max-w-full object-contain rounded-xl p-1"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                (e.target as HTMLElement).style.opacity = '0.3';
+              }}
+            />
+            <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+              <label className="cursor-pointer bg-white text-slate-800 text-xs font-black px-4 py-2 rounded-xl hover:bg-slate-100 transition-all select-none">
+                Change Image
+                <input type="file" accept="image/*" className="hidden" onChange={onFileChange} />
+              </label>
+              <button 
+                type="button"
+                onClick={() => onChange('')}
+                className="bg-red-500 text-white text-xs font-black px-4 py-2 rounded-xl hover:bg-red-600 transition-all"
+              >
+                Clear
+              </button>
+            </div>
+            <span className="absolute bottom-2 left-2 bg-brand-gold-500 text-slate-900 font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow">
+              {isBase64 ? 'Uploaded File' : 'URL Image'}
+            </span>
+          </div>
+        ) : (
+          <div className="text-center flex flex-col items-center py-2 select-none">
+            <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+              <UploadCloud size={22} className="text-brand-gold-600" />
+            </div>
+            <p className="text-sm font-bold text-slate-700">Drag & drop your image here, or</p>
+            <label className="mt-1 text-xs font-extrabold text-brand-gold-600 hover:text-brand-gold-700 cursor-pointer underline decoration-2 underline-offset-2">
+              browse files
+              <input type="file" accept="image/*" className="hidden" onChange={onFileChange} />
+            </label>
+            <p className="text-[11px] text-slate-400 mt-1">Supports PNG, JPG, JPEG, WEBP, GIF</p>
+          </div>
+        )}
+      </div>
+
+      <div className="relative mt-2">
+        <label className="block text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Or paste image URL</label>
+        <input 
+          type="text" 
+          placeholder={placeholder} 
+          value={isBase64 ? '' : value} 
+          disabled={!!isBase64}
+          onChange={e => onChange(e.target.value)} 
+          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-brand-gold-500 outline-none placeholder:text-slate-400 disabled:opacity-50" 
+        />
+        {isBase64 && (
+          <p className="text-[10px] text-brand-gold-600 mt-1 font-semibold">Using uploaded file. Clear image to paste a custom URL.</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default function CatererDashboard() {
+  const { user, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [partnerOrders, setPartnerOrders] = useState<any[]>([]);
+  const [caterer, setCaterer] = useState<any>(null);
+
+  // New filters and date-range states
+  const [orderListFilter, setOrderListFilter] = useState<'all' | 'pending' | 'approved' | 'completed' | 'rejected' | 'revenue'>('all');
+  const [eventFilter, setEventFilter] = useState<'7' | '15' | '30' | 'custom'>('7');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  
+  // Modals
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  
+  const [showModifyModal, setShowModifyModal] = useState(false);
+  const [modifyData, setModifyData] = useState<any>({ price: 0, package: '', guests: 0, notes: '' });
+
+  // Order Management Extra States
+  const [showChangesRequestModal, setShowChangesRequestModal] = useState(false);
+  const [changesRequestText, setChangesRequestText] = useState('');
+  const [internalNotesText, setInternalNotesText] = useState('');
+  const [showFullDetailsModal, setShowFullDetailsModal] = useState(false);
+
+  // Menu Builder State
+  const [draftPackages, setDraftPackages] = useState<any[]>([]);
+  const [isParsing, setIsParsing] = useState(false);
+
+  // Profile Edit State
+  const [profileFormData, setProfileFormData] = useState<any>({});
+  const [isProfilePending, setIsProfilePending] = useState(false);
+  const [dashboardNewAreaText, setDashboardNewAreaText] = useState('');
+
+  const [resolvedCatererId, setResolvedCatererId] = useState<string | null>(() => localStorage.getItem('catererDashboardId'));
+  const [isResolvingCaterer, setIsResolvingCaterer] = useState(false);
+
+  // Resolution effect for the business record
+  useEffect(() => {
+    async function resolveCaterer() {
+      if (resolvedCatererId) return;
+      if (!user) return;
+      
+      setIsResolvingCaterer(true);
+      console.log("[CATERER RESOLVE] Attempting to resolve business registration ID for user:", user.email, "uid:", user.id);
+      
+      const supabase = getSupabase();
+      if (!supabase) {
+        setIsResolvingCaterer(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('caterer_registrations')
+          .select('id')
+          .or(`userId.eq.${user.id},email.eq.${user.email}`)
+          .maybeSingle();
+
+        if (error) {
+          console.error("[CATERER RESOLVE] Error querying registration:", error);
+        } else if (data) {
+          console.log("[CATERER RESOLVE] Resolved registration successfully:", data);
+          localStorage.setItem('catererDashboardId', data.id);
+          setResolvedCatererId(data.id);
+        } else {
+          // Fallback search in local storage registration copy
+          const rawRegs = localStorage.getItem('registrations');
+          if (rawRegs) {
+            const parsed = JSON.parse(rawRegs);
+            const locallyFound = parsed.find((r: any) => 
+              r.userId === user.id || 
+              (r.email && r.email.toLowerCase() === user.email.toLowerCase())
+            );
+            if (locallyFound) {
+              console.log("[CATERER RESOLVE] Resolved from local registrations cache:", locallyFound);
+              localStorage.setItem('catererDashboardId', locallyFound.id);
+              setResolvedCatererId(locallyFound.id);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("[CATERER RESOLVE] Exception during resolution:", err);
+      } finally {
+        setIsResolvingCaterer(false);
+      }
+    }
+
+    resolveCaterer();
+  }, [user, resolvedCatererId]);
+
+  // Main data fetching and realtime subscription effect
+  useEffect(() => {
+    if (!resolvedCatererId) {
+      console.log("[CATERER DASHBOARD] Delaying loading/subscription until registration ID is resolved.");
+      return;
+    }
+
+    refreshData();
+
+    const supabase = getSupabase();
+    if (supabase) {
+      const channel = supabase
+        .channel(`caterer-orders-realtime-${resolvedCatererId}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'orders', filter: `catererId=eq.${resolvedCatererId}` },
+          (payload) => {
+            console.log("[REALTIME] Order update received on Caterer Dashboard:", payload);
+            refreshData();
+            reloadNotifications();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user, resolvedCatererId]);
+
+  const refreshData = async () => {
+    // Fetch Caterer Details
+    const cid = resolvedCatererId || localStorage.getItem('catererDashboardId');
+    if (!cid) {
+      console.log("[CATERER DASHBOARD] refreshData canceled: cid is missing.");
+      return;
+    }
+
+    // Fetch from Supabase
+    const supabase = getSupabase() as any;
+    let fetchedCaterer: any = null;
+    if (supabase) {
+      try {
+        console.log("Fetching live caterer profile from Supabase for ID:", cid);
+        const { data, error } = await (supabase
+          .from('caterer_registrations') as any)
+          .select('*')
+          .eq('id', cid)
+          .maybeSingle();
+
+        if (!error && data) {
+          const cat = data as any;
+          fetchedCaterer = cat;
+          setCaterer(cat);
+          setDraftPackages(cat.draftMenuPackages || cat.menuPackages || cat.packages || []);
+          setProfileFormData({
+              owner: cat.owner || '',
+              businessName: cat.businessName || '',
+              phone: cat.phone || '',
+              alternatePhone: cat.alternatePhone || '',
+              email: cat.email || '',
+              address: cat.address || '',
+              city: cat.city || '',
+              description: cat.description || '',
+              fssaiNumber: cat.fssaiNumber || '',
+              gstNumber: cat.gstNumber || '',
+              panNumber: cat.panNumber || '',
+              logo: cat.logo || '',
+              coverBanner: cat.coverBanner || '',
+              ownerPhoto: cat.ownerPhoto || '',
+              branchPhoto: cat.branchPhoto || '',
+              experience: cat.experience || '',
+              eventsCompleted: cat.eventsCompleted || '',
+              brandName: cat.brandName || '',
+              tagline: cat.tagline || '',
+              whatsappNumber: cat.whatsappNumber || '',
+              branches: cat.branches || '',
+              serviceAreas: cat.serviceAreas || '',
+              galleryPhotos: cat.galleryPhotos || [],
+              serveEntireHyderabad: cat.serveEntireHyderabad !== undefined ? cat.serveEntireHyderabad : (cat.serviceAreas === "All Hyderabad" || (Array.isArray(cat.serviceAreas) && cat.serviceAreas.length === 1 && cat.serviceAreas[0] === "All Hyderabad"))
+          });
+          setIsProfilePending(!!cat.pendingUpdates);
+          
+          // Sync local storage registrations
+          const registrationsLocal = JSON.parse(localStorage.getItem('registrations') || '[]');
+          const filtered = registrationsLocal.filter((r: any) => r.id !== cid);
+          localStorage.setItem('registrations', JSON.stringify([...filtered, cat]));
+        }
+      } catch (err) {
+        console.error("Error reading live profile from Supabase:", err);
+      }
+    }
+
+    if (!fetchedCaterer) {
+        const rawRegistrations = localStorage.getItem('registrations');
+        if (rawRegistrations) {
+            const all = JSON.parse(rawRegistrations);
+            const found = all.find((c: any) => c.id === cid);
+            if (found) {
+               setCaterer(found);
+               setDraftPackages(found.draftMenuPackages || found.menuPackages || found.packages || []);
+               setProfileFormData({
+                   owner: found.owner || '',
+                   businessName: found.businessName || '',
+                   phone: found.phone || '',
+                   alternatePhone: found.alternatePhone || '',
+                   email: found.email || '',
+                   address: found.address || '',
+                   city: found.city || '',
+                   description: found.description || '',
+                   fssaiNumber: found.fssaiNumber || '',
+                   gstNumber: found.gstNumber || '',
+                   panNumber: found.panNumber || '',
+                   logo: found.logo || '',
+                   coverBanner: found.coverBanner || '',
+                   ownerPhoto: found.ownerPhoto || '',
+                   branchPhoto: found.branchPhoto || '',
+                   experience: found.experience || '',
+                   eventsCompleted: found.eventsCompleted || '',
+                   brandName: found.brandName || '',
+                   tagline: found.tagline || '',
+                   whatsappNumber: found.whatsappNumber || '',
+                   branches: found.branches || '',
+                   serviceAreas: found.serviceAreas || '',
+                   galleryPhotos: found.galleryPhotos || [],
+                   serveEntireHyderabad: found.serveEntireHyderabad !== undefined ? found.serveEntireHyderabad : (found.serviceAreas === "All Hyderabad" || (Array.isArray(found.serviceAreas) && found.serviceAreas.length === 1 && found.serviceAreas[0] === "All Hyderabad"))
+               });
+               setIsProfilePending(!!found.pendingUpdates);
+            }
+        }
+    }
+
+    // Fetch Orders from Supabase first
+    if (supabase) {
+      try {
+        console.log("Fetching live orders from Supabase for caterer ID:", cid);
+        const { data: ords, error: ordsErr } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('catererId', cid)
+          .order('created_at', { ascending: false });
+
+        if (!ordsErr && ords) {
+          setPartnerOrders(ords);
+          // Sync local storage orders
+          const rawOrders = localStorage.getItem('orders') || '[]';
+          const allLocalOrders = JSON.parse(rawOrders).filter((o: any) => o.catererId !== cid);
+          localStorage.setItem('orders', JSON.stringify([...allLocalOrders, ...ords]));
+          return;
+        }
+      } catch (err) {
+        console.error("Error reading live orders from Supabase:", err);
+      }
+    }
+
+    // Check localStorage fallback for orders
+    const rawOrders = localStorage.getItem('orders');
+    if (rawOrders) {
+        const allOrders = JSON.parse(rawOrders);
+        const myOrders = allOrders.filter((o: any) => o.catererId === cid);
+        // sort by newest
+        myOrders.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        setPartnerOrders(myOrders);
+    }
+  };
+
+  const handleOpenOrderDetails = (ord: any) => {
+    setSelectedOrder(ord);
+    setInternalNotesText(ord.internalNotes || ord.internal_notes || '');
+    setShowFullDetailsModal(true);
+  };
+
+  const handleCloseOrderDetails = () => {
+    setSelectedOrder(null);
+    setShowFullDetailsModal(false);
+  };
+
+  const handleSaveInternalNotes = async (orderId: string) => {
+    try {
+      const supabase = getSupabase();
+      if (supabase) {
+        await supabase.from('orders').update({
+          internalNotes: internalNotesText,
+          internal_notes: internalNotesText
+        }).eq('id', orderId);
+      }
+    } catch (e) {
+      console.warn("Could not save internal notes upstream:", e);
+    }
+    const rawOrders = localStorage.getItem('orders');
+    if (rawOrders) {
+      const allOrders = JSON.parse(rawOrders);
+      const updated = allOrders.map((o: any) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            internalNotes: internalNotesText,
+            internal_notes: internalNotesText
+          };
+        }
+        return o;
+      });
+      localStorage.setItem('orders', JSON.stringify(updated));
+    }
+    if (selectedOrder) {
+      setSelectedOrder({ ...selectedOrder, internalNotes: internalNotesText, internal_notes: internalNotesText });
+    }
+    refreshData();
+    toast("Internal notes updated successfully", "success");
+  };
+
+  const handleRequestChanges = async () => {
+    if (!changesRequestText.trim()) {
+      toast("Please specify what changes or details you are requesting.", "error");
+      return;
+    }
+    
+    try {
+      await performOrderStatusUpdate(
+        selectedOrder.id, 
+        'changes_requested', 
+        { 
+          changesRequestedMemo: changesRequestText,
+          specialNotes: changesRequestText 
+        }, 
+        user?.email || 'partner@caternest.com', 
+        'partner'
+      );
+      
+      storeNotification(
+        selectedOrder.id,
+        "Details Requested",
+        `The caterer has requested updates for your order #${selectedOrder.id}: ${changesRequestText}`,
+        "customer",
+        caterer?.id
+      );
+
+      setShowChangesRequestModal(false);
+      setSelectedOrder(null);
+      setChangesRequestText('');
+      await refreshData();
+      toast("Requested changes successfully", "success");
+    } catch (err) {
+      console.error("Failed to request changes:", err);
+      toast("Error requested changes", "error");
+    }
+  };
+
+  const handleApprove = async (id: string) => {
+    try {
+      await performOrderStatusUpdate(id, 'approved', {}, user?.email || 'partner@caternest.com', 'partner');
+      
+      const ord = partnerOrders.find(o => o.id === id);
+      storeNotification(
+        id,
+        "Order Approved! 🎉",
+        `Your booking query for ${ord?.eventDate || 'selected date'} has been approved by the caterer.`,
+        "customer",
+        caterer?.id
+      );
+      
+      storeNotification(
+        id,
+        "Order Approved",
+        `Order #${id} has been approved by ${caterer?.businessName || 'Caterer'}.`,
+        "admin"
+      );
+
+      await refreshData();
+      setSelectedOrder(null);
+      toast("Order approved successfully", "success");
+    } catch (err) {
+      console.error("Failed to approve order:", err);
+      toast("Error approving order", "error");
+    }
+  };
+
+  const handleReject = async () => {
+    if(!rejectReason.trim()) {
+      toast("Please provide a rejection reason.", "error");
+      return;
+    }
+    try {
+      await performOrderStatusUpdate(
+        selectedOrder.id, 
+        'rejected', 
+        { rejectionReason: rejectReason }, 
+        user?.email || 'partner@caternest.com', 
+        'partner'
+      );
+      
+      storeNotification(
+        selectedOrder.id,
+        "Order Rejected",
+        `Your booking request was declined. Reason: ${rejectReason}`,
+        "customer",
+        caterer?.id
+      );
+      
+      setShowRejectModal(false);
+      setSelectedOrder(null);
+      setRejectReason('');
+      await refreshData();
+      toast("Order rejected successfully", "success");
+    } catch (err) {
+      console.error("Failed to reject order:", err);
+      toast("Error rejecting order", "error");
+    }
+  };
+
+  const handleModify = async () => {
+    try {
+      await performOrderStatusUpdate(
+        selectedOrder.id, 
+        'quotation_updated', 
+        {
+          pricePerPlate: modifyData.price,
+          guests: modifyData.guests,
+          specialNotes: modifyData.notes,
+          totalEstimate: modifyData.price * modifyData.guests + (selectedOrder.platformFee || 0)
+        }, 
+        user?.email || 'partner@caternest.com', 
+        'partner'
+      );
+      
+      storeNotification(
+        selectedOrder.id,
+        "Quote Proposal Adjusted",
+        `The caterer has sent an adjusted quotation of ₹${(modifyData.price * modifyData.guests + (selectedOrder.platformFee || 0)).toLocaleString()}`,
+        "customer",
+        caterer?.id
+      );
+
+      setShowModifyModal(false);
+      setSelectedOrder(null);
+      await refreshData();
+      toast("Adjusted quotation sent to customer", "success");
+    } catch (err) {
+      console.error("Failed to modify quote:", err);
+      toast("Error modifying quote", "error");
+    }
+  };
+
+  const openModifyModal = (ord: any) => {
+    setSelectedOrder(ord);
+    setModifyData({
+      price: ord.pricePerPlate,
+      package: ord.packageDetails?.packageName || 'Custom',
+      guests: ord.guests,
+      notes: ord.specialNotes || ''
+    });
+    setShowModifyModal(true);
+  };
+
+  // Notification tab state hooks and triggers
+  const [localNotifications, setLocalNotifications] = useState<any[]>([]);
+  
+  const reloadNotifications = () => {
+    const raw = localStorage.getItem('notifications') || '[]';
+    try {
+      const parsed = JSON.parse(raw);
+      const filtered = parsed.filter((n: any) => 
+        n.targetRole === 'caterer' && 
+        (!n.catererId || n.catererId === caterer?.id || n.catererId === user?.id)
+      );
+      setLocalNotifications(filtered);
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'notifications' || caterer) {
+      reloadNotifications();
+    }
+  }, [activeTab, caterer]);
+
+  const handleMarkNotificationRead = (id: string) => {
+    const raw = localStorage.getItem('notifications') || '[]';
+    try {
+      const parsed = JSON.parse(raw);
+      const updated = parsed.map((n: any) => n.id === id ? { ...n, read: true } : n);
+      localStorage.setItem('notifications', JSON.stringify(updated));
+      reloadNotifications();
+      toast("Notification marked read", "success");
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  const handleClearAllNotifications = () => {
+    const raw = localStorage.getItem('notifications') || '[]';
+    try {
+      const parsed = JSON.parse(raw);
+      const remaining = parsed.filter((n: any) => 
+        !(n.targetRole === 'caterer' && (!n.catererId || n.catererId === caterer?.id || n.catererId === user?.id))
+      );
+      localStorage.setItem('notifications', JSON.stringify(remaining));
+      reloadNotifications();
+      toast("Notifications cleared", "success");
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+      const cid = resolvedCatererId || localStorage.getItem('catererDashboardId');
+      if (!cid || !caterer) return;
+
+      const supabase = getSupabase() as any;
+      if (supabase) {
+        try {
+          const { error } = await supabase
+            .from('caterer_registrations')
+            .update({ draftMenuPackages: draftPackages })
+            .eq('id', caterer.id);
+          if (error) throw error;
+        } catch (err: any) {
+          console.error("Failed to save draft to Supabase:", err);
+        }
+      }
+
+      const rawRegistrations = localStorage.getItem('registrations');
+      if (rawRegistrations) {
+          const all = JSON.parse(rawRegistrations);
+          const updated = all.map((c: any) => c.id === caterer.id ? { ...c, draftMenuPackages: draftPackages } : c);
+          try {
+              localStorage.setItem('registrations', JSON.stringify(updated));
+              toast('Draft saved successfully', 'success');
+              refreshData();
+          } catch (err) {
+              console.error("Quota exceeded during save", err);
+              alert("Your changes are too large for custom browser storage limits. Saved to live database but clearing local storage cache...");
+              refreshData();
+          }
+      }
+  };
+
+  const handlePublishMenu = async () => {
+      const cid = resolvedCatererId || localStorage.getItem('catererDashboardId');
+      if (!cid || !caterer) return;
+
+      const supabase = getSupabase() as any;
+      if (supabase) {
+        try {
+          const { error } = await supabase
+            .from('caterer_registrations')
+            .update({ 
+               draftMenuPackages: draftPackages, 
+               menuPackages: draftPackages,
+               packages: draftPackages
+            })
+            .eq('id', caterer.id);
+          if (error) throw error;
+        } catch (err: any) {
+          console.error("Failed to publish menu to Supabase:", err);
+        }
+      }
+
+      const rawRegistrations = localStorage.getItem('registrations');
+      if (rawRegistrations) {
+          const all = JSON.parse(rawRegistrations);
+          const updated = all.map((c: any) => c.id === caterer.id ? { ...c, draftMenuPackages: draftPackages, menuPackages: draftPackages, packages: draftPackages } : c);
+          try {
+              localStorage.setItem('registrations', JSON.stringify(updated));
+              toast('Menu published successfully! Customers can now see these changes.', 'success');
+              refreshData();
+          } catch (err) {
+              console.error("Quota exceeded during publish", err);
+              alert("Your menu was successfully published to the live database! Cache cleared locally.");
+              refreshData();
+          }
+      }
+  };
+
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      const cid = resolvedCatererId || localStorage.getItem('catererDashboardId');
+      if (!cid || !caterer) return;
+
+      const sensitivePayload = {
+          owner: profileFormData.owner || '',
+          businessName: profileFormData.businessName || '',
+          phone: profileFormData.phone || '',
+          alternatePhone: profileFormData.alternatePhone || '',
+          email: profileFormData.email || '',
+          fssaiNumber: profileFormData.fssaiNumber || '',
+          gstNumber: profileFormData.gstNumber || '',
+          panNumber: profileFormData.panNumber || '',
+          logo: profileFormData.logo || '',
+          coverBanner: profileFormData.coverBanner || '',
+          ownerPhoto: profileFormData.ownerPhoto || '',
+          branchPhoto: profileFormData.branchPhoto || ''
+      };
+
+      const hasSensitiveChanges = 
+          sensitivePayload.owner !== (caterer.owner || '') ||
+          sensitivePayload.businessName !== (caterer.businessName || '') ||
+          sensitivePayload.phone !== (caterer.phone || '') ||
+          sensitivePayload.alternatePhone !== (caterer.alternatePhone || '') ||
+          sensitivePayload.email !== (caterer.email || '') ||
+          sensitivePayload.fssaiNumber !== (caterer.fssaiNumber || '') ||
+          sensitivePayload.gstNumber !== (caterer.gstNumber || '') ||
+          sensitivePayload.panNumber !== (caterer.panNumber || '') ||
+          sensitivePayload.logo !== (caterer.logo || '') ||
+          sensitivePayload.coverBanner !== (caterer.coverBanner || '') ||
+          sensitivePayload.ownerPhoto !== (caterer.ownerPhoto || '') ||
+          sensitivePayload.branchPhoto !== (caterer.branchPhoto || '');
+
+      const finalPendingUpdates = hasSensitiveChanges ? {
+          ...sensitivePayload,
+          _requestedBy: caterer.owner || caterer.businessName || "Caterer",
+          _requestedAt: new Date().toISOString()
+      } : (caterer.pendingUpdates || null);
+
+      const directPayload = {
+          brandName: profileFormData.brandName || null,
+          tagline: profileFormData.tagline || null,
+          description: profileFormData.description || null,
+          experience: profileFormData.experience ? parseInt(profileFormData.experience) : null,
+          eventsCompleted: profileFormData.eventsCompleted ? parseInt(profileFormData.eventsCompleted) : null,
+          branches: profileFormData.branches ? parseInt(profileFormData.branches) : null,
+          serviceAreas: profileFormData.serviceAreas || null,
+          serveEntireHyderabad: profileFormData.serveEntireHyderabad || (profileFormData.serviceAreas === "All Hyderabad" || (Array.isArray(profileFormData.serviceAreas) && profileFormData.serviceAreas.length === 1 && profileFormData.serviceAreas[0] === "All Hyderabad")),
+          whatsappNumber: profileFormData.whatsappNumber || null,
+          address: profileFormData.address || null,
+          city: profileFormData.city || null,
+          galleryPhotos: profileFormData.galleryPhotos || [],
+          services: caterer.services || null,
+          achievements: caterer.achievements || null,
+          highlights: caterer.highlights || null,
+          specializations: caterer.specializations || null,
+          pendingUpdates: finalPendingUpdates
+      };
+
+      // ADDED DEBUG LOGS
+      console.log("=== CATERNEST DATA SYNCHRONIZATION AUDIT LOGS ===");
+      const directKeys = [
+          { name: "Brand Public Name", field: "brandName", col: "includedItems._fallback_brandName" },
+          { name: "Brand Tagline", field: "tagline", col: "includedItems._fallback_tagline" },
+          { name: "Description", field: "description", col: "includedItems._fallback_description" },
+          { name: "Experience Years", field: "experience", col: "includedItems._fallback_experience" },
+          { name: "Events Completed", field: "eventsCompleted", col: "includedItems._fallback_eventsCompleted" },
+          { name: "Branch Count", field: "branches", col: "includedItems._fallback_branches" },
+          { name: "Service Areas", field: "serviceAreas", col: "includedItems._fallback_serviceAreas" },
+          { name: "WhatsApp Number", field: "whatsappNumber", col: "includedItems._fallback_whatsappNumber" },
+          { name: "HQ Address", field: "address", col: "address" },
+          { name: "City", field: "city", col: "city" }
+      ];
+      directKeys.forEach(({ name, field, col }) => {
+          const oldVal = (caterer as any)[field];
+          const newVal = (directPayload as any)[field];
+          if (oldVal !== newVal) {
+              console.log(`[SYNC DEBUG] Field: "${name}", Old Value: ${JSON.stringify(oldVal)}, New Value: ${JSON.stringify(newVal)}, Database Column Updated: "${col}"`);
+          }
+      });
+
+      const sensitiveKeysMapping = [
+          { name: "Founder Name", field: "owner", col: "owner" },
+          { name: "Legal Business Name", field: "businessName", col: "businessName" },
+          { name: "Phone/Mobile", field: "phone", col: "phone" },
+          { name: "Alternate Phone", field: "alternatePhone", col: "alternatePhone" },
+          { name: "Email", field: "email", col: "email" },
+          { name: "FSSAI", field: "fssaiNumber", col: "fssaiNumber" },
+          { name: "GST", field: "gstNumber", col: "gstNumber" },
+          { name: "PAN", field: "panNumber", col: "panNumber" },
+          { name: "Logo", field: "logo", col: "logo" },
+          { name: "Cover Banner", field: "coverBanner", col: "coverBanner" },
+          { name: "Founder Photo", field: "ownerPhoto", col: "ownerPhoto" },
+          { name: "Branch Photo", field: "branchPhoto", col: "branchPhoto" }
+      ];
+      sensitiveKeysMapping.forEach(({ name, field, col }) => {
+          const oldVal = (caterer as any)[field];
+          const newVal = (sensitivePayload as any)[field];
+          if (oldVal !== newVal) {
+              console.log(`[SYNC DEBUG] Field: "${name}" (SENSITIVE), Old Value: ${JSON.stringify(oldVal)}, New Value: ${JSON.stringify(newVal)}, Database Column Updated: "pendingUpdates.${field} (Admin review required)"`);
+          }
+      });
+      console.log("================================================");
+
+      const supabase = getSupabase() as any;
+      if (supabase) {
+        try {
+          const { error } = await supabase
+            .from('caterer_registrations')
+            .update(directPayload)
+            .eq('id', caterer.id);
+          if (error) throw error;
+        } catch (err: any) {
+          console.error("Failed to submit profile updates to Supabase:", err);
+        }
+      }
+
+      const rawRegistrations = localStorage.getItem('registrations');
+      if (rawRegistrations) {
+          const all = JSON.parse(rawRegistrations);
+          const updated = all.map((c: any) => {
+              if (c.id === caterer.id) {
+                  return {
+                      ...c,
+                      ...directPayload,
+                      address: profileFormData.address || c.address,
+                      pendingUpdates: finalPendingUpdates
+                  };
+              }
+              return c;
+          });
+          try {
+              localStorage.setItem('registrations', JSON.stringify(updated));
+              if (hasSensitiveChanges) {
+                  toast('Sensitive changes require Admin Review. Profile update requested.', 'success');
+              } else {
+                  toast('Profile saved successfully!', 'success');
+              }
+              refreshData();
+          } catch (err: any) {
+              if (err.name === "QuotaExceededError" || err.message?.includes("quota") || err.message?.includes("exceeded")) {
+                  console.warn("[QuotaExceededError] localStorage quota exceeded in Dashboard. Cleaning large datasets inside cache.");
+                  const cleaned = updated.map((c: any) => {
+                      const copy = { ...c };
+                      delete copy.galleryPhotos;
+                      delete copy.menuPackages;
+                      delete copy.packages;
+                      delete copy.draftMenuPackages;
+                      delete copy.images;
+                      if (copy.includedItems && typeof copy.includedItems === "object") {
+                          const incCopy = { ...copy.includedItems };
+                          delete incCopy._fallback_galleryPhotos;
+                          delete incCopy._fallback_menuPackages;
+                          delete incCopy._fallback_packages;
+                          delete incCopy._fallback_draftMenuPackages;
+                          delete incCopy._fallback_images;
+                          copy.includedItems = incCopy;
+                      }
+                      return copy;
+                  });
+                  try {
+                      localStorage.setItem('registrations', JSON.stringify(cleaned));
+                      if (hasSensitiveChanges) {
+                          toast('Sensitive changes require Admin Review. Profile update requested.', 'success');
+                      } else {
+                          toast('Profile saved successfully!', 'success');
+                      }
+                      refreshData();
+                  } catch (innerErr) {
+                      console.error("Quota exceeded even after cleanup", innerErr);
+                      alert("The profile update request was saved on Supabase! Cache cleared locally.");
+                      refreshData();
+                  }
+              } else {
+                  console.error("Error setting localStorage registrations:", err);
+              }
+          }
+      }
+  };
+
+  const [galleryDragActive, setGalleryDragActive] = useState(false);
+
+  const handleGalleryDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setGalleryDragActive(true);
+    } else if (e.type === "dragleave") {
+      setGalleryDragActive(false);
+    }
+  };
+
+  const handleGalleryDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setGalleryDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleMultipleFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleDeletePhoto = (index: number) => {
+    const current = profileFormData.galleryPhotos || [];
+    const updated = current.filter((_: any, i: number) => i !== index);
+    setProfileFormData({
+      ...profileFormData,
+      galleryPhotos: updated
+    });
+  };
+
+  const handleReplacePhoto = async (index: number, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert("Please select an image file.");
+      return;
+    }
+    const supabase = getSupabase();
+    let uploadedUrl = "";
+    try {
+      if (supabase) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}.${fileExt}`;
+        const publicUrl = await uploadToSupabaseBucket('branding-images', fileName, file, file.type);
+        if (publicUrl) {
+          uploadedUrl = publicUrl;
+        }
+      }
+    } catch (err) {
+      console.warn("Supabase storage upload failed, fallback to local base64:", err);
+    }
+
+    if (!uploadedUrl) {
+      try {
+        uploadedUrl = await compressImageFile(file, 800, 800, 0.8) as string;
+      } catch (e) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          if (ev.target?.result) {
+            const current = [...(profileFormData.galleryPhotos || [])];
+            current[index] = ev.target.result as string;
+            setProfileFormData({ ...profileFormData, galleryPhotos: current });
+          }
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+
+    const current = [...(profileFormData.galleryPhotos || [])];
+    current[index] = uploadedUrl;
+    setProfileFormData({
+      ...profileFormData,
+      galleryPhotos: current
+    });
+  };
+
+  const handleMovePhoto = (index: number, direction: 'left' | 'right') => {
+    const current = [...(profileFormData.galleryPhotos || [])];
+    if (direction === 'left' && index > 0) {
+      const temp = current[index];
+      current[index] = current[index - 1];
+      current[index - 1] = temp;
+    } else if (direction === 'right' && index < current.length - 1) {
+      const temp = current[index];
+      current[index] = current[index + 1];
+      current[index + 1] = temp;
+    }
+    setProfileFormData({
+      ...profileFormData,
+      galleryPhotos: current
+    });
+  };
+
+  const handleMakePrimary = (index: number) => {
+    if (index === 0) return;
+    const current = [...(profileFormData.galleryPhotos || [])];
+    const item = current.splice(index, 1)[0];
+    current.unshift(item);
+    setProfileFormData({
+      ...profileFormData,
+      galleryPhotos: current
+    });
+  };
+
+  const handleMultipleFiles = async (files: FileList) => {
+    const newPhotos: string[] = [];
+    const supabase = getSupabase();
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith('image/')) continue;
+      
+      try {
+        if (supabase) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}.${fileExt}`;
+          const publicUrl = await uploadToSupabaseBucket('branding-images', fileName, file, file.type);
+          if (publicUrl) {
+            newPhotos.push(publicUrl);
+            continue;
+          }
+        }
+      } catch (err) {
+        console.warn("Supabase storage upload failed, fallback to local base64:", err);
+      }
+
+      // Fallback to Base64 compression
+      try {
+        const base64 = await compressImageFile(file, 800, 800, 0.8) as string;
+        newPhotos.push(base64);
+      } catch (e) {
+        // Fallback to FileReader
+        const p = new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        const res = await p;
+        newPhotos.push(res);
+      }
+    }
+
+    if (newPhotos.length > 0) {
+      const current = profileFormData.galleryPhotos || [];
+      setProfileFormData({
+        ...profileFormData,
+        galleryPhotos: [...current, ...newPhotos]
+      });
+    }
+  };
+
+  const totalOrders = partnerOrders.length;
+  const pendingOrders = partnerOrders.filter(o => {
+    const s = normalizeStatus(o.status);
+    return s === 'pending' || s === 'updated_by_customer';
+  }).length;
+  const approvedOrders = partnerOrders.filter(o => normalizeStatus(o.status) === 'approved').length;
+  const modifiedOrders = partnerOrders.filter(o => normalizeStatus(o.status) === 'changes_requested').length;
+  const rejectedOrders = partnerOrders.filter(o => {
+    const s = normalizeStatus(o.status);
+    return s === 'rejected' || s === 'cancelled';
+  }).length;
+  const completedOrders = partnerOrders.filter(o => normalizeStatus(o.status) === 'completed').length;
+  
+  // Helpers for robust order calculations
+  const getOrderGuests = (ord: any): string | number => {
+    if (!ord) return '—';
+    const val = ord.guests ?? ord.guestCount;
+    return (val !== undefined && val !== null && val !== '') ? val : '—';
+  };
+
+  const getOrderTotalAmount = (ord: any): number => {
+    if (!ord) return 0;
+    const val = ord.totalEstimate ?? ord.totalAmount ?? ord.amount;
+    if (val !== undefined && val !== null && !isNaN(Number(val)) && Number(val) > 0) {
+      return Number(val);
+    }
+    const g = Number(ord.guests ?? ord.guestCount ?? 0);
+    const p = Number(ord.pricePerPlate ?? ord.packageDetails?.startingPrice ?? 0);
+    const fee = Number(ord.platformFee ?? 0);
+    if (g > 0 && p > 0) return g * p + fee;
+    return 0;
+  };
+
+  const parseOrderDetails = (order: any) => {
+    let meals = order.mealSelection || '';
+    let timings = order.mealTimings || '';
+    let dietary = order.dietaryPreferences || (Array.isArray(order.dietary) ? order.dietary.join(', ') : '');
+    let specialInstructions = order.specialInstructions || '';
+    let venueAddress = order.venueAddress || order.address || order.venue || '';
+    let venueName = order.venueName || '';
+    let mapUrl = order.googleMapsUrl || order.mapLocation || '';
+
+    const rawNotes = order.specialNotes || order.notes || '';
+    if (rawNotes) {
+      const lines = rawNotes.split(/[\n\r]+/).map((s: string) => s.trim()).filter(Boolean);
+      const leftovers: string[] = [];
+
+      for (const line of lines) {
+        if (/^meals?\s*:/i.test(line)) {
+          if (!meals) meals = line.replace(/^meals?\s*:/i, '').trim();
+        } else if (/^timings?\s*:/i.test(line) || /^time\s*:/i.test(line)) {
+          if (!timings) timings = line.replace(/^(timings?|time)\s*:/i, '').trim();
+        } else if (/^dietary\s*:/i.test(line) || /^diet\s*:/i.test(line)) {
+          if (!dietary) dietary = line.replace(/^(dietary|diet)\s*:/i, '').trim();
+        } else if (/^google\s*maps?\s*:/i.test(line) || /^map\s*:/i.test(line) || /https?:\/\/maps/i.test(line)) {
+          if (!mapUrl) {
+            const match = line.match(/https?:\/\/[^\s]+/i);
+            mapUrl = match ? match[0] : line.replace(/^.*?:/i, '').trim();
+          }
+        } else if (/^venue\s*(name|type|address)?\s*:/i.test(line)) {
+          if (!venueAddress) venueAddress = line.replace(/^.*?:/i, '').trim();
+        } else if (/^special\s*(instructions?|notes?|requests?)\s*:/i.test(line)) {
+          leftovers.push(line.replace(/^special\s*(instructions?|notes?|requests?)\s*:/i, '').trim());
+        } else {
+          leftovers.push(line);
+        }
+      }
+
+      if (!specialInstructions && leftovers.length > 0) {
+        specialInstructions = leftovers.join('\n');
+      }
+    }
+
+    return {
+      meals,
+      timings,
+      dietary,
+      specialInstructions,
+      venueAddress,
+      venueName,
+      mapUrl
+    };
+  };
+
+  const getCategorizedMenuItems = (order: any) => {
+    const selectedList: string[] = order?.selectedItems || [];
+    const categories = order?.packageDetails?.categories || [];
+
+    if (categories.length > 0 && selectedList.length > 0) {
+      const grouped: { categoryName: string; items: string[] }[] = [];
+      const claimed = new Set<string>();
+
+      for (const cat of categories) {
+        const catItems = (cat.items || []).filter((it: string) => selectedList.includes(it));
+        if (catItems.length > 0) {
+          grouped.push({ categoryName: cat.categoryName, items: catItems });
+          catItems.forEach((it: string) => claimed.add(it));
+        }
+      }
+
+      const leftovers = selectedList.filter((it: string) => !claimed.has(it));
+      if (leftovers.length > 0) {
+        grouped.push({ categoryName: 'Special Add-ons & Extra Items', items: leftovers });
+      }
+
+      if (grouped.length > 0) return grouped;
+    }
+
+    if (selectedList.length > 0) {
+      return [{ categoryName: 'Selected Menu Items', items: selectedList }];
+    }
+
+    return [];
+  };
+
+  // Calculate Revenue
+  const revenue = partnerOrders
+      .filter(o => {
+        const s = normalizeStatus(o.status);
+        return s === 'approved' || s === 'completed';
+      })
+      .reduce((acc, curr) => acc + (((Number(curr.pricePerPlate) || 0) * (Number(curr.guests || curr.guestCount) || 0)) * 0.9), 0);
+  
+  // This month revenue
+  const thisMonthRevenue = partnerOrders
+      .filter(o => {
+        const s = normalizeStatus(o.status);
+        const isApprovedOrCompleted = s === 'approved' || s === 'completed';
+        return isApprovedOrCompleted && new Date(o.created_at).getMonth() === new Date().getMonth();
+      })
+      .reduce((acc, curr) => acc + (((Number(curr.pricePerPlate) || 0) * (Number(curr.guests || curr.guestCount) || 0)) * 0.9), 0);
+
+  const getStatusColor = (status: string) => {
+    return getStatusBadgeColor(status);
+  };
+
+  const unreadNotificationsCount = localNotifications.filter(n => !n.read).length;
+
+  const filteredOrderList = partnerOrders.filter((o) => {
+    const norm = normalizeStatus(o.status);
+    if (orderListFilter === 'pending') {
+      return norm === 'pending' || norm === 'changes_requested' || o.status === 'Submitted' || o.status === 'Pending Caterer Review';
+    }
+    if (orderListFilter === 'approved') {
+      return norm === 'approved' || o.status === 'Approved';
+    }
+    if (orderListFilter === 'completed') {
+      return norm === 'completed' || o.status === 'Completed';
+    }
+    if (orderListFilter === 'rejected') {
+      return norm === 'rejected' || o.status === 'Rejected' || o.status === 'Cancelled';
+    }
+    if (orderListFilter === 'revenue') {
+      return norm === 'approved' || norm === 'completed' || o.status === 'Approved' || o.status === 'Completed';
+    }
+    return true; // 'all'
+  });
+
+  const getFilteredUpcomingEvents = () => {
+    const approved = partnerOrders.filter(o => {
+      const norm = normalizeStatus(o.status);
+      return (norm === 'approved' || o.status === 'Approved') && o.eventDate;
+    });
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const filtered = approved.filter(o => {
+      const evDate = new Date(o.eventDate);
+      if (isNaN(evDate.getTime())) return false;
+      
+      if (evDate < todayStart) return false;
+
+      const diffTime = evDate.getTime() - todayStart.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (eventFilter === '7') {
+        return diffDays <= 7;
+      }
+      if (eventFilter === '15') {
+        return diffDays <= 15;
+      }
+      if (eventFilter === '30') {
+        return diffDays <= 30;
+      }
+      if (eventFilter === 'custom') {
+        if (customStartDate) {
+          const start = new Date(customStartDate);
+          if (!isNaN(start.getTime()) && evDate < start) return false;
+        }
+        if (customEndDate) {
+          const end = new Date(customEndDate);
+          const endPlusDay = new Date(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59);
+          if (!isNaN(end.getTime()) && evDate > endPlusDay) return false;
+        }
+        return true;
+      }
+      return true;
+    });
+
+    filtered.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+    return filtered;
+  };
+
+  const navItems = [
+      { id: 'dashboard', label: 'Dashboard', icon: Activity },
+      { id: 'orders', label: 'Orders', icon: ShoppingBag, badge: pendingOrders > 0 ? pendingOrders : null },
+      { id: 'notifications', label: 'Notifications', icon: Bell, badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : null },
+      { id: 'payments', label: 'Payments', icon: CreditCard },
+      { id: 'profile', label: 'Profile', icon: User },
+      { id: 'gallery', label: 'Gallery', icon: ImageIcon },
+      { id: 'packages', label: 'Menu Packages', icon: Package },
+       { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
+  if (caterer && (caterer.status === 'Pending Approval' || caterer.status === 'pending_approval')) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 pt-24 select-none">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-100 text-center shadow-lg animate-fade-in"
+          id="pending-approval-guard"
+        >
+          <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mx-auto mb-6">
+            <Clock size={32} className="animate-pulse" />
+          </div>
+          <h2 className="text-2xl font-display font-medium text-slate-900 mb-3">Under Review</h2>
+          <p className="text-slate-500 text-sm leading-relaxed mb-6">
+            Your account is under review. Please wait for admin approval.
+          </p>
+          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left mb-6">
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Business Name</p>
+            <p className="font-bold text-slate-800">{caterer.businessName}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-3 mb-1">Owner</p>
+            <p className="text-xs font-semibold text-slate-600">{caterer.owner || caterer.ownerName}</p>
+          </div>
+          <p className="text-xs text-slate-400 font-medium">
+            Our administrators typically review registration requests within 24 hours.
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 pt-16 md:pt-20">
+      {/* Hide global navbar on mobile */}
+      <style>{`
+        @media (max-width: 768px) {
+          #main-navigation-navbar {
+            display: none !important;
+          }
+        }
+      `}</style>
+
+      {/* MOBILE PREMIUM VIEW */}
+      <CatererMobileDashboard
+        user={user}
+        caterer={caterer}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        partnerOrders={partnerOrders}
+        localNotifications={localNotifications}
+        unreadNotificationsCount={unreadNotificationsCount}
+        totalOrders={totalOrders}
+        pendingOrders={pendingOrders}
+        approvedOrders={approvedOrders}
+        completedOrders={completedOrders}
+        rejectedOrders={rejectedOrders}
+        revenue={revenue}
+        eventFilter={eventFilter}
+        setEventFilter={setEventFilter}
+        customStartDate={customStartDate}
+        setCustomStartDate={setCustomStartDate}
+        customEndDate={customEndDate}
+        setCustomEndDate={setCustomEndDate}
+        getFilteredUpcomingEvents={getFilteredUpcomingEvents}
+        handleOpenOrderDetails={handleOpenOrderDetails}
+        getStatusColor={getStatusColor}
+        navItems={navItems}
+        logout={logout}
+        orderListFilter={orderListFilter}
+        setOrderListFilter={setOrderListFilter}
+        filteredOrderList={filteredOrderList}
+        setSelectedOrder={setSelectedOrder}
+        handleApprove={handleApprove}
+        setShowRejectModal={setShowRejectModal}
+        openModifyModal={openModifyModal}
+        profileFormData={profileFormData}
+        setProfileFormData={setProfileFormData}
+        isProfilePending={isProfilePending}
+        handleProfileSubmit={handleProfileSubmit}
+        dashboardNewAreaText={dashboardNewAreaText}
+        setDashboardNewAreaText={setDashboardNewAreaText}
+        handleClearAllNotifications={handleClearAllNotifications}
+        handleMarkNotificationRead={handleMarkNotificationRead}
+        handleDeletePhoto={handleDeletePhoto}
+        handleReplacePhoto={handleReplacePhoto}
+        handleMovePhoto={handleMovePhoto}
+        handleMakePrimary={handleMakePrimary}
+        handleMultipleFiles={handleMultipleFiles}
+      />
+
+      <div className="hidden md:flex h-[calc(100vh-80px)]">
+        
+        {/* Sidebar */}
+        <div 
+          className="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col hidden md:flex fixed left-0 top-20 z-20"
+          style={{ height: 'calc(100vh - 80px)' }}
+        >
+            <div className="p-6">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Caterer Portal</p>
+                <h2 className="text-xl font-display font-medium text-white truncate">{caterer?.businessName || 'My Business'}</h2>
+                <div className="mt-2 flex items-center gap-2 text-xs text-brand-gold-400 font-medium bg-brand-gold-500/10 px-2.5 py-1 rounded-md inline-flex border border-brand-gold-500/20">
+                    <CheckCircle size={12}/> Approved Partner
+                </div>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto overflow-x-hidden w-full px-4 space-y-1 custom-sidebar-scrollbar">
+               {navItems.map(item => (
+                   <button 
+                       key={item.id}
+                       onClick={() => setActiveTab(item.id)} 
+                       className={cn("w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-colors", activeTab === item.id ? "bg-brand-gold-500 text-slate-900" : "hover:bg-slate-800 text-slate-300")}
+                   >
+                       <div className="flex items-center gap-3">
+                           <item.icon size={18} /> {item.label}
+                       </div>
+                       {item.badge && <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-bold", activeTab === item.id ? "bg-slate-900 text-brand-gold-500" : "bg-brand-gold-500 text-slate-900")}>{item.badge}</span>}
+                   </button>
+               ))}
+            </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto md:pl-64">
+            <div className="p-4 md:p-8 pb-32 md:pb-8">
+               
+               {activeTab === 'dashboard' && (
+                 <div className="hidden md:block">
+                    <h1 className="text-3xl font-display font-bold text-slate-900 mb-8">Dashboard Overview</h1>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <button onClick={() => { setActiveTab('orders'); setOrderListFilter('all'); }} className="text-left w-full group active:scale-95"><p className="text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors uppercase tracking-wider">Total Orders</p><p className="text-2xl font-bold text-slate-900 mt-1">{totalOrders}</p></button>
+                            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><Package size={20}/></div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <button onClick={() => { setActiveTab('orders'); setOrderListFilter('pending'); }} className="text-left w-full group active:scale-95"><p className="text-xs font-semibold text-slate-500 group-hover:text-amber-600 transition-colors uppercase tracking-wider">Pending Orders</p><p className="text-2xl font-bold text-amber-600 mt-1">{pendingOrders}</p></button>
+                            <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><Clock size={20}/></div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <button onClick={() => { setActiveTab('orders'); setOrderListFilter('approved'); }} className="text-left w-full group active:scale-95"><p className="text-xs font-semibold text-slate-500 group-hover:text-green-600 transition-colors uppercase tracking-wider">Approved</p><p className="text-2xl font-bold text-green-600 mt-1">{approvedOrders}</p></button>
+                            <div className="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center shrink-0"><CheckCircle size={20}/></div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <button onClick={() => { setActiveTab('orders'); setOrderListFilter('completed'); }} className="text-left w-full group active:scale-95"><p className="text-xs font-semibold text-slate-500 group-hover:text-slate-700 transition-colors uppercase tracking-wider">Completed</p><p className="text-2xl font-bold text-slate-800 mt-1">{completedOrders}</p></button>
+                            <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0"><CheckCircle2 size={20}/></div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <button onClick={() => { setActiveTab('orders'); setOrderListFilter('rejected'); }} className="text-left w-full group active:scale-95"><p className="text-xs font-semibold text-slate-500 group-hover:text-red-600 transition-colors uppercase tracking-wider">Rejected</p><p className="text-2xl font-bold text-red-600 mt-1">{rejectedOrders}</p></button>
+                            <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0"><XCircle size={20}/></div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <button onClick={() => { setActiveTab('orders'); setOrderListFilter('revenue'); }} className="text-left w-full group active:scale-95"><p className="text-xs font-semibold text-slate-500 group-hover:text-brand-gold-600 transition-colors uppercase tracking-wider">Revenue</p><p className="text-2xl font-bold text-brand-gold-600 mt-1">₹{(revenue/1000).toFixed(1)}k</p></button>
+                            <div className="w-10 h-10 rounded-lg bg-brand-gold-50 text-brand-gold-600 flex items-center justify-center shrink-0"><Activity size={20}/></div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-8">
+                        <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
+                            <div>
+                                <h3 className="font-bold text-slate-900 text-lg font-display">Upcoming Scheduled Events</h3>
+                                <p className="text-xs text-slate-500 mt-0.5">Filter and manage confirmed celebrations</p>
+                                
+                                {/* Range selector row */}
+                                <div className="flex flex-wrap gap-4 items-center justify-between mt-4 bg-slate-50 p-4 rounded-xl border border-slate-150 w-full md:min-w-[700px]">
+                                    <div className="flex gap-1 bg-slate-200/60 p-1 rounded-xl shrink-0">
+                                        {[
+                                            { id: '7', label: '7 Days' },
+                                            { id: '15', label: '15 Days' },
+                                            { id: '30', label: '30 Days' },
+                                            { id: 'custom', label: 'Custom Range' }
+                                        ].map((tab) => (
+                                            <button
+                                                key={tab.id}
+                                                type="button"
+                                                onClick={() => setEventFilter(tab.id as any)}
+                                                className={cn(
+                                                    "px-3 py-1.5 text-xs font-bold rounded-lg transition-all",
+                                                    eventFilter === tab.id
+                                                        ? "bg-white text-slate-900 shadow-sm"
+                                                        : "text-slate-500 hover:text-slate-850"
+                                                )}
+                                            >
+                                                {tab.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    
+                                    {eventFilter === 'custom' && (
+                                        <div className="flex items-center gap-2 animate-fade-in text-xs font-bold text-slate-600">
+                                            <span>From</span>
+                                            <input 
+                                                type="date" 
+                                                value={customStartDate} 
+                                                onChange={(e) => setCustomStartDate(e.target.value)} 
+                                                className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-brand-gold-500" 
+                                            />
+                                            <span>To</span>
+                                            <input 
+                                                type="date" 
+                                                value={customEndDate} 
+                                                onChange={(e) => setCustomEndDate(e.target.value)} 
+                                                className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-brand-gold-500" 
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {/* New rich layout grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 w-full md:min-w-[700px]">
+                                    {getFilteredUpcomingEvents().map(ord => (
+                                        <div key={'upcoming-event-'+ord.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:shadow-md hover:border-brand-green-300 transition-all flex flex-col justify-between">
+                                            <div>
+                                                <div className="flex gap-4 items-center mb-4">
+                                                    <div className="w-14 h-14 bg-brand-green-900 text-white rounded-xl flex flex-col items-center justify-center border border-brand-green-800 flex-shrink-0 shadow-sm">
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold-300">{new Date(ord.eventDate).toLocaleDateString('en-US', {month: 'short'})}</span>
+                                                        <span className="text-xl font-display font-extrabold leading-none">{new Date(ord.eventDate).getDate()}</span>
+                                                    </div>
+                                                    <div className="truncate">
+                                                        <p className="font-bold text-slate-900 text-sm truncate" title={ord.customerName}>{ord.customerName}</p>
+                                                        <span className={cn("px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border", getStatusColor(ord.status))}>
+                                                            {ord.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="space-y-1.5 text-xs text-slate-650 font-medium border-t border-slate-100 pt-3">
+                                                    <p className="flex justify-between">
+                                                        <span className="text-slate-400">Guests:</span> 
+                                                        <span className="font-semibold text-slate-800">{getOrderGuests(ord)}</span>
+                                                    </p>
+                                                    <p className="flex justify-between">
+                                                        <span className="text-slate-400">Package:</span> 
+                                                        <span className="font-semibold text-slate-800 truncate max-w-[140px]" title={ord.packageDetails?.packageName}>{ord.packageDetails?.packageName || 'Custom'}</span>
+                                                    </p>
+                                                    <p className="flex justify-between">
+                                                        <span className="text-slate-400">Phone:</span> 
+                                                        <span className="font-semibold text-slate-800">{ord.phone || ord.customerPhone || 'N/A'}</span>
+                                                    </p>
+                                                    <p className="flex justify-between items-start gap-2">
+                                                        <span className="text-slate-400 shrink-0">Venue:</span> 
+                                                        <span className="font-semibold text-slate-800 text-right truncate max-w-[140px]" title={ord.venue || ord.address || ord.venueAddress}>{ord.venue || ord.address || ord.venueAddress || 'TBD'}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+                                                <button onClick={() => handleOpenOrderDetails(ord)} className="text-xs font-bold text-brand-green-905 hover:text-brand-green-800 flex items-center gap-1 active:scale-95">
+                                                    View Details <ChevronRight size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {getFilteredUpcomingEvents().length === 0 && (
+                                        <div className="col-span-full py-10 text-center text-slate-400 text-sm bg-slate-50 rounded-2xl border border-dashed border-slate-205">
+                                            <CalendarDays size={28} className="mx-auto mb-2 text-slate-300" />
+                                            <p className="font-bold text-slate-600">No scheduled events</p>
+                                            <p className="text-xs text-slate-400 mt-1">No upcoming events are scheduled within this timeframe.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <button onClick={() => setActiveTab('orders')} className="text-sm font-bold text-brand-green-700 hover:text-brand-green-800">View All Calendar</button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {[].map(ord => (
+                                <div key={'upcoming-'+ord.id} className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex gap-4 hover:border-brand-green-300 transition-colors">
+                                    <div className="w-12 h-12 bg-white rounded-lg flex flex-col items-center justify-center border border-slate-200 flex-shrink-0">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase">{new Date(ord.eventDate).toLocaleDateString('en-US', {month: 'short'})}</span>
+                                        <span className="text-lg font-bold text-slate-800 leading-none">{new Date(ord.eventDate).getDate()}</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-slate-900 truncate" title={ord.customerName}>{ord.customerName}</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">{ord.eventType || 'Event'} • {ord.guests} Guests</p>
+                                        <p className="text-[10px] font-bold text-brand-green-700 mt-1.5 uppercase tracking-wider bg-brand-green-100 inline-block px-2 py-0.5 rounded">Ordered</p>
+                                    </div>
+                                </div>
+                            ))}
+                            {false && (
+                                <div className="col-span-full py-8 text-center text-slate-500 text-sm bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                    No upcoming events scheduled for this week.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 className="font-bold text-slate-900">Recent Notifications</h3>
+                        </div>
+                        <div className="divide-y divide-slate-100 h-64 overflow-y-auto p-2">
+                           {partnerOrders.slice(0, 5).map((ord) => (
+                               <div key={ord.id} className="p-4 flex gap-4 hover:bg-slate-50 rounded-lg">
+                                   <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex flex-shrink-0 items-center justify-center"><Bell size={18}/></div>
+                                   <div>
+                                       <p className="font-bold text-slate-800 text-sm">New order received from {ord.customerName}</p>
+                                       <p className="text-xs text-slate-500 mt-1">Package: {ord.packageDetails?.packageName || 'Custom'} • Guests: {ord.guests} • Date: {ord.eventDate || 'TBD'}</p>
+                                       <p className="text-[10px] text-slate-400 mt-2">{new Date(ord.created_at).toLocaleString()}</p>
+                                   </div>
+                               </div>
+                           ))}
+                           {partnerOrders.length === 0 && <div className="p-8 text-center text-sm text-slate-500">No recent notifications.</div>}
+                        </div>
+                    </div>
+                 </div>
+               )}
+
+               {activeTab === 'orders' && (
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-140px)]">
+                      <div className="p-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-50 gap-4">
+                          <div>
+                              <h2 className="text-xl font-bold text-slate-900">Order Management</h2>
+                              <p className="text-xs text-slate-500 mt-0.5">Filter, review, and confirm customer booking requests</p>
+                          </div>
+                          <div className="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                              {[
+                                { id: 'all', label: 'All Orders' },
+                                { id: 'pending', label: 'Pending' },
+                                { id: 'approved', label: 'Approved' },
+                                { id: 'completed', label: 'Completed' },
+                                { id: 'revenue', label: 'Revenue Base' }
+                              ].map((f) => (
+                                  <button
+                                      key={f.id}
+                                      type="button"
+                                      onClick={() => setOrderListFilter(f.id as any)}
+                                      className={cn(
+                                          "px-3 py-1.5 text-xs font-bold rounded-lg transition-all",
+                                          orderListFilter === f.id 
+                                              ? "bg-white text-slate-900 shadow-sm cursor-default"
+                                              : "text-slate-500 hover:text-slate-900 cursor-pointer"
+                                      )}
+                                  >
+                                      {f.label}
+                                  </button>
+                              ))}
+                          </div>
+                      </div>
+                      
+                      <div className="overflow-x-auto flex-1 hidden md:block">
+                          <table className="w-full text-left text-sm whitespace-nowrap">
+                              <thead className="bg-slate-50 text-slate-500 font-medium sticky top-0 border-b border-slate-200 z-10">
+                                  <tr>
+                                      <th className="px-6 py-4">Order ID</th>
+                                      <th className="px-6 py-4">Date & Time</th>
+                                      <th className="px-6 py-4">Customer</th>
+                                      <th className="px-6 py-4">Phone</th>
+                                      <th className="px-6 py-4">Package</th>
+                                      <th className="px-6 py-4">Guests</th>
+                                      <th className="px-6 py-4">Amount</th>
+                                      <th className="px-6 py-4">Status</th>
+                                      <th className="px-6 py-4 w-10">Actions</th>
+                                  </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                  {filteredOrderList.map((ord) => (
+                                      <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors group">
+                                          <td className="px-6 py-4 font-mono font-medium text-slate-700">{ord.id}</td>
+                                          <td className="px-6 py-4 text-slate-500">{new Date(ord.created_at).toLocaleDateString()}<br/><span className="text-[10px]">{new Date(ord.created_at).toLocaleTimeString()}</span></td>
+                                          <td className="px-6 py-4">
+                                              <div className="font-bold text-slate-800 leading-tight">{ord.customerName || 'Test User'}</div>
+                                              {(ord.venue || ord.address) && (
+                                                  <div className="text-[11px] text-slate-500 font-medium whitespace-normal max-w-xs block mt-1">
+                                                      {ord.venue || ord.address}
+                                                  </div>
+                                              )}
+                                          </td>
+                                          <td className="px-6 py-4 text-slate-500">{ord.customerPhone || ord.phone || 'N/A'}</td>
+                                          <td className="px-6 py-4 text-slate-600">{ord.packageDetails?.packageName || 'Custom'}</td>
+                                          <td className="px-6 py-4 text-slate-600 font-semibold">{getOrderGuests(ord)}</td>
+                                          <td className="px-6 py-4 font-bold text-brand-green-900">₹{getOrderTotalAmount(ord).toLocaleString('en-IN')}</td>
+                                          <td className="px-6 py-4">
+                                              <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider", getStatusColor(ord.status))}>
+                                                  {ord.status}
+                                              </span>
+                                          </td>
+                                          <td className="px-6 py-4">
+                                              <button onClick={() => handleOpenOrderDetails(ord)} className="px-3 py-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 rounded-lg text-xs font-bold transition-colors">
+                                                  View
+                                              </button>
+                                          </td>
+                                      </tr>
+                                  ))}
+                                  {filteredOrderList.length === 0 && (
+                                      <tr><td colSpan={9} className="px-6 py-12 text-center text-slate-500 italic font-medium">No {orderListFilter !== 'all' ? orderListFilter : ''} orders found.</td></tr>
+                                  )}
+                              </tbody>
+                          </table>
+                      </div>
+
+                      {/* Mobile view cards (Zomato/Swiggy-style usability) */}
+                      <div className="block md:hidden divide-y divide-slate-150 max-h-[calc(100vh-220px)] overflow-y-auto p-4 space-y-4">
+                          {filteredOrderList.map((ord) => (
+                              <div key={ord.id} className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col gap-3 shadow-2xs hover:border-brand-gold-500/40 transition-colors">
+                                  <div className="flex justify-between items-start">
+                                      <span className="font-mono text-[10px] font-semibold text-slate-500">#{ord.id.substring(0, 8)}</span>
+                                      <span className={cn("px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider", getStatusColor(ord.status))}>
+                                          {ord.status}
+                                      </span>
+                                  </div>
+                                  
+                                  <div>
+                                      <div className="font-bold text-slate-800 text-sm leading-tight">{ord.customerName || 'Test User'}</div>
+                                      <div className="text-[10px] text-slate-400 font-medium mt-0.5">{new Date(ord.created_at).toLocaleDateString()} {new Date(ord.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                                      {(ord.venue || ord.address) && (
+                                          <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-1">
+                                              📍 {ord.venue || ord.address}
+                                          </p>
+                                      )}
+                                  </div>
+
+                                  <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-left">
+                                      <div className="flex flex-col">
+                                          <span className="text-[8px] text-slate-400 font-black uppercase tracking-wider">Package</span>
+                                          <span className="text-xs font-bold text-slate-700">{ord.packageDetails?.packageName || 'Custom'}</span>
+                                      </div>
+                                      <div className="flex flex-col text-right">
+                                          <span className="text-[8px] text-slate-400 font-black uppercase tracking-wider">Guests</span>
+                                          <span className="text-xs font-bold text-slate-700">{getOrderGuests(ord)}</span>
+                                      </div>
+                                      <div className="flex flex-col text-right">
+                                          <span className="text-[8px] text-slate-400 font-black uppercase tracking-wider">Amount</span>
+                                          <span className="text-xs font-black text-brand-green-900">₹{getOrderTotalAmount(ord).toLocaleString('en-IN')}</span>
+                                      </div>
+                                  </div>
+
+                                  <div className="flex justify-end gap-2 pt-1">
+                                      <button 
+                                          type="button"
+                                          onClick={() => handleOpenOrderDetails(ord)} 
+                                          className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 rounded-lg text-xs font-black uppercase tracking-widest transition-colors text-center"
+                                      >
+                                          View Details
+                                      </button>
+                                  </div>
+                              </div>
+                          ))}
+                          {filteredOrderList.length === 0 && (
+                              <div className="p-8 text-center text-slate-500 italic font-medium text-xs">No orders found.</div>
+                          )}
+                      </div>
+                  </div>
+               )}
+
+               {activeTab === 'payments' && (
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-140px)]">
+                      <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                          <h2 className="text-xl font-bold text-slate-900">Payment History</h2>
+                      </div>
+                      
+                      <div className="overflow-x-auto flex-1">
+                          <table className="w-full text-left text-sm whitespace-nowrap">
+                              <thead className="bg-slate-50 text-slate-500 font-medium sticky top-0 border-b border-slate-200 z-10">
+                                  <tr>
+                                      <th className="px-6 py-4">Order ID</th>
+                                      <th className="px-6 py-4">Date</th>
+                                      <th className="px-6 py-4">Customer</th>
+                                      <th className="px-6 py-4">Gross Amount</th>
+                                      <th className="px-6 py-4">Platform Fee</th>
+                                      <th className="px-6 py-4 text-brand-green-900">Net Amount</th>
+                                      <th className="px-6 py-4">Status</th>
+                                  </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                  {partnerOrders.filter(o => ['Approved', 'Completed'].includes(o.status)).map((ord) => {
+                                      const gross = (ord.pricePerPlate || 0) * (ord.guests || 0);
+                                      const netAmount = gross * 0.9;
+                                      return (
+                                      <tr key={'pay-'+ord.id} className="hover:bg-slate-50 transition-colors">
+                                          <td className="px-6 py-4 font-mono font-medium text-slate-700">{ord.id}</td>
+                                          <td className="px-6 py-4 text-slate-500">{new Date(ord.created_at).toLocaleDateString()}</td>
+                                          <td className="px-6 py-4 font-bold text-slate-800">{ord.customerName}</td>
+                                          <td className="px-6 py-4">₹{gross.toLocaleString()}</td>
+                                          <td className="px-6 py-4 text-red-600">-₹{((gross * 0.1) + (ord.platformFee || 0)).toLocaleString()}</td>
+                                          <td className="px-6 py-4 font-bold text-brand-green-900 bg-brand-green-50/30">₹{netAmount.toLocaleString()}</td>
+                                          <td className="px-6 py-4">
+                                              <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-800">
+                                                  Settled
+                                              </span>
+                                          </td>
+                                      </tr>
+                                      )
+                                  })}
+                                  {partnerOrders.filter(o => ['Approved', 'Completed'].includes(o.status)).length === 0 && (
+                                      <tr><td colSpan={7} className="px-6 py-12 text-center text-slate-500">No payment history found.</td></tr>
+                                  )}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+               )}
+
+               {activeTab === 'packages' && (
+                  <div className="space-y-6">
+                      <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                          <div>
+                              <h2 className="text-xl font-bold text-slate-900">Menu Packages</h2>
+                              <p className="text-sm text-slate-500">Edit your menu packages. Changes are saved as drafts until published.</p>
+                          </div>
+                          <div className="flex gap-3">
+                              <button onClick={handleSaveDraft} className="px-6 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl transition-colors flex items-center gap-2">
+                                  <Save size={18} /> Save Draft
+                              </button>
+                              <button onClick={handlePublishMenu} className="px-6 py-2 bg-brand-green-900 text-white hover:bg-brand-green-800 font-bold rounded-xl transition-colors shadow-lg shadow-brand-green-900/20">
+                                  Publish Changes
+                              </button>
+                          </div>
+                      </div>
+                      <CatererMenuBuilder 
+                          packages={draftPackages} 
+                          onChange={setDraftPackages} 
+                          isParsing={isParsing} 
+                          setIsParsing={setIsParsing} 
+                      />
+                  </div>
+               )}
+
+               {activeTab === 'profile' && (
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+                      <div className="mb-8 border-b border-slate-100 pb-4">
+                          <h2 className="text-xl font-bold text-slate-900">Profile Management</h2>
+                          <p className="text-sm text-slate-500">Identity changes require admin approval before becoming visible.</p>
+                      </div>
+
+                      {isProfilePending && (
+                          <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-4">
+                              <Clock className="text-amber-500 flex-shrink-0 mt-0.5" size={20} />
+                              <div>
+                                  <h4 className="font-bold text-amber-900 text-sm">Update Request Pending</h4>
+                                  <p className="text-amber-800 text-sm mt-1">Your recent profile changes are currently under review by our admin team. Once approved, they will be visible to customers.</p>
+                              </div>
+                          </div>
+                      )}
+
+                      <form onSubmit={handleProfileSubmit} className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div>
+                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Owner Name</label>
+                                  <input type="text" value={profileFormData.owner || ''} onChange={(e) => setProfileFormData({...profileFormData, owner: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" required />
+                              </div>
+                              <div>
+                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Business Name</label>
+                                  <input type="text" value={profileFormData.businessName || ''} onChange={(e) => setProfileFormData({...profileFormData, businessName: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" required />
+                              </div>
+                              <div>
+                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Mobile Number</label>
+                                  <input type="tel" value={profileFormData.phone || ''} onChange={(e) => setProfileFormData({...profileFormData, phone: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" required />
+                              </div>
+                              <div>
+                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Email Address</label>
+                                  <input type="email" value={profileFormData.email || ''} onChange={(e) => setProfileFormData({...profileFormData, email: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" required />
+                              </div>
+                              <div className="col-span-1 md:col-span-2">
+                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Business Description</label>
+                                  <textarea value={profileFormData.description || ''} onChange={(e) => setProfileFormData({...profileFormData, description: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none h-24 resize-none" placeholder="Tell customers about your catering service..." required></textarea>
+                              </div>
+                              <div className="col-span-1 md:col-span-2">
+                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Full Address</label>
+                                  <textarea value={profileFormData.address || ''} onChange={(e) => setProfileFormData({...profileFormData, address: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none h-24 resize-none" required></textarea>
+                              </div>
+                              <div>
+                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Base City</label>
+                                  <input type="text" value={profileFormData.city || ''} onChange={(e) => setProfileFormData({...profileFormData, city: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" required />
+                              </div>
+                          </div>
+
+                          <div className="pt-6 border-t border-slate-100">
+                              <h3 className="font-bold text-slate-800 mb-4">Professional & Operational Details</h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Brand Name</label>
+                                      <input type="text" value={profileFormData.brandName || ''} onChange={(e) => setProfileFormData({...profileFormData, brandName: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" placeholder="e.g. Royal Caterers Premium" />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Tagline</label>
+                                      <input type="text" value={profileFormData.tagline || ''} onChange={(e) => setProfileFormData({...profileFormData, tagline: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" placeholder="e.g. Exquisite flavors for unrepeatable moments" />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">WhatsApp Mobile Connection</label>
+                                      <input type="tel" value={profileFormData.whatsappNumber || ''} onChange={(e) => setProfileFormData({...profileFormData, whatsappNumber: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" placeholder="e.g. +91 98765 43210" />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Years of Experience</label>
+                                      <input type="number" value={profileFormData.experience || ''} onChange={(e) => setProfileFormData({...profileFormData, experience: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" placeholder="e.g. 10" />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Events Completed</label>
+                                      <input type="number" value={profileFormData.eventsCompleted || ''} onChange={(e) => setProfileFormData({...profileFormData, eventsCompleted: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" placeholder="e.g. 350" />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Number of Branches</label>
+                                      <input type="number" value={profileFormData.branches || ''} onChange={(e) => setProfileFormData({...profileFormData, branches: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none" placeholder="e.g. 3" />
+                                  </div>
+                                  <div className="col-span-1 md:col-span-2">
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Service Areas</label>
+                                      
+                                      {/* Serve Entire Hyderabad checkbox */}
+                                      <label className="flex items-center gap-2 cursor-pointer select-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-3 transition hover:bg-slate-100">
+                                          <input
+                                              type="checkbox"
+                                              checked={(() => {
+                                                  const raw = profileFormData.serviceAreas;
+                                                  if (!raw) return false;
+                                                  const arr = Array.isArray(raw) ? raw : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
+                                                  return arr.length === 1 && arr[0] === "All Hyderabad";
+                                              })()}
+                                              onChange={(e) => {
+                                                  if (e.target.checked) {
+                                                      setProfileFormData({ ...profileFormData, serviceAreas: ["All Hyderabad"] });
+                                                  } else {
+                                                      setProfileFormData({ ...profileFormData, serviceAreas: [] });
+                                                  }
+                                              }}
+                                              className="w-4 h-4 text-[#0F3D2E] focus:ring-[#0F3D2E] border-gray-300 rounded cursor-pointer accent-[#0F3D2E]"
+                                          />
+                                          <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                              Serve Entire Hyderabad
+                                          </span>
+                                      </label>
+
+                                      {!(() => {
+                                          const raw = profileFormData.serviceAreas;
+                                          if (!raw) return false;
+                                          const arr = Array.isArray(raw) ? raw : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
+                                          return arr.length === 1 && arr[0] === "All Hyderabad";
+                                      })() && (
+                                          <div className="flex flex-col gap-3">
+                                              <div className="flex gap-2">
+                                                  <input
+                                                      type="text"
+                                                      value={dashboardNewAreaText}
+                                                      onChange={(e) => setDashboardNewAreaText(e.target.value)}
+                                                      onKeyDown={(e) => {
+                                                          if (e.key === 'Enter') {
+                                                              e.preventDefault();
+                                                              const trimmed = dashboardNewAreaText.trim();
+                                                              if (trimmed) {
+                                                                  const raw = profileFormData.serviceAreas;
+                                                                  const arr = Array.isArray(raw) ? [...raw] : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
+                                                                  if (!arr.includes(trimmed)) {
+                                                                      arr.push(trimmed);
+                                                                      setProfileFormData({ ...profileFormData, serviceAreas: arr });
+                                                                  }
+                                                              }
+                                                              setDashboardNewAreaText("");
+                                                          }
+                                                      }}
+                                                      placeholder="Enter area name, e.g. Jubilee Hills"
+                                                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none"
+                                                  />
+                                                  <button
+                                                      type="button"
+                                                      onClick={() => {
+                                                          const trimmed = dashboardNewAreaText.trim();
+                                                          if (trimmed) {
+                                                              const raw = profileFormData.serviceAreas;
+                                                              const arr = Array.isArray(raw) ? [...raw] : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
+                                                              if (!arr.includes(trimmed)) {
+                                                                  arr.push(trimmed);
+                                                                  setProfileFormData({ ...profileFormData, serviceAreas: arr });
+                                                              }
+                                                          }
+                                                          setDashboardNewAreaText("");
+                                                      }}
+                                                      className="bg-[#0F3D2E] hover:bg-[#173D32] text-white text-xs font-bold px-5 py-3 rounded-xl transition cursor-pointer"
+                                                  >
+                                                      + Add Area
+                                                  </button>
+                                              </div>
+
+                                              <div className="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto pr-1 py-1">
+                                                  {(() => {
+                                                      const raw = profileFormData.serviceAreas;
+                                                      if (!raw) return [];
+                                                      return Array.isArray(raw) ? raw : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
+                                                  })().map((area: string, idx: number) => (
+                                                      <span
+                                                          key={idx}
+                                                          className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-full text-xs font-semibold shadow-xs select-none"
+                                                      >
+                                                          {area}
+                                                          <button
+                                                              type="button"
+                                                              onClick={() => {
+                                                                  const raw = profileFormData.serviceAreas;
+                                                                  const arr = Array.isArray(raw) ? raw : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
+                                                                  const filtered = arr.filter((a: string) => a !== area);
+                                                                  setProfileFormData({ ...profileFormData, serviceAreas: filtered });
+                                                              }}
+                                                              className="text-slate-400 hover:text-red-500 transition-colors focus:outline-none cursor-pointer"
+                                                          >
+                                                              <X size={12} strokeWidth={2.5} />
+                                                          </button>
+                                                      </span>
+                                                  ))}
+                                                  {(() => {
+                                                      const raw = profileFormData.serviceAreas;
+                                                      const arr = Array.isArray(raw) ? raw : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
+                                                      return arr.length === 0;
+                                                  })() && (
+                                                      <p className="text-xs text-slate-400 italic">No specific service areas added yet. Type an area above and click Add Area.</p>
+                                                  )}
+                                              </div>
+                                          </div>
+                                      )}
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="pt-6 border-t border-slate-100">
+                              <h3 className="font-bold text-slate-800 mb-4">Branding & Identity</h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                   <ImageUploaderField 
+                                        label="Caterer Logo Upload (500x500)"
+                                        value={profileFormData.logo || ''}
+                                        onChange={(val) => setProfileFormData({...profileFormData, logo: val})}
+                                        placeholder="e.g. https://host.com/logo.jpg"
+                                   />
+                                   <ImageUploaderField 
+                                        label="Cover Banner Upload (1600x600)"
+                                        value={profileFormData.coverBanner || ''}
+                                        onChange={(val) => setProfileFormData({...profileFormData, coverBanner: val})}
+                                        placeholder="e.g. https://host.com/banner.jpg"
+                                   />
+                                   <ImageUploaderField 
+                                        label="Founder Photo Upload (500x500)"
+                                        value={profileFormData.ownerPhoto || ''}
+                                        onChange={(val) => setProfileFormData({...profileFormData, ownerPhoto: val})}
+                                        placeholder="e.g. https://host.com/founder.jpg"
+                                   />
+                                   <ImageUploaderField 
+                                        label="Branch Photo Upload (Optional)"
+                                        value={profileFormData.branchPhoto || ''}
+                                        onChange={(val) => setProfileFormData({...profileFormData, branchPhoto: val})}
+                                        placeholder="e.g. https://host.com/branch.jpg"
+                                   />
+                              </div>
+                          </div>
+
+                          <div className="pt-6 border-t border-slate-100">
+                               <h3 className="font-bold text-slate-800 mb-1">Gallery Photos</h3>
+                               <p className="text-sm text-slate-500 mb-6">Manage the images shown on your Explore Caterers listing.</p>
+                               
+                               {/* Desktop Grid (4 images per row) */}
+                               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                                   {(profileFormData.galleryPhotos || []).map((imgUrl: string, idx: number) => (
+                                       <div key={idx} className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm relative group hover:border-brand-gold-500 transition-all flex flex-col justify-between">
+                                           <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-50 border border-slate-100 mb-3 flex items-center justify-center">
+                                               <img 
+                                                   src={imgUrl} 
+                                                   alt={`Gallery ${idx + 1}`} 
+                                                   className="w-full h-full object-cover" 
+                                                   referrerPolicy="no-referrer"
+                                               />
+                                               {idx === 0 && (
+                                                   <span className="absolute top-2 left-2 bg-brand-gold-500 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                                       <Star size={10} fill="currentColor" /> Primary
+                                                   </span>
+                                               )}
+                                           </div>
+                                           
+                                           <div className="space-y-2 mt-auto">
+                                               {idx > 0 && (
+                                                   <button 
+                                                       type="button" 
+                                                       onClick={() => handleMakePrimary(idx)}
+                                                       className="w-full py-1.5 bg-brand-gold-50 hover:bg-brand-gold-100 text-brand-gold-900 font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-1 border border-brand-gold-100"
+                                                   >
+                                                       <Star size={12} /> Make Primary
+                                                   </button>
+                                               )}
+                                               
+                                               <div className="flex gap-2">
+                                                   <button 
+                                                       type="button"
+                                                       disabled={idx === 0}
+                                                       onClick={() => handleMovePhoto(idx, 'left')}
+                                                       className="flex-1 py-1 bg-slate-50 hover:bg-slate-100 disabled:opacity-30 border border-slate-200 text-slate-600 rounded-lg flex items-center justify-center"
+                                                       title="Move Left"
+                                                   >
+                                                       <ChevronLeft size={16} />
+                                                   </button>
+                                                   <button 
+                                                       type="button"
+                                                       disabled={idx === (profileFormData.galleryPhotos || []).length - 1}
+                                                       onClick={() => handleMovePhoto(idx, 'right')}
+                                                       className="flex-1 py-1 bg-slate-50 hover:bg-slate-100 disabled:opacity-30 border border-slate-200 text-slate-600 rounded-lg flex items-center justify-center"
+                                                       title="Move Right"
+                                                   >
+                                                       <ChevronRight size={16} />
+                                                   </button>
+                                               </div>
+
+                                               <div className="flex gap-2">
+                                                   <label className="flex-1 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold rounded-lg text-xs transition-colors cursor-pointer text-center uppercase tracking-wider">
+                                                       Replace
+                                                       <input 
+                                                           type="file" 
+                                                           accept="image/*" 
+                                                           className="hidden" 
+                                                           onChange={(e) => {
+                                                               const file = e.target.files?.[0];
+                                                               if (file) {
+                                                                   handleReplacePhoto(idx, file);
+                                                               }
+                                                           }} 
+                                                       />
+                                                   </label>
+                                                   <button 
+                                                       type="button" 
+                                                       onClick={() => handleDeletePhoto(idx)}
+                                                       className="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 font-bold rounded-lg text-xs transition-colors"
+                                                   >
+                                                       <Trash2 size={14} />
+                                                   </button>
+                                               </div>
+                                           </div>
+                                       </div>
+                                   ))}
+                               </div>
+                               
+                               {/* Upload Box with Drag & Drop */}
+                               <div 
+                                   onDragEnter={handleGalleryDrag}
+                                   onDragOver={handleGalleryDrag}
+                                   onDragLeave={handleGalleryDrag}
+                                   onDrop={handleGalleryDrop}
+                                   className={cn(
+                                       "border-2 border-dashed rounded-3xl p-8 transition-all flex flex-col items-center justify-center min-h-[180px] relative overflow-hidden bg-[#FAF9F5]/30",
+                                       galleryDragActive ? "border-brand-gold-500 bg-brand-gold-50/20 scale-[0.99]" : "border-[#DEAA38]/30"
+                                   )}
+                               >
+                                   <div className="text-center flex flex-col items-center">
+                                       <div className="w-12 h-12 rounded-full bg-[#FAF6EC] text-amber-700 flex items-center justify-center mb-3 shadow-sm">
+                                           <UploadCloud size={24} className="text-[#DEAA38]" />
+                                       </div>
+                                       <p className="text-sm font-bold text-slate-700 mb-1">Drag & drop your images here</p>
+                                       <p className="text-xs text-slate-400 mb-4">Supports JPG, PNG, WEBP (multiple select)</p>
+                                       <label className="cursor-pointer bg-[#DEAA38] text-slate-950 text-xs font-black px-6 py-3 rounded-xl hover:bg-amber-500 shadow-sm transition-all select-none uppercase tracking-wider">
+                                           Upload New Photos
+                                           <input 
+                                               type="file" 
+                                               accept="image/*" 
+                                               multiple 
+                                               className="hidden" 
+                                               onChange={(e) => {
+                                                   if (e.target.files && e.target.files.length > 0) {
+                                                       handleMultipleFiles(e.target.files);
+                                                   }
+                                               }} 
+                                           />
+                                       </label>
+                                   </div>
+                               </div>
+                           </div>
+
+                          <div className="pt-6 border-t border-slate-100">
+                              <h3 className="font-bold text-slate-800 mb-4">Legal Details</h3>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">FSSAI Number</label>
+                                      <input type="text" value={profileFormData.fssaiNumber || ''} onChange={(e) => setProfileFormData({...profileFormData, fssaiNumber: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none uppercase" placeholder="14-digit number" />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">GSTIN</label>
+                                      <input type="text" value={profileFormData.gstNumber || ''} onChange={(e) => setProfileFormData({...profileFormData, gstNumber: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none uppercase" placeholder="15-character GSTIN" />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">PAN Number</label>
+                                      <input type="text" value={profileFormData.panNumber || ''} onChange={(e) => setProfileFormData({...profileFormData, panNumber: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-brand-gold-500 outline-none uppercase" placeholder="10-character PAN" />
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="pt-8 text-right">
+                              <button type="submit" className="px-8 py-3 bg-brand-green-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-green-800 transition-colors">
+                                  Submit Profile for Review
+                              </button>
+                          </div>
+                      </form>
+                  </div>
+               )}
+
+               {activeTab === 'notifications' && (
+                   <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 max-w-4xl mx-auto">
+                       <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+                           <div>
+                               <h2 className="text-xl font-bold text-slate-950 flex items-center gap-2"><Bell className="text-brand-gold-500" /> Notifications Inbox</h2>
+                               <p className="text-sm text-slate-500 mt-1">Status changes, system updates, and incoming quotations</p>
+                           </div>
+                           {localNotifications.length > 0 && (
+                               <button onClick={handleClearAllNotifications} className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold rounded-xl text-xs transition-colors">
+                                   Clear All
+                               </button>
+                           )}
+                       </div>
+
+                       <div className="space-y-3">
+                           {localNotifications.map((n) => (
+                               <div key={n.id} className={cn("p-4 rounded-xl border transition-all flex justify-between items-start", n.read ? "bg-slate-50 border-slate-150" : "bg-brand-gold-50/20 border-brand-gold-100 shadow-sm")}>
+                                   <div className="space-y-1">
+                                       <div className="flex items-center gap-2">
+                                           <span className={cn("w-2 h-2 rounded-full", n.read ? "bg-slate-300" : "bg-brand-gold-500")} />
+                                           <h4 className="font-bold text-slate-800 text-sm">{n.title}</h4>
+                                       </div>
+                                       <p className="text-xs text-slate-600 pl-4">{n.message}</p>
+                                       {n.orderId && <p className="text-[10px] text-slate-400 font-mono pl-4">Order ID: {n.orderId}</p>}
+                                   </div>
+                                   {!n.read && (
+                                       <button onClick={() => handleMarkNotificationRead(n.id)} className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-[10px] font-bold transition-all">
+                                           Mark Read
+                                        </button>
+                                   )}
+                               </div>
+                           ))}
+                           {localNotifications.length === 0 && (
+                               <div className="text-center py-12 text-slate-500">
+                                   <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                                       <Bell size={24} />
+                                   </div>
+                                   <p className="font-semibold text-slate-700">All caught up!</p>
+                                   <p className="text-xs text-slate-500 mt-1">You have no new notifications.</p>
+                                </div>
+                            )}
+                       </div>
+                   </div>
+               )}
+
+               {['gallery', 'settings'].includes(activeTab) && (
+                   <div className="pt-20 text-center flex flex-col items-center">
+                       <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mb-4">
+                           <Settings size={32}/>
+                       </div>
+                       <h2 className="text-2xl font-bold text-slate-800 mb-2 capitalize">{activeTab} Details</h2>
+                       <p className="text-slate-500 max-w-md">This section is currently under development and will allow you to manage your {activeTab} in future updates.</p>
+                       <button onClick={() => setActiveTab('dashboard')} className="mt-6 px-4 py-2 bg-slate-800 text-white rounded-lg font-bold text-sm">Return to Dashboard</button>
+                   </div>
+               )}
+
+            </div>
+         </div>
+      </div>
+
+              {/* Order Details & Kitchen Work Order Modal */}
+      <AnimatePresence>
+          {selectedOrder && (
+            (() => {
+              const parsed = parseOrderDetails(selectedOrder);
+              const guestsNum = Number(selectedOrder.guests || selectedOrder.guestCount || 0);
+              const pricePerPlate = Number(selectedOrder.pricePerPlate || selectedOrder.packageDetails?.startingPrice || (guestsNum > 0 && selectedOrder.totalEstimate ? Math.round(Number(selectedOrder.totalEstimate) / guestsNum) : 0));
+              const foodCost = pricePerPlate * guestsNum;
+              const platformFee = Number(selectedOrder.platformFee || 0);
+              const customerTotal = getOrderTotalAmount(selectedOrder) || (foodCost + platformFee);
+              const categorizedGroups = getCategorizedMenuItems(selectedOrder);
+              const totalItemsCount = selectedOrder.selectedItems?.length || selectedOrder.items?.length || 0;
+
+              return (
+                <div 
+                  key={`order-modal-backdrop-${selectedOrder.id}`}
+                  className="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-[80] flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto"
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                      handleCloseOrderDetails();
+                    }
+                  }}
+                >
+                  <motion.div 
+                    key={`order-modal-sheet-${selectedOrder.id}`}
+                    initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                    transition={{ duration: 0.2 }}
+                    className="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl border border-slate-200"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Top Action Bar */}
+                    <div className="p-4 sm:p-6 border-b border-slate-200 flex flex-wrap justify-between items-center gap-3 bg-slate-50">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-brand-gold-600 block mb-1">
+                          Kitchen Work Order & Event Specification Sheet
+                        </span>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <h2 className="font-display font-bold text-xl sm:text-2xl text-slate-900">Order #{selectedOrder.id}</h2>
+                          <span className={cn("px-2.5 py-1 inline-block rounded-md text-xs font-bold uppercase tracking-wider", getStatusColor(selectedOrder.status))}>
+                            {selectedOrder.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Booked on: {new Date(selectedOrder.created_at).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button 
+                          type="button"
+                          onClick={() => window.print()}
+                          className="px-3 sm:px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          title="Print Work Order Sheet"
+                        >
+                          <Printer size={14} /> <span className="hidden sm:inline">Print Work Order</span>
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={handleCloseOrderDetails}
+                          className="p-2 hover:bg-slate-200 rounded-full transition text-slate-500 cursor-pointer"
+                          title="Close modal"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Modal Body with Full Specification */}
+                    <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+                      
+                      {/* Quick Event Specs Grid */}
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                          <p className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-widest">Status</p>
+                          <span className={cn("px-2 py-0.5 inline-block rounded text-xs font-bold uppercase tracking-wider", getStatusColor(selectedOrder.status))}>
+                            {selectedOrder.status}
+                          </span>
+                        </div>
+                        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                          <p className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-widest flex items-center gap-1">
+                            <CalendarDays size={11} /> Event Date
+                          </p>
+                          <p className="font-bold text-slate-900 text-sm mt-0.5">
+                            {selectedOrder.eventDate || selectedOrder.eventDates?.join(", ") || "N/A"}
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                          <p className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-widest flex items-center gap-1">
+                            <User size={11} /> Guest Count
+                          </p>
+                          <p className="font-bold text-slate-900 text-sm mt-0.5">
+                            {getOrderGuests(selectedOrder)} Guests
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                          <p className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-widest">Occasion</p>
+                          <p className="font-bold text-slate-900 text-sm mt-0.5">
+                            {selectedOrder.eventType || selectedOrder.occasion || "Catering Event"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* 2-Column: Customer Details & Venue Location */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        {/* Customer Information */}
+                        <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
+                          <h4 className="font-bold text-slate-900 text-sm mb-3 pb-2 border-b border-slate-200/80 flex items-center gap-1.5">
+                            <User size={15} className="text-slate-500" /> Customer Contact Information
+                          </h4>
+                          <div className="space-y-2.5 text-xs">
+                            <p className="flex justify-between items-center">
+                              <span className="text-slate-500 font-medium">Customer Name:</span>
+                              <span className="font-bold text-slate-900 text-sm">{selectedOrder.customerName || "N/A"}</span>
+                            </p>
+                            <p className="flex justify-between items-center">
+                              <span className="text-slate-500 font-medium">Phone Number:</span>
+                              {selectedOrder.customerPhone || selectedOrder.phone ? (
+                                <a 
+                                  href={`tel:${selectedOrder.customerPhone || selectedOrder.phone}`}
+                                  className="font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 underline"
+                                >
+                                  <Phone size={11} /> {selectedOrder.customerPhone || selectedOrder.phone}
+                                </a>
+                              ) : (
+                                <span className="text-slate-400 font-medium">N/A</span>
+                              )}
+                            </p>
+                            <p className="flex justify-between items-center">
+                              <span className="text-slate-500 font-medium">Email Address:</span>
+                              {selectedOrder.customerEmail ? (
+                                <a 
+                                  href={`mailto:${selectedOrder.customerEmail}`}
+                                  className="font-bold text-blue-700 hover:text-blue-900 truncate max-w-[200px] flex items-center gap-1 underline"
+                                >
+                                  <Mail size={11} /> {selectedOrder.customerEmail}
+                                </a>
+                              ) : (
+                                <span className="text-slate-400 font-medium">N/A</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Venue & Location */}
+                        <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
+                          <h4 className="font-bold text-slate-900 text-sm mb-3 pb-2 border-b border-slate-200/80 flex items-center gap-1.5">
+                            <MapPin size={15} className="text-slate-500" /> Venue & Event Location
+                          </h4>
+                          <div className="space-y-2 text-xs">
+                            {parsed.venueName && (
+                              <p className="font-bold text-slate-900 text-sm">{parsed.venueName}</p>
+                            )}
+                            <p className="text-slate-700 font-medium leading-relaxed">
+                              {parsed.venueAddress || selectedOrder.venue || selectedOrder.address || "Address not specified"}
+                            </p>
+                            {(parsed.mapUrl || (selectedOrder.latitude && selectedOrder.longitude) || parsed.venueAddress) && (
+                              <a 
+                                href={parsed.mapUrl || ((selectedOrder.latitude && selectedOrder.longitude) ? `https://www.google.com/maps/search/?api=1&query=${selectedOrder.latitude},${selectedOrder.longitude}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsed.venueAddress || selectedOrder.venue || selectedOrder.address)}`)} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-gold-50 hover:bg-brand-gold-100 text-brand-gold-900 border border-brand-gold-300 rounded-lg font-bold text-xs transition-colors shadow-2xs"
+                              >
+                                📍 View in Google Maps ↗
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Meal Timings & Dietary Service Specifications */}
+                      <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200">
+                        <h4 className="font-bold text-slate-900 text-sm mb-2.5 pb-2 border-b border-slate-200 flex items-center gap-1.5">
+                          <Clock size={15} className="text-slate-500" /> Meal Service & Timings
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                          <div className="bg-white p-3 rounded-xl border border-slate-200">
+                            <span className="text-slate-500 font-medium block mb-1">Service / Meal</span>
+                            <span className="font-bold text-slate-900 text-sm">{parsed.meals || selectedOrder.mealSelection || "Full Meal Catering"}</span>
+                          </div>
+                          <div className="bg-white p-3 rounded-xl border border-slate-200">
+                            <span className="text-slate-500 font-medium block mb-1">Service Timings</span>
+                            <span className="font-bold text-slate-900 text-sm">{parsed.timings || selectedOrder.mealTimings || "Standard Meal Timings"}</span>
+                          </div>
+                          <div className="bg-white p-3 rounded-xl border border-slate-200">
+                            <span className="text-slate-500 font-medium block mb-1">Dietary Preferences</span>
+                            <span className="font-bold text-slate-900 text-sm">{parsed.dietary || "Standard Menu"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Menu & Package Items - Full Specification */}
+                      <div className="border border-slate-200 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs">
+                        <div className="flex flex-wrap justify-between items-center border-b border-slate-200 pb-3 mb-4 gap-2">
+                          <div>
+                            <h3 className="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                              <ChefHat size={18} className="text-brand-green-800" /> Full Menu Specification ({totalItemsCount} Total Items)
+                            </h3>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              Package: <span className="font-bold text-slate-800">{selectedOrder.packageDetails?.packageName || "Customized Menu"}</span>
+                            </p>
+                          </div>
+                          {selectedOrder.matchedSlab && selectedOrder.matchedSlab.minGuests && (
+                            <span className="bg-brand-gold-100 text-brand-gold-900 border border-brand-gold-200 px-3 py-1 rounded-full text-xs font-bold">
+                              {selectedOrder.matchedSlab.minGuests} - {selectedOrder.matchedSlab.maxGuests || "1000+"} Guests Slab
+                            </span>
+                          )}
+                        </div>
+
+                        {categorizedGroups.length > 0 ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-h-80 overflow-y-auto pr-1">
+                            {categorizedGroups.map((group, idx) => (
+                              <div key={idx} className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                <div className="flex justify-between items-center mb-2 pb-1 border-b border-slate-200">
+                                  <span className="font-bold text-xs uppercase text-slate-700 tracking-wider">
+                                    {group.categoryName}
+                                  </span>
+                                  <span className="text-[10px] font-bold bg-white text-slate-600 px-2 py-0.5 rounded-full border border-slate-200">
+                                    {group.items.length} items
+                                  </span>
+                                </div>
+                                <ul className="space-y-1.5 text-xs">
+                                  {group.items.map((it, iIdx) => (
+                                    <li key={iIdx} className="flex items-center gap-2 font-medium text-slate-800">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-brand-gold-500 shrink-0"></span>
+                                      <span>{it}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-500 italic py-2">Chef&apos;s curated package selections.</p>
+                        )}
+                      </div>
+
+                      {/* Customer Special Instructions & Dietary Notes */}
+                      {parsed.specialInstructions && (
+                        <div className="border border-amber-200 bg-amber-50/80 rounded-2xl p-4">
+                          <h4 className="font-bold text-amber-900 text-xs uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            📌 Customer Special Instructions & Dietary Notes
+                          </h4>
+                          <p className="text-amber-950 font-medium text-xs whitespace-pre-line leading-relaxed">
+                            {parsed.specialInstructions}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Financial Breakdown & Commercials */}
+                      <div className="border border-emerald-200 bg-emerald-50/70 rounded-2xl p-4 sm:p-5">
+                        <h3 className="font-bold text-emerald-950 text-sm mb-3 flex items-center justify-between border-b border-emerald-200/80 pb-2">
+                          <span className="flex items-center gap-1.5">
+                            <CreditCard size={16} className="text-emerald-700" /> Commercial Financials & Billing
+                          </span>
+                          {pricePerPlate > 0 && (
+                            <span className="text-xs font-bold bg-white text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                              ₹{pricePerPlate} / plate
+                            </span>
+                          )}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                          <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
+                            <span className="text-slate-500 font-medium block mb-1">
+                              Food Cost ({pricePerPlate > 0 ? `₹${pricePerPlate}` : "Custom"} × {guestsNum} guests)
+                            </span>
+                            <span className="text-slate-900 font-bold text-sm">₹{foodCost.toLocaleString("en-IN")}</span>
+                          </div>
+                          <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
+                            <span className="text-slate-500 font-medium block mb-1">Platform Fee</span>
+                            <span className="text-slate-900 font-bold text-sm">{platformFee > 0 ? `₹${platformFee.toLocaleString("en-IN")}` : "Included / ₹0"}</span>
+                          </div>
+                          <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
+                            <span className="text-slate-500 font-medium block mb-1">Customer Total</span>
+                            <span className="text-brand-green-950 font-extrabold text-lg">₹{customerTotal.toLocaleString("en-IN")}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Private Caterer Kitchen Notes (Memo) */}
+                      <div className="border border-slate-200 bg-slate-50 rounded-2xl p-4 text-left">
+                        <div className="flex justify-between items-center mb-1.5">
+                          <h4 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                            🔒 Caterer Private Kitchen Notes (Confidential)
+                          </h4>
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold">Staff & Kitchen Eyes Only</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mb-2">
+                          Add private kitchen notes, head chef assignments, delivery dispatch timing, or setup reminders:
+                        </p>
+                        <textarea 
+                          value={internalNotesText}
+                          onChange={(e) => setInternalNotesText(e.target.value)}
+                          placeholder="e.g. Head chef Assigned: Ramesh. Setup vehicles must leave by 10:30 AM. Extra welcome drinks buffer requested..."
+                          className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-gold-500 outline-none resize-none h-20 mb-2 font-sans"
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => handleSaveInternalNotes(selectedOrder.id)}
+                          className="px-4 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <Save size={13} /> Save Memo
+                        </button>
+                      </div>
+
+                    </div>
+
+                    {/* Modal Footer Actions */}
+                    <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center flex-wrap gap-3">
+                      <div>
+                        <span className="text-xs text-slate-500">
+                          Order ID: <strong className="text-slate-800 font-mono">#{selectedOrder.id}</strong>
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        {["pending", "Submitted", "Pending Caterer Review", "updated_by_customer", "changes_requested"].includes(normalizeStatus(selectedOrder.status)) ? (
+                          <>
+                            <button 
+                              type="button"
+                              onClick={() => setShowRejectModal(true)} 
+                              className="px-4 py-2 border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                            >
+                              Reject
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={() => setShowChangesRequestModal(true)} 
+                              className="px-4 py-2 border border-blue-300 text-blue-700 hover:bg-blue-50 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                            >
+                              Request Changes
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={() => handleApprove(selectedOrder.id)} 
+                              className="px-5 py-2 bg-brand-green-900 text-white hover:bg-brand-green-800 font-bold rounded-xl text-xs transition-colors shadow-lg shadow-brand-green-900/20 cursor-pointer"
+                            >
+                              Approve Order
+                            </button>
+                          </>
+                        ) : normalizeStatus(selectedOrder.status) === "approved" ? (
+                          <>
+                            <button 
+                              type="button"
+                              onClick={async () => {
+                                await performOrderStatusUpdate(
+                                  selectedOrder.id, 
+                                  "completed", 
+                                  { completedAt: new Date().toISOString() }, 
+                                  user?.email || "partner@caternest.com", 
+                                  "partner"
+                                );
+                                storeNotification(
+                                  selectedOrder.id, 
+                                  "Event Completed 🎉", 
+                                  `Your catering booking with ${caterer?.businessName || "the caterer"} has been marked as Completed!`, 
+                                  "customer", 
+                                  caterer?.id
+                                );
+                                await refreshData();
+                                handleCloseOrderDetails();
+                                toast("Booking marked as Completed!", "success");
+                              }} 
+                              className="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-xs transition-colors shadow-sm cursor-pointer"
+                            >
+                              Mark Event Completed
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={handleCloseOrderDetails} 
+                              className="px-6 py-2 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 text-xs transition cursor-pointer"
+                            >
+                              Close
+                            </button>
+                          </>
+                        ) : (
+                          <button 
+                            type="button"
+                            onClick={handleCloseOrderDetails} 
+                            className="px-6 py-2 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 text-xs transition cursor-pointer"
+                          >
+                            Close
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              );
+            })()
+          )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showRejectModal && (
+               <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+                     <h3 className="text-xl font-bold text-slate-900 mb-2">Reject Order</h3>
+                     <p className="text-sm text-slate-500 mb-4">Please provide a reason for rejecting this order. The customer will be notified.</p>
+                     <textarea 
+                         className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:border-red-500 outline-none resize-none h-24 mb-4"
+                         placeholder="e.g. Date fully booked, Out of service area..."
+                         value={rejectReason}
+                         onChange={(e)=>setRejectReason(e.target.value)}
+                     ></textarea>
+                     <div className="flex gap-3 justify-end mt-2">
+                         <button onClick={() => setShowRejectModal(false)} className="px-4 py-2 font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
+                         <button onClick={handleReject} className="px-4 py-2 font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md shadow-red-600/20 w-32">Confirm Reject</button>
+                     </div>
+                 </motion.div>
+              </div>
+          )}
+
+          {showChangesRequestModal && (
+              <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+                     <h3 className="text-xl font-bold text-slate-900 mb-2">Request Order Changes</h3>
+                     <p className="text-sm text-slate-500 mb-4">Please specify what changes, details, or clarifications you are requesting from the customer. The customer will be prompted to update their choices.</p>
+                     <textarea 
+                         className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:border-blue-500 outline-none resize-none h-24 mb-4"
+                         placeholder="e.g. Please specify dessert choices, adjust event start time, etc..."
+                         value={changesRequestText}
+                         onChange={(e)=>setChangesRequestText(e.target.value)}
+                     ></textarea>
+                     <div className="flex gap-3 justify-end mt-2">
+                         <button onClick={() => { setShowChangesRequestModal(false); setChangesRequestText(''); }} className="px-4 py-2 font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
+                         <button onClick={handleRequestChanges} className="px-4 py-2 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md shadow-blue-600/20">Send Request</button>
+                     </div>
+                 </motion.div>
+              </div>
+          )}
+
+          {showModifyModal && (
+              <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+                     <h3 className="text-xl font-bold text-slate-900 mb-4">Modify Order Quote</h3>
+                     
+                     <div className="space-y-4 mb-6">
+                         <div>
+                             <label className="block text-sm font-bold text-slate-700 mb-1">Price Per Plate (₹)</label>
+                             <input type="number" value={modifyData.price} onChange={(e)=>setModifyData({...modifyData, price: Number(e.target.value)})} className="w-full bg-slate-50 border border-slate-200 p-2 rounded-lg" />
+                         </div>
+                         <div>
+                             <label className="block text-sm font-bold text-slate-700 mb-1">Guest Count</label>
+                             <input type="number" value={modifyData.guests} onChange={(e)=>setModifyData({...modifyData, guests: Number(e.target.value)})} className="w-full bg-slate-50 border border-slate-200 p-2 rounded-lg" />
+                         </div>
+                         <div>
+                             <label className="block text-sm font-bold text-slate-700 mb-1">Caterer Notes for Customer</label>
+                             <textarea value={modifyData.notes} onChange={(e)=>setModifyData({...modifyData, notes: e.target.value})} className="w-full bg-slate-50 border border-slate-200 p-2 rounded-lg resize-none h-20 placeholder:text-slate-400" placeholder="e.g. Adjusted price for premium items requested..."></textarea>
+                         </div>
+                     </div>
+
+                     <div className="bg-brand-green-50 p-3 rounded-lg flex justify-between items-center mb-6">
+                         <span className="font-bold text-brand-green-900">New Estimate:</span>
+                         <span className="font-display font-bold text-xl text-brand-green-900">₹{(modifyData.price * modifyData.guests + (selectedOrder?.platformFee || 0)).toLocaleString()}</span>
+                     </div>
+                     
+                     <div className="flex gap-3 justify-end">
+                         <button onClick={() => setShowModifyModal(false)} className="px-4 py-2 font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
+                         <button onClick={handleModify} className="px-4 py-2 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md shadow-blue-600/20">Send Modification</button>
+                     </div>
+                 </motion.div>
+              </div>
+          )}
+      </AnimatePresence>
+    </div>
+  );
+}
