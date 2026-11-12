@@ -10,13 +10,6 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 import zlib from "zlib";
 import { execSync } from "child_process";
-import * as pdfParseModule from "pdf-parse";
-
-const PDFParse: any =
-  (pdfParseModule as any)?.PDFParse ||
-  (pdfParseModule as any)?.default ||
-  pdfParseModule;
-
 import {
   sendWhatsAppMessage,
   normalizePhoneNumber,
@@ -32,18 +25,23 @@ const app = express();
 // Path normalizer middleware for Vercel Serverless Functions
 // Restores original request URL when Vercel rewrites forward /api/(.*) to /api/index
 app.use((req: any, res: any, next: any) => {
-  const queryPath = req.query?.__path ? String(req.query.__path) : null;
-  const forwardedUrl =
-    (queryPath ? `/api/${queryPath.replace(/^\/+/, "")}` : null) ||
-    req.headers["x-forwarded-url"] ||
-    req.headers["x-forwarded-uri"] ||
-    (req.headers["x-now-route-matches"]
-      ? `/api/${decodeURIComponent(String(req.headers["x-now-route-matches"]).replace(/^1=/, ""))}`
-      : null);
-
-  if (forwardedUrl && typeof forwardedUrl === "string" && forwardedUrl !== "/api/index" && forwardedUrl !== "/api") {
-    req.url = forwardedUrl;
-  }
+  try {
+    const rawUrl = String(req.url || "");
+    if (rawUrl.includes("__path=")) {
+      const parsed = new URL(rawUrl, "http://localhost");
+      const qPath = parsed.searchParams.get("__path");
+      if (qPath) {
+        req.url = `/api/${qPath.replace(/^\/+/, "")}`;
+      }
+    } else if (req.query?.__path) {
+      req.url = `/api/${String(req.query.__path).replace(/^\/+/, "")}`;
+    } else if (req.headers["x-forwarded-url"] || req.headers["x-forwarded-uri"]) {
+      const fwd = String(req.headers["x-forwarded-url"] || req.headers["x-forwarded-uri"]);
+      if (fwd.startsWith("/api/")) {
+        req.url = fwd;
+      }
+    }
+  } catch {}
   next();
 });
 
@@ -167,6 +165,7 @@ export function resolveSupabaseUrl(rawUrl?: string, key?: string): string {
 export function getServiceRoleKey(): string {
   return (
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
     process.env.SUPABASE_SERVICE_KEY ||
     process.env.SUPABASE_SECRET_KEY ||
     process.env.SERVICE_ROLE_KEY ||
@@ -4000,13 +3999,21 @@ const extractPdfAssetsAndText = async (
   const cardImages: { b64: string; mimeType: string }[] = [];
 
   try {
-    const parser = new PDFParse({ data: pdfBuffer });
-    const parsed = await parser.getText();
-    if (parsed && parsed.text) {
-      text = parsed.text;
+    const pdfModule: any = await import("pdf-parse").catch(() => null);
+    const PDFParseClass =
+      pdfModule?.PDFParse ||
+      pdfModule?.default?.PDFParse ||
+      pdfModule?.default ||
+      pdfModule;
+    if (typeof PDFParseClass === "function") {
+      const parser = new PDFParseClass({ data: pdfBuffer });
+      const parsed = await parser.getText();
+      if (parsed && parsed.text) {
+        text = parsed.text;
+      }
     }
-  } catch (pdfErr) {
-    console.warn("[MENU PARSER] PDFParse text extraction error:", pdfErr);
+  } catch (pdfErr: any) {
+    console.warn("[MENU PARSER] Dynamic pdf-parse extraction skipped or unavailable:", pdfErr?.message);
   }
 
   try {
@@ -6373,3 +6380,4 @@ app.use((err: any, req: any, res: any, next: any) => {
 });
 
 export default app;
+export { app };

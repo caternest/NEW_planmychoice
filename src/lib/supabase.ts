@@ -454,8 +454,13 @@ export async function uploadMenuDocumentToStorage(
         signJson = await signRes.json().catch(() => null);
       } else {
         const signErrText = await signRes.text().catch(() => '');
-        lastErrors.push({ path: 'presign', error: `HTTP ${signRes.status}: ${signErrText}` });
-        console.warn(`[MENU STORAGE] Storage sign returned HTTP ${signRes.status}.`);
+        let cleanErr = signErrText;
+        try {
+          const parsed = JSON.parse(signErrText);
+          cleanErr = parsed.error || parsed.message || signErrText;
+        } catch {}
+        lastErrors.push({ path: 'presign', error: `HTTP ${signRes.status}: ${cleanErr}` });
+        console.warn(`[MENU STORAGE] Storage sign returned HTTP ${signRes.status}:`, cleanErr);
       }
     } catch (signErr: any) {
       lastErrors.push({ path: 'presign', error: signErr?.message || 'Network error' });
