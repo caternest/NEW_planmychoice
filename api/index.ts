@@ -16,17 +16,20 @@ import {
   normalizePhoneNumberE164,
   sendOrderApprovedWhatsApp,
   sendOrderApprovedSMS,
-} from "../src/server/whatsapp-service.ts";
+} from "../src/server/whatsapp-service";
 
 dotenv.config();
 
 const app = express();
 
 // Path normalizer middleware for Vercel Serverless Functions
-// Restores original request URL when Vercel rewrites forward /api/(.*) to /api/index
+// Restores original request URL when Vercel rewrites forward /api/(.*) to /api
 app.use((req: any, res: any, next: any) => {
   try {
     const rawUrl = String(req.url || "");
+    const rawOriginalUrl = String(req.originalUrl || "");
+
+    // 1. Check for query parameter __path
     if (rawUrl.includes("__path=")) {
       const parsed = new URL(rawUrl, "http://localhost");
       const qPath = parsed.searchParams.get("__path");
@@ -35,11 +38,22 @@ app.use((req: any, res: any, next: any) => {
       }
     } else if (req.query?.__path) {
       req.url = `/api/${String(req.query.__path).replace(/^\/+/, "")}`;
-    } else if (req.headers["x-forwarded-url"] || req.headers["x-forwarded-uri"]) {
-      const fwd = String(req.headers["x-forwarded-url"] || req.headers["x-forwarded-uri"]);
+    }
+    // 2. Check for Vercel forwarding headers
+    else if (req.headers["x-forwarded-url"] || req.headers["x-forwarded-uri"] || req.headers["x-matched-path"]) {
+      const fwd = String(
+        req.headers["x-forwarded-url"] ||
+        req.headers["x-forwarded-uri"] ||
+        req.headers["x-matched-path"] ||
+        ""
+      );
       if (fwd.startsWith("/api/")) {
         req.url = fwd;
       }
+    }
+    // 3. Fallback to originalUrl if it has the specific API route
+    else if (rawOriginalUrl.startsWith("/api/") && rawUrl === "/api") {
+      req.url = rawOriginalUrl;
     }
   } catch {}
   next();
@@ -163,15 +177,15 @@ export function resolveSupabaseUrl(rawUrl?: string, key?: string): string {
 }
 
 export function getServiceRoleKey(): string {
-  return (
+  const raw =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
     process.env.SUPABASE_SERVICE_KEY ||
     process.env.SUPABASE_SECRET_KEY ||
     process.env.SERVICE_ROLE_KEY ||
     process.env.SUPABASE_ADMIN_KEY ||
-    ""
-  );
+    "";
+  return raw.trim().replace(/^["']|["']$/g, "");
 }
 
 // Auto-repair environment Supabase URL if mistyped or missing canonical host
@@ -580,18 +594,33 @@ async function ensureBucketExists(supabase: any, bucketName: string, isPublic: b
 }
 
 app.post(["/api/storage/sign", "/storage/sign"], async (req: any, res: any) => {
+  const requestId = `sign_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  res.setHeader("X-Request-Id", requestId);
+
+  // 1. Structured log at Function Entry
+  console.log(`[STORAGE SIGN][${requestId}] Function entry:`, {
+    method: req.method,
+    url: req.url,
+    originalUrl: req.originalUrl,
+    contentType: req.headers["content-type"],
+    hasBody: !!req.body,
+    bucket: req.body?.bucket,
+    filePath: req.body?.filePath,
+  });
+
   try {
-    const rawBucket = String(req.body?.bucket || "documents").trim();
+    const rawBucket = String(req.body?.bucket || "menu-cards").trim();
     const rawFilePath = String(req.body?.filePath || "").trim();
 
     // Whitelist allowed storage buckets to prevent arbitrary bucket operations
     const ALLOWED_BUCKETS = ["documents", "menu-cards", "branding-images", "food-images", "gallery-images"];
-    const targetBucket = ALLOWED_BUCKETS.includes(rawBucket) ? rawBucket : "documents";
+    const targetBucket = ALLOWED_BUCKETS.includes(rawBucket) ? rawBucket : "menu-cards";
 
     if (!rawFilePath) {
-      console.warn("[STORAGE SIGN] Presign rejected: Missing filePath in request body.");
+      console.warn(`[STORAGE SIGN][${requestId}] Presign rejected: Missing filePath in request body.`);
       return res.status(400).json({
         success: false,
+        requestId,
         error: "Missing required 'filePath' in request body.",
         code: "MISSING_FILEPATH",
       });
@@ -600,26 +629,34 @@ app.post(["/api/storage/sign", "/storage/sign"], async (req: any, res: any) => {
     // Sanitize filePath to prevent path traversal
     const cleanFilePath = rawFilePath.replace(/\\/g, "/").replace(/\.\.\//g, "").replace(/^\/+/, "");
     if (!cleanFilePath) {
+      console.warn(`[STORAGE SIGN][${requestId}] Presign rejected: Invalid cleanFilePath after sanitization.`);
       return res.status(400).json({
         success: false,
+        requestId,
         error: "Invalid 'filePath' provided.",
         code: "INVALID_FILEPATH",
       });
     }
 
-    const serviceRoleKey = getServiceRoleKey();
-    const hasServiceRole = !!serviceRoleKey;
+    // 2. Structured log for Environment Variable presence check (sanitized, zero secrets logged)
+    const rawServiceRole = getServiceRoleKey();
+    const rawSupabaseUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").trim().replace(/^["']|["']$/g, "");
+    const envPresence = {
+      hasSupabaseUrl: !!rawSupabaseUrl,
+      supabaseUrlHost: rawSupabaseUrl ? rawSupabaseUrl.split("/")[2] || "configured" : "missing",
+      hasServiceRoleKey: !!rawServiceRole,
+      serviceRoleKeyLength: rawServiceRole.length,
+      hasAnonKey: !!(process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY),
+    };
+    console.log(`[STORAGE SIGN][${requestId}] Environment variable presence:`, envPresence);
 
-    console.log(
-      `[STORAGE SIGN] Processing presign request. Bucket: "${targetBucket}", Path: "${cleanFilePath}", HasServiceRole: ${hasServiceRole}`,
-    );
-
-    if (!hasServiceRole) {
+    if (!rawServiceRole) {
       const missingErrMsg =
-        "SUPABASE_SERVICE_ROLE_KEY is required in Vercel environment variables to generate signed upload URLs for storage.";
-      console.error(`[STORAGE SIGN] Error: ${missingErrMsg}`);
+        "SUPABASE_SERVICE_ROLE_KEY is required in Vercel environment variables to generate signed upload URLs for storage. Please add SUPABASE_SERVICE_ROLE_KEY under Vercel Project Settings > Environment Variables.";
+      console.error(`[STORAGE SIGN][${requestId}] Configuration Error: ${missingErrMsg}`);
       return res.status(500).json({
         success: false,
+        requestId,
         error: missingErrMsg,
         code: "MISSING_SERVICE_ROLE_KEY",
         missingEnv: "SUPABASE_SERVICE_ROLE_KEY",
@@ -628,30 +665,47 @@ app.post(["/api/storage/sign", "/storage/sign"], async (req: any, res: any) => {
       });
     }
 
-    const supabase = getSupabaseClient();
-    if (!supabase) {
-      console.error("[STORAGE SIGN] Supabase server client failed to initialize.");
+    // 3. Supabase service-role client initialization
+    const supabaseUrl = resolveSupabaseUrl(rawSupabaseUrl, rawServiceRole);
+    if (!supabaseUrl) {
+      const urlErrMsg = "Supabase URL could not be resolved from environment variables.";
+      console.error(`[STORAGE SIGN][${requestId}] Error: ${urlErrMsg}`);
       return res.status(500).json({
         success: false,
-        error: "Supabase client initialization failed on server.",
-        code: "CLIENT_INIT_FAILED",
+        requestId,
+        error: urlErrMsg,
+        code: "INVALID_SUPABASE_URL",
       });
     }
+
+    console.log(`[STORAGE SIGN][${requestId}] Initializing stateless service-role Supabase client...`);
+    const supabase = createClient(supabaseUrl, rawServiceRole, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
 
     // Ensure bucket exists safely without throwing unhandled errors
     await ensureBucketExists(supabase, targetBucket, targetBucket !== "documents");
 
+    // 4. createSignedUploadUrl invocation structured log
+    console.log(
+      `[STORAGE SIGN][${requestId}] Invoking createSignedUploadUrl for bucket "${targetBucket}", path "${cleanFilePath}"...`
+    );
     const { data, error } = await supabase.storage
       .from(targetBucket)
       .createSignedUploadUrl(cleanFilePath, { upsert: true });
 
     if (error || !data?.signedUrl) {
       const errMsg = error?.message || "Supabase Storage returned empty signed URL.";
-      console.error(
-        `[STORAGE SIGN] createSignedUploadUrl failed for bucket "${targetBucket}" path "${cleanFilePath}": ${errMsg}`
-      );
+      console.error(`[STORAGE SIGN][${requestId}] createSignedUploadUrl failed:`, {
+        error: errMsg,
+        status: (error as any)?.statusCode || (error as any)?.status,
+      });
       return res.status(500).json({
         success: false,
+        requestId,
         error: errMsg,
         code: (error as any)?.statusCode || (error as any)?.code || "STORAGE_SIGN_FAILED",
         bucket: targetBucket,
@@ -669,7 +723,7 @@ app.post(["/api/storage/sign", "/storage/sign"], async (req: any, res: any) => {
         signedDownloadUrl = dlData.signedUrl;
       }
     } catch (dlEx: any) {
-      console.warn("[STORAGE SIGN] Notice: signed download URL generation skipped:", dlEx?.message);
+      console.warn(`[STORAGE SIGN][${requestId}] Notice: signed download URL generation skipped:`, dlEx?.message);
     }
 
     const { data: publicData } = supabase.storage
@@ -678,10 +732,11 @@ app.post(["/api/storage/sign", "/storage/sign"], async (req: any, res: any) => {
 
     const publicUrl = publicData?.publicUrl || null;
 
-    console.log(`[STORAGE SIGN] Presigned URL successfully issued for ${targetBucket}/${cleanFilePath}`);
+    console.log(`[STORAGE SIGN][${requestId}] Signed upload URL successfully generated for ${targetBucket}/${cleanFilePath}`);
 
     return res.status(200).json({
       success: true,
+      requestId,
       signedUrl: data.signedUrl,
       token: data.token,
       path: data.path || cleanFilePath,
@@ -691,10 +746,19 @@ app.post(["/api/storage/sign", "/storage/sign"], async (req: any, res: any) => {
       publicUrl: signedDownloadUrl || publicUrl,
     });
   } catch (err: any) {
-    console.error("[STORAGE SIGN] Unhandled exception in /api/storage/sign:", err?.message || err);
+    // 5. Error catch block with complete error name, message, stack, and cause (secrets redacted)
+    const errorDetails = {
+      name: err?.name || "Error",
+      message: err?.message || String(err),
+      stack: err?.stack || "",
+      cause: err?.cause ? String(err.cause) : undefined,
+    };
+    console.error(`[STORAGE SIGN][${requestId}] Unhandled exception in /api/storage/sign:`, errorDetails);
     return res.status(500).json({
       success: false,
+      requestId,
       error: err?.message || "Internal server error during storage pre-sign operation.",
+      errorName: err?.name || "Error",
       code: "INTERNAL_SIGN_ERROR",
     });
   }

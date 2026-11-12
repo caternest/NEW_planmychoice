@@ -438,6 +438,7 @@ export async function uploadMenuDocumentToStorage(
 
     // 1. Attempt to obtain signed upload URL and tokens from backend
     let signJson: any = null;
+    let requestId: string | null = null;
     try {
       const signRes = await fetch('/api/storage/sign', {
         method: 'POST',
@@ -450,20 +451,31 @@ export async function uploadMenuDocumentToStorage(
         }),
       });
 
+      requestId = signRes.headers.get('x-request-id') || null;
+
       if (signRes.ok) {
         signJson = await signRes.json().catch(() => null);
+        if (signJson?.requestId) requestId = signJson.requestId;
       } else {
         const signErrText = await signRes.text().catch(() => '');
         let cleanErr = signErrText;
         try {
           const parsed = JSON.parse(signErrText);
           cleanErr = parsed.error || parsed.message || signErrText;
-        } catch {}
-        lastErrors.push({ path: 'presign', error: `HTTP ${signRes.status}: ${cleanErr}` });
+          if (parsed.requestId) requestId = parsed.requestId;
+        } catch {
+          // If HTML from Vercel gateway, extract brief marker
+          if (cleanErr.includes('FUNCTION_INVOCATION_FAILED')) {
+            const match = cleanErr.match(/bom1::[a-zA-Z0-9_-]+/);
+            cleanErr = `Serverless Function Crash: FUNCTION_INVOCATION_FAILED ${match ? `(${match[0]})` : ''}`;
+          }
+        }
+        const formattedErr = `HTTP ${signRes.status}: ${cleanErr}${requestId ? ` [Request ID: ${requestId}]` : ''}`;
+        lastErrors.push({ path: 'presign', error: formattedErr });
         console.warn(`[MENU STORAGE] Storage sign returned HTTP ${signRes.status}:`, cleanErr);
       }
     } catch (signErr: any) {
-      lastErrors.push({ path: 'presign', error: signErr?.message || 'Network error' });
+      lastErrors.push({ path: 'presign', error: signErr?.message || 'Network error requesting signed URL' });
       console.warn(`[MENU STORAGE] Network error requesting signed URL:`, signErr);
     }
 
@@ -475,7 +487,7 @@ export async function uploadMenuDocumentToStorage(
       };
     }
 
-    // PATH 1: If backend provided a signed upload URL, upload directly via XHR
+    // PATH 1: Upload directly via XHR to Supabase Storage signed upload URL
     if (signJson?.success && signJson.signedUrl) {
       const { signedUrl, token, bucket, filePath, signedDownloadUrl, publicUrl } = signJson;
       console.log(`[MENU STORAGE] Signed upload URL acquired. Uploading raw file directly to storage...`);
@@ -507,13 +519,13 @@ export async function uploadMenuDocumentToStorage(
 
         xhr.onerror = () => {
           console.warn(`[MENU STORAGE] Direct XHR network error.`);
-          lastErrors.push({ path: 'signed-xhr', error: 'Network error during PUT' });
+          lastErrors.push({ path: 'signed-xhr', error: 'Network error during PUT to signed URL' });
           resolve(false);
         };
 
         xhr.ontimeout = () => {
           console.warn(`[MENU STORAGE] Direct XHR upload timed out after 180s.`);
-          lastErrors.push({ path: 'signed-xhr', error: 'PUT timed out after 180s' });
+          lastErrors.push({ path: 'signed-xhr', error: 'PUT to signed URL timed out after 180s' });
           resolve(false);
         };
 
@@ -530,7 +542,7 @@ export async function uploadMenuDocumentToStorage(
         };
       }
 
-      // Fallback to Supabase JS SDK uploadToSignedUrl if XHR failed
+      // Retry via Supabase JS SDK uploadToSignedUrl if XHR failed
       try {
         const client = getSupabase();
         if (client && token) {
@@ -562,53 +574,6 @@ export async function uploadMenuDocumentToStorage(
       }
     }
 
-    // PATH 2: Direct Client SDK Upload (only attempted if user is authenticated)
-    if (client && authUserId) {
-      console.log(`[MENU STORAGE] Attempting direct browser upload to Supabase Storage via client SDK for authenticated user...`);
-      onProgress?.(20);
-
-      const menuBuckets = Array.from(new Set([targetBucket, 'documents']));
-
-      for (const b of menuBuckets) {
-        try {
-          console.log(`[MENU STORAGE] Attempting client direct upload to bucket "${b}" with path "${fileName}"...`);
-          onProgress?.(25);
-          const { data, error } = await client.storage
-            .from(b)
-            .upload(fileName, file, {
-              contentType: file.type || 'application/pdf',
-              upsert: true,
-            });
-
-          if (!error && data) {
-            console.log(`[MENU STORAGE] Client direct upload succeeded to bucket "${b}"!`);
-            onProgress?.(100);
-
-            const { data: pubData } = client.storage.from(b).getPublicUrl(fileName);
-            let clientSignedUrl: string | null = null;
-            try {
-              const { data: sData } = await client.storage.from(b).createSignedUrl(fileName, 3600);
-              if (sData?.signedUrl) clientSignedUrl = sData.signedUrl;
-            } catch {}
-
-            return {
-              success: true,
-              bucket: b,
-              path: fileName,
-              url: clientSignedUrl || pubData?.publicUrl || undefined,
-            };
-          } else if (error) {
-            const statusCode = (error as any)?.statusCode || (error as any)?.status || 'RLS';
-            lastErrors.push({ path: `client-direct-${b}`, error: `${error.message} (${statusCode})` });
-            console.warn(`[MENU STORAGE] Client direct upload to bucket "${b}" failed:`, error.message);
-          }
-        } catch (bErr: any) {
-          lastErrors.push({ path: `client-direct-${b}`, error: bErr?.message || 'Exception' });
-          console.warn(`[MENU STORAGE] Exception in client upload to bucket "${b}":`, bErr);
-        }
-      }
-    }
-
     // Send safe telemetry report to /api/storage/diagnostic-log
     try {
       fetch('/api/storage/diagnostic-log', {
@@ -619,6 +584,7 @@ export async function uploadMenuDocumentToStorage(
           fileName: file.name,
           fileSize: file.size,
           mimeType: file.type,
+          requestId,
           error: lastErrors.map((e) => `[${e.path}]: ${e.error}`).join(' | '),
           details: lastErrors,
         }),
