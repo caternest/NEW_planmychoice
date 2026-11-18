@@ -1,46 +1,86 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, ChevronRight, Utensils, User, Store, FileText, CheckCircle2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export default function JoinSteps({ currentStep }: { currentStep: number }) {
   const steps = [
-    { title: "Menu & Pricing", desc: "AI Extraction" },
-    { title: "Basic Details", desc: "Contact Information" },
-    { title: "Business Details", desc: "Operations & Location" },
-    { title: "Documents", desc: "Verification Documents" },
-    { title: "Review & Submit", desc: "Final Confirmation" }
+    { title: "Menu & Pricing", desc: "AI Extraction", icon: Utensils },
+    { title: "Basic Details", desc: "Contact Information", icon: User },
+    { title: "Business Details", desc: "Operations & Location", icon: Store },
+    { title: "Documents", desc: "Verification Documents", icon: FileText },
+    { title: "Review & Submit", desc: "Final Confirmation", icon: CheckCircle2 }
   ];
 
   return (
     <div className="relative">
-      <div className="absolute left-[17px] top-4 bottom-4 w-[1.5px] bg-slate-200" />
-      <div className="space-y-6">
+      <div className="absolute left-[26px] top-6 bottom-6 w-[1.5px] bg-[#E3D5B0]" />
+      <div className="space-y-3">
         {steps.map((step, idx) => {
           const stepNum = idx + 1;
           const isActive = currentStep === stepNum;
           const isPast = currentStep > stepNum;
-          
+          const StepIcon = step.icon;
+
           return (
-            <div key={idx} className="relative flex gap-4 select-none items-center">
-              <div 
-                className={cn(
-                  "w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center relative z-10 transition-all duration-300 border-2 font-poppins text-sm font-semibold",
-                  isPast ? "bg-brand-green-900 border-brand-green-900 text-white" : 
-                  isActive ? "bg-brand-gold-500 border-brand-gold-500 text-slate-900 ring-4 ring-brand-gold-500/10 font-bold" : 
-                  "bg-white border-slate-200 text-slate-400"
-                )}
-              >
-                {isPast ? <Check size={16} strokeWidth={3} className="text-white" /> : <span>{stepNum}</span>}
+            <div
+              key={idx}
+              className={cn(
+                "relative flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-2xl transition-all duration-200 select-none",
+                isActive
+                  ? "bg-gradient-to-r from-[#FAE4A0] via-[#F7DC88] to-[#F3CF6B]/85 border border-[#E5B84B] shadow-[0_4px_14px_rgba(217,163,35,0.2)]"
+                  : "border border-transparent"
+              )}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div
+                  className={cn(
+                    "w-7 h-7 rounded-full flex flex-shrink-0 items-center justify-center relative z-10 transition-all border font-poppins text-xs font-bold",
+                    isPast
+                      ? "bg-[#024731] border-[#024731] text-white"
+                      : isActive
+                        ? "bg-gradient-to-b from-[#E8A923] to-[#C88412] border-[#B77A12] text-white shadow-xs"
+                        : "bg-[#FFFDF8] border-[#D8CFAF] text-[#494032]"
+                  )}
+                >
+                  {isPast ? <Check size={13} strokeWidth={3} /> : <span>{stepNum}</span>}
+                </div>
+
+                <div
+                  className={cn(
+                    "w-7 h-7 rounded-full flex flex-shrink-0 items-center justify-center border transition-colors",
+                    isActive
+                      ? "bg-[#FFFDF8]/80 border-[#D9A323]/55 text-[#0F3D2E]"
+                      : isPast
+                        ? "bg-[#E6F4EC] border-[#A7DCBA] text-[#024731]"
+                        : "bg-[#FAF6EC] border-[#E4D7B6] text-[#6B5F4B]"
+                  )}
+                >
+                  <StepIcon size={13} strokeWidth={2.1} />
+                </div>
+
+                <div className="min-w-0">
+                  <p
+                    className={cn(
+                      "text-[11px] font-bold font-poppins uppercase tracking-wider leading-tight truncate",
+                      isActive ? "text-[#0F241C]" : isPast ? "text-[#024731]" : "text-[#3D3526]"
+                    )}
+                  >
+                    {step.title}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-[10.5px] font-poppins leading-tight mt-0.5 truncate",
+                      isActive ? "text-[#4A3B22] font-medium" : "text-[#6B5F4B]"
+                    )}
+                  >
+                    {step.desc}
+                  </p>
+                </div>
               </div>
-              <div className="pt-0.5">
-                <p className={cn(
-                  "text-xs font-bold font-poppins uppercase tracking-wider transition-colors", 
-                  isActive ? "text-brand-gold-600" : isPast ? "text-brand-green-800" : "text-slate-400"
-                )}>
-                  {step.title}
-                </p>
-                <p className="text-[11px] text-slate-400 font-poppins leading-none mt-0.5">{step.desc}</p>
-              </div>
+
+              {isActive && (
+                <ChevronRight size={14} className="text-[#6B4A10] shrink-0" />
+              )}
             </div>
           );
         })}

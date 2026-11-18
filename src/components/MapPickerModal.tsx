@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, X, Check, Search, Globe, AlertCircle, RefreshCw } from 'lucide-react';
 import { LOCAL_HYDERABAD_LOCATIONS } from './AddressAutocomplete';
 import { searchLocations, reverseGeocode as libReverseGeocode } from '../lib/locationIntelligence';
+import { toast } from './Toast';
 
 
 interface MapPickerModalProps {
@@ -358,7 +359,7 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
 
   const handleModalUseCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+      toast("Geolocation is not supported by your browser", "error");
       return;
     }
 
@@ -505,26 +506,28 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
           animation: markerGlowEffect 2.0s cubic-bezier(0.16, 1, 0.3, 1) 1;
         }
       `}} />
-      <div className="bg-white border border-[#E7D4A4] rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden text-slate-800 relative flex flex-col max-h-[90vh]">
+      <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden text-[#0F241C] relative flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-stone-50">
-          <div className="flex items-center gap-2">
-            <MapPin className="text-[#D4AF37]" size={20} />
-            <h3 className="text-base font-serif font-bold text-[#1E1E1E] uppercase tracking-wide">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-[#D9A323]/40 bg-gradient-to-r from-[#01291D] via-[#034431] to-[#01261B] text-[#FFFDF8]">
+          <div className="flex items-center gap-2.5">
+            <span className="w-8 h-8 rounded-lg bg-[#F5C642]/15 border border-[#F5C642]/40 flex items-center justify-center">
+              <MapPin className="text-[#F5C642]" size={18} />
+            </span>
+            <h3 className="text-base font-display font-bold text-[#FFFDF8] uppercase tracking-wide">
               {title}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition cursor-pointer"
+            className="text-[#F5C642]/80 hover:text-[#FFFDF8] bg-white/10 hover:bg-white/20 border border-[#D9A323]/30 p-1.5 rounded-full transition cursor-pointer"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Search Bar */}
-        <div className="px-6 py-3 border-b border-slate-100 bg-stone-50/50 relative">
+        <div className="px-6 py-3 border-b border-[#DFC78A]/60 bg-[#FAF3E2]/70 relative">
           <form onSubmit={handleSearch} className="flex gap-2">
             <div ref={modalSuggestionsRef} className="relative flex-1">
               <input
@@ -554,24 +557,24 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
                   }
                 }}
                 onFocus={() => setIsModalSuggestionsOpen(true)}
-                className="w-full bg-white border border-[#E7D4A4] focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/5 rounded-xl pl-10 pr-10 py-2.5 text-sm outline-none transition"
+                className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:ring-4 focus:ring-[#D4961B]/10 rounded-xl pl-10 pr-10 py-2.5 text-sm text-[#0F241C] placeholder:text-[#8E7D5E] outline-none transition"
               />
-              <Search className="absolute left-3.5 top-3.5 text-slate-400" size={16} />
+              <Search className="absolute left-3.5 top-3.5 text-[#9A6A0F]" size={16} />
               
               {isLoadingModalSuggestions && (
                 <div className="absolute right-3.5 top-3.5 flex items-center justify-center">
-                  <RefreshCw className="animate-spin text-slate-400" size={14} />
+                  <RefreshCw className="animate-spin text-[#9A6A0F]" size={14} />
                 </div>
               )}
 
               {isModalSuggestionsOpen && (
-                <div className="absolute left-0 right-0 mt-2 bg-white border border-stone-100 rounded-[12px] shadow-2xl max-h-[320px] overflow-y-auto z-[9999] p-2 animate-in fade-in slide-in-from-top-1 duration-250">
+                <div className="absolute left-0 right-0 mt-2 bg-[#FFFDF8] border border-[#DFC78A] rounded-2xl shadow-2xl max-h-[320px] overflow-y-auto z-[9999] p-2 animate-in fade-in slide-in-from-top-1 duration-250">
                   {isLoadingModalSuggestions ? (
-                    <div className="px-4 py-8 text-center text-stone-500 font-sans text-xs flex flex-col items-center justify-center gap-3">
-                      <div className="p-2 rounded-full bg-amber-50 text-[#DEAA38]">
-                        <RefreshCw className="animate-spin text-[#DEAA38]" size={20} />
+                    <div className="px-4 py-8 text-center text-[#5C5240] font-sans text-xs flex flex-col items-center justify-center gap-3">
+                      <div className="p-2 rounded-full bg-[#FAF0D4] text-[#9A6A0F] border border-[#DFC78A]">
+                        <RefreshCw className="animate-spin text-[#9A6A0F]" size={20} />
                       </div>
-                      <span className="font-semibold text-[#DEAA38] text-sm animate-pulse">Searching locations...</span>
+                      <span className="font-semibold text-[#9A6A0F] text-sm">Searching locations...</span>
                     </div>
                   ) : modalSuggestions.length > 0 ? (
                     <div className="space-y-1">
@@ -582,21 +585,21 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
                             key={item.id}
                             type="button"
                             onClick={() => handleSelectModalSuggestion(item)}
-                            className={`w-full text-left px-4 py-3.5 hover:bg-amber-50/40 rounded-xl transition-all duration-200 flex items-start gap-4 group cursor-pointer border ${
+                            className={`w-full text-left px-4 py-3.5 hover:bg-[#FAF0D4]/60 rounded-xl transition-all duration-200 flex items-start gap-4 group cursor-pointer border ${
                               isSelected 
-                                ? 'bg-amber-50/60 border-amber-200/80 shadow-sm' 
+                                ? 'bg-[#FAF0D4]/80 border-[#DFC78A] shadow-sm' 
                                 : 'border-transparent'
                             }`}
                           >
-                            <div className="p-2 rounded-xl bg-amber-50 text-[#DEAA38] group-hover:bg-[#DEAA38] group-hover:text-white transition-all duration-200 shrink-0 shadow-sm flex items-center justify-center">
+                            <div className="p-2 rounded-xl bg-[#FAF0D4] border border-[#DFC78A] text-[#9A6A0F] group-hover:bg-[#024731] group-hover:text-[#F5C642] transition-all duration-200 shrink-0 shadow-sm flex items-center justify-center">
                               <MapPin size={18} className="stroke-[2.5]" />
                             </div>
                             <div className="truncate font-sans flex-1">
-                              <span className="block text-base font-semibold text-stone-900 truncate leading-snug group-hover:text-black">
+                              <span className="block text-base font-semibold text-[#0F241C] truncate leading-snug">
                                 {renderModalHighlighted(item.mainLabel, searchQuery)}
                               </span>
                               {item.subLabel && (
-                                <span className="block text-xs text-stone-500 font-medium leading-relaxed mt-1">
+                                <span className="block text-xs text-[#6B5F4B] font-medium leading-relaxed mt-1">
                                   {item.subLabel}
                                 </span>
                               )}
@@ -606,12 +609,12 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
                       })}
                     </div>
                   ) : searchQuery.trim().length >= 3 ? (
-                    <div className="px-4 py-8 text-center text-stone-500 font-sans text-xs flex flex-col items-center justify-center gap-2">
-                      <div className="p-2 rounded-full bg-stone-50 text-stone-400">
-                        <MapPin size={24} className="text-stone-300" />
+                    <div className="px-4 py-8 text-center text-[#5C5240] font-sans text-xs flex flex-col items-center justify-center gap-2">
+                      <div className="p-2 rounded-full bg-[#FAF0D4] text-[#9A6A0F]">
+                        <MapPin size={24} className="text-[#9A6A0F]" />
                       </div>
-                      <span className="font-bold text-stone-600 text-sm">No matching location found.</span>
-                      <span className="text-[11px] text-stone-400 max-w-[200px] leading-normal mx-auto">
+                      <span className="font-bold text-[#0F241C] text-sm">No matching location found.</span>
+                      <span className="text-[11px] text-[#6B5F4B] max-w-[200px] leading-normal mx-auto">
                         Try another nearby landmark.
                       </span>
                     </div>
@@ -622,19 +625,19 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
             <button
               type="submit"
               disabled={isSearching}
-              className="bg-[#D4AF37] hover:bg-[#b59223] disabled:opacity-50 text-white font-bold text-xs px-5 rounded-xl transition cursor-pointer uppercase tracking-wider shrink-0 flex items-center gap-1.5 font-sans"
+              className="bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 hover:brightness-110 disabled:opacity-50 text-[#FFFDF8] font-bold text-xs px-5 rounded-xl transition cursor-pointer uppercase tracking-wider shrink-0 flex items-center gap-1.5 font-sans"
             >
-              {isSearching ? <RefreshCw className="animate-spin" size={13} /> : 'Search'}
+              {isSearching ? <RefreshCw className="animate-spin text-[#F5C642]" size={13} /> : 'Search'}
             </button>
           </form>
         </div>
 
         {/* Map Container */}
-        <div className="relative flex-1 min-h-[350px] bg-slate-100">
+        <div className="relative flex-1 min-h-[350px] bg-[#FAF3E2]">
           {isLoading && (
-            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 gap-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]"></div>
-              <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider font-sans">Loading Interactive Map...</span>
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#FFFDF8]/90 gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#065239]"></div>
+              <span className="text-xs font-bold text-[#9A6A0F] uppercase tracking-wider font-sans">Loading Interactive Map...</span>
             </div>
           )}
           <div ref={mapContainerRef} className="w-full h-full" style={{ minHeight: '350px' }} />
@@ -643,23 +646,23 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
           <button
             type="button"
             onClick={handleModalUseCurrentLocation}
-            className="absolute top-4 right-4 z-40 bg-white/95 hover:bg-white text-stone-800 font-extrabold text-[11px] px-4 py-2.5 rounded-xl border border-stone-200/80 hover:border-stone-300 shadow-md flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 uppercase tracking-wider font-sans"
+            className="absolute top-4 right-4 z-40 bg-[#FFFDF8]/95 hover:bg-[#FAF0D4] text-[#0F241C] font-extrabold text-[11px] px-4 py-2.5 rounded-xl border border-[#DFC78A] shadow-md flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 uppercase tracking-wider font-sans"
           >
-            <MapPin size={12} className="text-[#DEAA38]" /> Use Current Location
+            <MapPin size={12} className="text-[#9A6A0F]" /> Use Current Location
           </button>
 
           {/* Floating Address Bar */}
-          <div className="absolute bottom-4 left-4 right-4 z-40 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-[#E7D4A4]/40 shadow-xl space-y-3 max-h-[190px] overflow-y-auto">
+          <div className="absolute bottom-4 left-4 right-4 z-40 bg-[#FFFDF8]/95 backdrop-blur-md p-4 rounded-2xl border border-[#DFC78A] shadow-xl space-y-3 max-h-[190px] overflow-y-auto">
             <div className="flex items-start gap-2.5">
-              <MapPin className="text-[#D4AF37] shrink-0 mt-0.5" size={16} />
+              <MapPin className="text-[#D4961B] shrink-0 mt-0.5" size={16} />
               <div className="space-y-1">
-                <span className="block text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider font-mono">Selected Address</span>
+                <span className="block text-[11px] font-bold text-[#9A6A0F] uppercase tracking-wider font-mono">Selected Address</span>
                 {isGeocoding ? (
-                  <span className="text-xs text-slate-400 italic flex items-center gap-1.5">
-                    <RefreshCw className="animate-spin text-[#D4AF37]" size={12} /> Resolving street address...
+                  <span className="text-xs text-[#6B5F4B] italic flex items-center gap-1.5">
+                    <RefreshCw className="animate-spin text-[#D4961B]" size={12} /> Resolving street address...
                   </span>
                 ) : (
-                  <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                  <p className="text-xs text-[#0F241C] font-medium leading-relaxed">
                     {address || "Drag pin or tap map to update..."}
                   </p>
                 )}
@@ -667,12 +670,12 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
             </div>
 
             {showRadius && (
-              <div className="border-t border-slate-100 pt-3 space-y-2 font-sans">
+              <div className="border-t border-[#EFE3C4] pt-3 space-y-2 font-sans">
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-[#6B5F4B] uppercase tracking-wider">
                     📍 Service Coverage Radius
                   </span>
-                  <span className="text-xs font-bold text-[#DEAA38] font-mono">
+                  <span className="text-xs font-bold text-[#9A6A0F] font-mono tabular-nums">
                     {radiusKm} KM
                   </span>
                 </div>
@@ -689,7 +692,7 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
                         setRadiusKm(Number(val));
                       }
                     }}
-                    className="bg-stone-50 border border-slate-200 text-xs font-bold text-slate-700 rounded-lg px-2 py-1.5 focus:outline-none"
+                    className="bg-[#FAF3E2]/70 border border-[#DFC78A] text-xs font-bold text-[#0F241C] rounded-lg px-2 py-1.5 focus:outline-none"
                   >
                     {[5, 10, 15, 20, 25, 30, 40, 50].map((km) => (
                       <option key={km} value={km}>{km} KM</option>
@@ -704,7 +707,7 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
                       max="100"
                       value={radiusKm}
                       onChange={(e) => setRadiusKm(Number(e.target.value))}
-                      className="flex-1 accent-[#DEAA38] h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                      className="flex-1 accent-[#D4961B] h-1.5 bg-[#EFE3C4] rounded-lg appearance-none cursor-pointer"
                     />
                   )}
                 </div>
@@ -714,14 +717,14 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
         </div>
 
         {/* Footer info & Coordinates */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-stone-50 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex gap-4 text-[10px] text-slate-500 font-mono">
+        <div className="px-6 py-4 border-t border-[#DFC78A]/70 bg-[#FAF3E2]/70 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex gap-4 text-[10px] text-[#5C5240] font-mono tabular-nums">
             <div>
-              <span className="text-slate-400 mr-1">LAT:</span>
+              <span className="text-[#8E7D5E] mr-1">LAT:</span>
               <span>{latitude.toFixed(6)}</span>
             </div>
             <div>
-              <span className="text-slate-400 mr-1">LNG:</span>
+              <span className="text-[#8E7D5E] mr-1">LNG:</span>
               <span>{longitude.toFixed(6)}</span>
             </div>
           </div>
@@ -729,16 +732,16 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
           <div className="flex gap-2 w-full sm:w-auto font-sans">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-xs px-6 py-3 rounded-xl transition cursor-pointer uppercase tracking-wider"
+              className="flex-1 sm:flex-none bg-[#FFFDF8] border border-[#DFC78A] hover:bg-[#FAF0D4] text-[#494032] font-bold text-xs px-6 py-3 rounded-xl transition cursor-pointer uppercase tracking-wider"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveLocation}
               disabled={isGeocoding}
-              className="flex-1 sm:flex-none bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs px-6 py-3 rounded-xl transition cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md"
+              className="flex-1 sm:flex-none bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 hover:brightness-110 text-[#FFFDF8] font-extrabold text-xs px-6 py-3 rounded-xl transition cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md"
             >
-              <Check size={14} /> Confirm Location
+              <Check size={14} className="text-[#F5C642]" /> Confirm Location
             </button>
           </div>
         </div>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -27,9 +26,9 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   if (loading) {
     console.log("[DEBUG LOG] ProtectedRoute: loading is true, rendering LoadingScreen...");
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
-        <Loader2 className="w-10 h-10 text-brand-green-900 animate-spin" />
-        <p className="text-sm font-medium text-slate-500 font-poppins">Verifying secure session...</p>
+      <div className="min-h-screen bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] flex flex-col items-center justify-center gap-4">
+        <div className="w-11 h-11 rounded-full border-4 border-[#E8C77A]/40 border-t-[#024731] animate-spin" />
+        <p className="text-sm font-semibold text-[#173D30] font-poppins">Verifying secure session...</p>
       </div>
     );
   }

@@ -2,22 +2,20 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, ChefHat, Calendar, User } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { usePlatformSettings } from '../contexts/PlatformSettingsContext';
 
-export default function BottomNavigation({ homepageMode: _unused }: { homepageMode?: string }) {
-  const { homepageMode } = usePlatformSettings();
+export default function BottomNavigation() {
   const location = useLocation();
   const currentPath = location.pathname;
 
   // Hide customer bottom navigation on dashboard/portal routes
-  const isCatererDashboard = 
-    currentPath.startsWith('/caterer-dashboard') || 
-    currentPath.startsWith('/partner') || 
-    currentPath.startsWith('/businesses') || 
+  const isCatererDashboard =
+    currentPath.startsWith('/caterer-dashboard') ||
+    currentPath.startsWith('/partner') ||
+    currentPath.startsWith('/businesses') ||
     currentPath.startsWith('/edit-business');
 
-  const isAdminDashboard = 
-    currentPath.startsWith('/admin-dashboard') || 
+  const isAdminDashboard =
+    currentPath.startsWith('/admin-dashboard') ||
     currentPath.startsWith('/admin/');
 
   if (isCatererDashboard || isAdminDashboard) {
@@ -48,7 +46,7 @@ export default function BottomNavigation({ homepageMode: _unused }: { homepageMo
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200/80 px-4 py-2 flex justify-around items-center z-40 shadow-[0_-4px_16px_rgba(0,0,0,0.04)] backdrop-blur-md">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#FFFDF8]/95 border-t border-[#DFC78A] px-3 py-1.5 flex justify-around items-center z-40 shadow-[0_-6px_22px_rgba(140,105,32,0.12)] backdrop-blur-md">
       {navItems.map((item) => {
         const isActive =
           item.path === '/'
@@ -59,23 +57,26 @@ export default function BottomNavigation({ homepageMode: _unused }: { homepageMo
           <Link
             key={item.label}
             to={item.path}
-            className="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 active:scale-95"
+            className={cn(
+              'flex flex-col items-center justify-center py-1.5 px-3.5 rounded-xl transition-all duration-200 active:scale-95',
+              isActive && 'bg-gradient-to-b from-[#FCE9A8]/65 to-[#F5D67B]/45 border border-[#D9A323]/45 shadow-2xs'
+            )}
           >
             <item.icon
-              size={20}
+              size={19}
               className={cn(
                 'transition-all duration-200',
                 isActive
-                  ? 'text-brand-green-900 stroke-[2.5px] scale-110'
-                  : 'text-slate-400 hover:text-slate-600 stroke-[2px]'
+                  ? 'text-[#024731] stroke-[2.4px]'
+                  : 'text-[#6E6350] hover:text-[#024731] stroke-[1.9px]'
               )}
             />
             <span
               className={cn(
-                'text-[10px] font-medium mt-1 font-poppins transition-all duration-200',
+                'text-[10px] mt-0.5 font-poppins transition-all duration-200',
                 isActive
-                  ? 'text-brand-green-900 font-extrabold'
-                  : 'text-slate-400 font-semibold'
+                  ? 'text-[#024731] font-bold'
+                  : 'text-[#6E6350] font-semibold'
               )}
             >
               {item.label}

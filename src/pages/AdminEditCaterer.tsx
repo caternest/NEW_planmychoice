@@ -18,7 +18,7 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({ label, value, onChan
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert("Please select an image file.");
+      toast("Please select an image file.", "error");
       return;
     }
     try {
@@ -80,7 +80,7 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({ label, value, onChan
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-semibold text-slate-700">{label}</label>
+      <label className="block text-sm font-semibold text-[#0F241C]">{label}</label>
       
       <div 
         onDragEnter={handleDrag}
@@ -88,13 +88,13 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({ label, value, onChan
         onDragLeave={handleDrag}
         onDrop={handleDrop}
         className={cn(
-          "border-2 border-dashed rounded-2xl p-4 transition-all flex flex-col items-center justify-center min-h-[160px] bg-slate-50 relative overflow-hidden",
-          dragActive ? "border-brand-gold-500 bg-brand-gold-50/20" : "border-slate-200 hover:border-slate-300",
-          value ? "border-brand-gold-300 bg-white" : ""
+          "border-2 border-dashed rounded-2xl p-4 transition-all flex flex-col items-center justify-center min-h-[160px] bg-[#FAF3E2]/45 relative overflow-hidden",
+          dragActive ? "border-[#D4961B] bg-[#FAF0D4]/65" : "border-[#DFC78A] hover:border-[#D4961B]",
+          value ? "border-[#D4961B] bg-[#FFFDF8]" : ""
         )}
       >
         {value ? (
-          <div className="relative w-full h-[140px] flex items-center justify-center group rounded-xl overflow-hidden bg-white">
+          <div className="relative w-full h-[140px] flex items-center justify-center group rounded-xl overflow-hidden bg-[#FFFDF8]">
             <img 
               src={value} 
               alt="Preview" 
@@ -104,50 +104,50 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({ label, value, onChan
                 (e.target as HTMLElement).style.opacity = '0.3';
               }}
             />
-            <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-              <label className="cursor-pointer bg-white text-slate-800 text-xs font-black px-4 py-2 rounded-xl hover:bg-slate-100 transition-all select-none">
+            <div className="absolute inset-0 bg-[#012419]/65 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+              <label className="cursor-pointer bg-[#FFFDF8] text-[#0F241C] border border-[#DFC78A] text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#FAF0D4] transition-all select-none">
                 Change Image
                 <input type="file" accept="image/*" className="hidden" onChange={onFileChange} />
               </label>
               <button 
                 type="button"
                 onClick={() => onChange('')}
-                className="bg-red-500 text-white text-xs font-black px-4 py-2 rounded-xl hover:bg-red-600 transition-all"
+                className="bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-red-700 transition-all"
               >
                 Clear
               </button>
             </div>
-            <span className="absolute bottom-2 left-2 bg-brand-gold-500 text-slate-900 font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow">
+            <span className="absolute bottom-2 left-2 bg-gradient-to-r from-[#FCE07E] to-[#D99B16] text-[#042419] font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow">
               {isBase64 ? 'Uploaded File' : 'URL Image'}
             </span>
           </div>
         ) : (
           <div className="text-center flex flex-col items-center py-2 select-none">
-            <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-              <UploadCloud size={22} className="text-brand-gold-600" />
+            <div className="w-12 h-12 rounded-full bg-[#FAF0D4] border border-[#DFC78A] text-[#A87512] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+              <UploadCloud size={22} />
             </div>
-            <p className="text-sm font-bold text-slate-700">Drag & drop your image here, or</p>
-            <label className="mt-1 text-xs font-extrabold text-brand-gold-600 hover:text-brand-gold-700 cursor-pointer underline decoration-2 underline-offset-2">
+            <p className="text-sm font-bold text-[#0F241C]">Drag &amp; drop your image here, or</p>
+            <label className="mt-1 text-xs font-extrabold text-[#9A6A0F] hover:text-[#785109] cursor-pointer underline decoration-2 underline-offset-2">
               browse files
               <input type="file" accept="image/*" className="hidden" onChange={onFileChange} />
             </label>
-            <p className="text-[11px] text-slate-400 mt-1">Supports PNG, JPG, JPEG, WEBP, GIF</p>
+            <p className="text-[11px] text-[#6B5F4B] mt-1">Supports PNG, JPG, JPEG, WEBP, GIF</p>
           </div>
         )}
       </div>
 
       <div className="relative mt-2">
-        <label className="block text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Or paste image URL</label>
+        <label className="block text-[11px] text-[#6B5F4B] font-bold uppercase tracking-wider mb-1">Or paste image URL</label>
         <input 
           type="text" 
           placeholder={placeholder} 
           value={isBase64 ? '' : value} 
           disabled={!!isBase64}
           onChange={e => onChange(e.target.value)} 
-          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-brand-gold-500 outline-none placeholder:text-slate-400 disabled:opacity-50" 
+          className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-[#D4961B]/25 focus:border-[#D4961B] outline-none placeholder:text-[#8E7D5E] text-[#0F241C] disabled:opacity-50" 
         />
         {isBase64 && (
-          <p className="text-[10px] text-brand-gold-600 mt-1 font-semibold">Using uploaded file. Clear image to paste a custom URL.</p>
+          <p className="text-[10px] text-[#9A6A0F] mt-1 font-semibold">Using uploaded file. Clear image to paste a custom URL.</p>
         )}
       </div>
     </div>
@@ -180,7 +180,16 @@ export default function AdminEditCaterer() {
     }
   }, [id]);
 
-  if (!caterer) return <div className="pt-32 text-center text-slate-500 font-medium">Loading Caterer Profile...</div>;
+  if (!caterer) {
+    return (
+      <div className="pt-28 pb-16 min-h-screen bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] flex items-center justify-center px-4 font-poppins">
+        <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl px-8 py-10 text-center shadow-[0_14px_36px_rgba(116,84,22,0.10)] max-w-sm w-full">
+          <div className="w-10 h-10 border-4 border-[#064E3B] border-t-[#D9A323] rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm font-semibold text-[#0F241C]">Loading Caterer Profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setCaterer({ ...caterer, [e.target.name]: e.target.value });
@@ -262,7 +271,7 @@ export default function AdminEditCaterer() {
         toast('Caterer profile successfully updated!', 'success');
       } catch (err) {
         console.error("Quota exceeded during save", err);
-        alert("The profile data is too large to save (images may exceed your browser's local storage quota limit). Try reducing gallery photos or profile image sizes.");
+        toast("The profile data is too large to save. Try reducing gallery photos or image sizes.", "error");
       }
     }
   };
@@ -350,7 +359,7 @@ export default function AdminEditCaterer() {
 
   const handlePasswordReset = () => {
      if (resetData.password && resetData.password.length < 6) {
-         alert('Password must be at least 6 characters.');
+         toast('Password must be at least 6 characters.', 'error');
          return;
      }
      setCaterer((prev: any) => ({ 
@@ -373,23 +382,27 @@ export default function AdminEditCaterer() {
       { id: 'gallery', label: 'Branding & Gallery', icon: ImageIcon },
   ];
 
+  const inputCls = "w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 py-2.5 text-[#0F241C] outline-none focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 placeholder:text-[#8E7D5E] transition-colors";
+
   return (
-    <div className="pt-24 pb-12 min-h-screen bg-slate-50 font-poppins">
+    <div className="pt-24 pb-12 min-h-screen bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] font-poppins">
       <div className="max-w-7xl mx-auto px-4">
-        <button onClick={() => navigate('/admin-dashboard')} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-6 font-semibold">
+        <button onClick={() => navigate('/admin-dashboard')} className="inline-flex items-center gap-2 text-[#064E3B] hover:text-[#01261B] mb-6 font-semibold bg-[#FFFDF8] border border-[#DFC78A] px-4 py-2 rounded-xl shadow-xs transition-colors cursor-pointer">
           <ArrowLeft size={18} /> Back to Dashboard
         </button>
         
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
+        <div className="bg-[#FFFDF8] rounded-3xl shadow-[0_18px_45px_rgba(116,84,22,0.12)] border border-[#DFC78A] overflow-hidden">
+          <div className="p-6 md:p-8 border-b border-[#D9A323]/45 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#01291D] via-[#034431] to-[#01261B]">
             <div>
-                <h1 className="text-2xl font-bold font-display text-slate-800 tracking-tight flex items-center gap-3">
-                    Edit Profile: <span className="text-brand-green-700">{caterer.businessName}</span>
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F5C642] uppercase tracking-wider mb-1.5">
+                  <ShieldCheck size={14} /> Super Admin Control Panel
+                </div>
+                <h1 className="text-2xl md:text-3xl font-bold font-display text-[#FFFDF8] tracking-tight flex flex-wrap items-center gap-2">
+                    Edit Profile: <span className="text-[#F5C642]">{caterer.businessName}</span>
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">Super Admin Control Panel</p>
             </div>
             <div className="flex gap-3">
-                <button onClick={handleSave} className="bg-brand-green-900 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-brand-green-800 flex items-center gap-2 shadow-lg shadow-brand-green-900/20">
+                <button onClick={handleSave} className="bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] text-[#042419] border border-[#B57B0C]/35 px-7 py-2.5 rounded-xl font-bold hover:brightness-105 flex items-center gap-2 shadow-lg transition-all cursor-pointer">
                   <Save size={18} /> Save All Changes
                 </button>
             </div>
@@ -397,61 +410,66 @@ export default function AdminEditCaterer() {
 
           <div className="flex flex-col lg:flex-row min-h-[600px]">
               {/* Sidebar Navigation */}
-              <div className="w-full lg:w-64 bg-slate-50 border-r border-slate-100 p-4 shrink-0 flex flex-row lg:flex-col gap-2 overflow-x-auto">
+              <div className="w-full lg:w-64 bg-[#FAF3E2]/70 border-b lg:border-b-0 lg:border-r border-[#DFC78A]/70 p-4 shrink-0 flex flex-row lg:flex-col gap-2 overflow-x-auto">
                   {TABS.map(tab => (
                       <button 
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id as any)}
-                          className={cn("flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-colors whitespace-nowrap", activeTab === tab.id ? "bg-white text-brand-green-800 shadow-sm border border-slate-200" : "text-slate-600 hover:bg-slate-100")}
+                          className={cn(
+                            "flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap cursor-pointer",
+                            activeTab === tab.id 
+                              ? "bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] text-[#042419] shadow-sm border border-[#B57B0C]/35" 
+                              : "text-[#3F3523] hover:bg-[#FFFDF8] border border-transparent"
+                          )}
                       >
-                          <tab.icon size={18} className={activeTab === tab.id ? "text-brand-green-600" : "text-slate-400"} />
+                          <tab.icon size={18} className={activeTab === tab.id ? "text-[#042419]" : "text-[#9A6A0F]"} />
                           {tab.label}
                       </button>
                   ))}
               </div>
 
                {/* Main Content Area */}
-              <div className="flex-1 p-6 lg:p-8">
+              <div className="flex-1 p-6 lg:p-8 bg-[#FFFDF8]">
                   {activeTab === 'basic' && (
                       <div className="space-y-8 max-w-3xl animate-in fade-in duration-300">
                           <div>
-                              <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Account Ownership</h3>
+                              <h3 className="text-lg font-bold font-display text-[#0F241C] mb-4 border-b border-[#EFE3C4] pb-2">Account Ownership</h3>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Owner Name</label>
-                                      <input name="owner" value={caterer.owner || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Owner Name</label>
+                                      <input name="owner" value={caterer.owner || ''} onChange={handleChange} className={inputCls} />
                                   </div>
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Primary Email</label>
-                                      <input name="email" value={caterer.email || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Primary Email</label>
+                                      <input name="email" value={caterer.email || ''} onChange={handleChange} className={inputCls} />
                                   </div>
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Mobile Number</label>
-                                      <input name="phone" value={caterer.phone || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Mobile Number</label>
+                                      <input name="phone" value={caterer.phone || ''} onChange={handleChange} className={inputCls} />
                                   </div>
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Alternate Mobile</label>
-                                      <input name="alternatePhone" value={caterer.alternatePhone || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Alternate Mobile</label>
+                                      <input name="alternatePhone" value={caterer.alternatePhone || ''} onChange={handleChange} className={inputCls} />
                                   </div>
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">WhatsApp Mobile Connection</label>
-                                      <input name="whatsappNumber" value={caterer.whatsappNumber || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">WhatsApp Mobile Connection</label>
+                                      <input name="whatsappNumber" value={caterer.whatsappNumber || ''} onChange={handleChange} className={inputCls} />
                                   </div>
                               </div>
                           </div>
 
                           <div>
-                              <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Login Credentials</h3>
+                              <h3 className="text-lg font-bold font-display text-[#0F241C] mb-4 border-b border-[#EFE3C4] pb-2">Login Credentials</h3>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-end">
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Username</label>
-                                      <input name="username" value={caterer.username || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Username</label>
+                                      <input name="username" value={caterer.username || ''} onChange={handleChange} className={inputCls} />
                                   </div>
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Current Password</label>
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Current Password</label>
                                       <div className="flex items-center gap-3">
-                                          <input type="text" readOnly value={"••••••••"} className="w-full bg-slate-100 border border-slate-200 text-slate-400 rounded-xl px-4 py-2.5 outline-none cursor-not-allowed" />
-                                          <button onClick={openPasswordReset} className="flex-shrink-0 px-4 py-2.5 bg-red-50 text-red-700 font-bold rounded-xl border border-red-100 hover:bg-red-100 transition flex items-center gap-2">
+                                          <input type="text" readOnly value={"••••••••"} className="w-full bg-[#FAF3E2]/70 border border-[#DFC78A] text-[#7D6E52] rounded-xl px-4 py-2.5 outline-none cursor-not-allowed" />
+                                          <button onClick={openPasswordReset} className="flex-shrink-0 px-4 py-2.5 bg-red-50 text-red-700 font-bold rounded-xl border border-red-200 hover:bg-red-100 transition flex items-center gap-2 cursor-pointer">
                                               <Key size={16} /> Reset
                                           </button>
                                       </div>
@@ -460,15 +478,15 @@ export default function AdminEditCaterer() {
                           </div>
 
                           <div>
-                              <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Location</h3>
+                              <h3 className="text-lg font-bold font-display text-[#0F241C] mb-4 border-b border-[#EFE3C4] pb-2">Location</h3>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                   <div className="md:col-span-2">
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Full Address</label>
-                                      <textarea name="location" value={caterer.location || ''} onChange={handleChange} rows={2} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Full Address</label>
+                                      <textarea name="location" value={caterer.location || ''} onChange={handleChange} rows={2} className={inputCls} />
                                   </div>
                                   <div>
-                                      <label className="block text-sm font-bold text-slate-700 mb-1.5">City</label>
-                                      <input name="city" value={caterer.city || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                      <label className="block text-sm font-bold text-[#0F241C] mb-1.5">City</label>
+                                      <input name="city" value={caterer.city || ''} onChange={handleChange} className={inputCls} />
                                   </div>
                               </div>
                           </div>
@@ -479,43 +497,43 @@ export default function AdminEditCaterer() {
                       <div className="space-y-6 max-w-4xl animate-in fade-in duration-300">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div className="md:col-span-2">
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Business Name</label>
-                                  <input name="businessName" value={caterer.businessName || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Business Name</label>
+                                  <input name="businessName" value={caterer.businessName || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Brand Display Name</label>
-                                  <input name="brandName" value={caterer.brandName || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Brand Display Name</label>
+                                  <input name="brandName" value={caterer.brandName || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Brand Tagline</label>
-                                  <input name="tagline" value={caterer.tagline || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Brand Tagline</label>
+                                  <input name="tagline" value={caterer.tagline || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div className="md:col-span-2">
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Business Description</label>
-                                  <textarea name="description" value={caterer.description || ''} onChange={handleChange} rows={4} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Business Description</label>
+                                  <textarea name="description" value={caterer.description || ''} onChange={handleChange} rows={4} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Years of Experience</label>
-                                  <input name="experience" type="number" value={caterer.experience || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Years of Experience</label>
+                                  <input name="experience" type="number" value={caterer.experience || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Events Completed</label>
-                                  <input name="eventsCompleted" type="number" value={caterer.eventsCompleted || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Events Completed</label>
+                                  <input name="eventsCompleted" type="number" value={caterer.eventsCompleted || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Established Year</label>
-                                  <input name="establishedYear" type="number" value={caterer.establishedYear || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Established Year</label>
+                                  <input name="establishedYear" type="number" value={caterer.establishedYear || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Number of Branches</label>
-                                  <input name="branches" type="number" value={caterer.branches || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Number of Branches</label>
+                                  <input name="branches" type="number" value={caterer.branches || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Operating Hours</label>
-                                  <input name="operatingHours" value={caterer.operatingHours || ''} onChange={handleChange} placeholder="e.g. 6:00 AM - 11:00 PM" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Operating Hours</label>
+                                  <input name="operatingHours" value={caterer.operatingHours || ''} onChange={handleChange} placeholder="e.g. 6:00 AM - 11:00 PM" className={inputCls} />
                               </div>
                               <div className="md:col-span-2 flex flex-col gap-3">
-                                  <label className="flex items-center gap-2 cursor-pointer select-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 transition hover:bg-slate-100">
+                                  <label className="flex items-center gap-2 cursor-pointer select-none bg-[#FAF3E2]/70 border border-[#DFC78A] rounded-xl px-4 py-3 transition hover:bg-[#FAF0D4]">
                                       <input
                                           type="checkbox"
                                           checked={!!caterer.serveEntireHyderabad}
@@ -525,27 +543,27 @@ export default function AdminEditCaterer() {
                                                   serveEntireHyderabad: e.target.checked
                                               }));
                                           }}
-                                          className="w-4 h-4 text-[#0F3D2E] focus:ring-[#0F3D2E] border-gray-300 rounded cursor-pointer accent-[#0F3D2E]"
+                                          className="w-4 h-4 text-[#0F3D2E] focus:ring-[#0F3D2E] border-[#DFC78A] rounded cursor-pointer accent-[#0F3D2E]"
                                       />
-                                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                      <span className="text-xs font-bold text-[#0F241C] uppercase tracking-wide">
                                           Serve Entire Hyderabad
                                       </span>
                                   </label>
 
                                   {!caterer.serveEntireHyderabad && (
                                       <div>
-                                          <label className="block text-sm font-bold text-slate-700 mb-1.5">Service Areas (comma separated)</label>
-                                          <input name="serviceAreas" value={caterer.serviceAreas || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                          <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Service Areas (comma separated)</label>
+                                          <input name="serviceAreas" value={caterer.serviceAreas || ''} onChange={handleChange} className={inputCls} />
                                       </div>
                                   )}
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Awards (Optional)</label>
-                                  <input name="awards" value={caterer.awards || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Awards (Optional)</label>
+                                  <input name="awards" value={caterer.awards || ''} onChange={handleChange} className={inputCls} />
                               </div>
                               <div>
-                                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Certifications (Optional)</label>
-                                  <input name="certifications" value={caterer.certifications || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-brand-green-500" />
+                                  <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Certifications (Optional)</label>
+                                  <input name="certifications" value={caterer.certifications || ''} onChange={handleChange} className={inputCls} />
                               </div>
                           </div>
                       </div>
@@ -559,21 +577,21 @@ export default function AdminEditCaterer() {
 
                   {activeTab === 'documents' && (
                       <div className="space-y-6 max-w-4xl animate-in fade-in duration-300">
-                          <p className="text-sm text-slate-600 bg-blue-50 p-4 rounded-xl border border-blue-100 font-medium">As Admin, you can view and replace the uploaded verification documents for this caterer.</p>
+                          <p className="text-sm text-[#5C3D06] bg-[#FAF0D4]/65 p-4 rounded-2xl border border-[#DFC78A] font-medium">As Admin, you can view and replace the uploaded verification documents for this caterer.</p>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               {['aadhaarFile', 'panFile', 'fssaiFile', 'gstFile'].map((docField) => (
-                                  <div key={docField} className="border border-slate-200 bg-slate-50 p-6 rounded-2xl relative">
-                                      <h4 className="font-bold text-slate-800 mb-1 capitalize text-base">{docField.replace('File', '')} Document</h4>
+                                  <div key={docField} className="border border-[#DFC78A] bg-[#FAF3E2]/45 p-6 rounded-2xl relative shadow-2xs">
+                                      <h4 className="font-bold text-[#0F241C] mb-1 capitalize text-base">{docField.replace('File', '')} Document</h4>
                                       <div className="mt-4 flex items-center justify-between">
                                           {caterer[docField] ? (
                                               <div className="flex items-center gap-2">
-                                                  <CheckCircle2 size={18} className="text-brand-green-600" />
-                                                  <span className="text-sm font-bold text-slate-700 truncate max-w-[150px]" title={caterer[docField]}>{caterer[docField]}</span>
+                                                  <CheckCircle2 size={18} className="text-[#116E39]" />
+                                                  <span className="text-sm font-bold text-[#0F241C] truncate max-w-[150px]" title={caterer[docField]}>{caterer[docField]}</span>
                                               </div>
                                           ) : (
-                                              <span className="text-sm text-slate-400 font-medium italic">Not uploaded</span>
+                                              <span className="text-sm text-[#7D6E52] font-medium italic">Not uploaded</span>
                                           )}
-                                          <label className="cursor-pointer text-xs font-bold text-brand-green-700 hover:text-brand-green-900 bg-brand-green-50 px-3 py-1.5 rounded-lg border border-brand-green-100 transition-colors">
+                                          <label className="cursor-pointer text-xs font-bold text-[#064E3B] hover:text-[#01261B] bg-[#E3F8EA] px-3 py-1.5 rounded-lg border border-[#9EE2BA] transition-colors">
                                               Replace
                                               <input type="file" className="hidden" onChange={e => handleDocumentChange(e, docField)} />
                                           </label>
@@ -588,8 +606,8 @@ export default function AdminEditCaterer() {
                       <div className="animate-in fade-in duration-300 max-w-4xl space-y-10">
                           
                           <div>
-                              <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2 flex items-center gap-2 animate-in slide-in-from-top-2 duration-300">Profile Branding</h3>
-                              <p className="text-sm text-slate-600 font-medium mb-6">Manage logo, cover banner, and founder image uploads.</p>
+                              <h3 className="text-lg font-bold font-display text-[#0F241C] mb-4 border-b border-[#EFE3C4] pb-2 flex items-center gap-2 animate-in slide-in-from-top-2 duration-300">Profile Branding</h3>
+                              <p className="text-sm text-[#5C5240] font-medium mb-6">Manage logo, cover banner, and founder image uploads.</p>
                               
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                    <ImageUploaderField 
@@ -620,36 +638,36 @@ export default function AdminEditCaterer() {
                           </div>
 
                           <div>
-                              <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Gallery Upload</h3>
-                              <div className="flex justify-between items-center mb-6">
-                                  <p className="text-sm text-slate-600 font-medium font-poppins">Manage portfolio images visible to customers.</p>
-                                  <label className="cursor-pointer font-bold text-sm bg-brand-green-900 text-white px-5 py-2.5 rounded-xl hover:bg-brand-green-800 flex items-center gap-2 shadow-sm transition-colors">
+                              <h3 className="text-lg font-bold font-display text-[#0F241C] mb-4 border-b border-[#EFE3C4] pb-2">Gallery Upload</h3>
+                              <div className="flex justify-between items-center mb-6 gap-4">
+                                  <p className="text-sm text-[#5C5240] font-medium font-poppins">Manage portfolio images visible to customers.</p>
+                                  <label className="cursor-pointer font-semibold text-sm bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border border-[#D4961B]/60 px-5 py-2.5 rounded-xl hover:brightness-110 flex items-center gap-2 shadow-sm transition-all shrink-0">
                                      <UploadCloud size={16} /> Upload New Images
                                      <input type="file" multiple accept="image/*" className="hidden" onChange={handleGalleryUpload} />
                                   </label>
                               </div>
                               
                               {(!caterer.galleryPhotos || caterer.galleryPhotos.length === 0) ? (
-                                  <div className="border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center flex flex-col items-center justify-center">
-                                      <ImageIcon size={48} className="text-slate-300 mb-4" />
-                                      <p className="text-slate-500 font-medium text-lg mb-1">No images uploaded yet</p>
-                                      <p className="text-sm text-slate-400">Click upload to add some portfolio pictures.</p>
+                                  <div className="border-2 border-dashed border-[#DFC78A] bg-[#FAF3E2]/40 rounded-3xl p-12 text-center flex flex-col items-center justify-center">
+                                      <ImageIcon size={48} className="text-[#C9A85B] mb-4" />
+                                      <p className="text-[#0F241C] font-medium text-lg mb-1">No images uploaded yet</p>
+                                      <p className="text-sm text-[#6B5F4B]">Click upload to add some portfolio pictures.</p>
                                   </div>
                               ) : (
                                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                       {caterer.galleryPhotos.map((photo: string, i: number) => {
                                           const isImage = photo.startsWith('data:image/') || photo.startsWith('http://') || photo.startsWith('https://');
                                           return (
-                                              <div key={i} className="group relative aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+                                              <div key={i} className="group relative aspect-square bg-[#FAF3E2] rounded-2xl overflow-hidden border border-[#DFC78A] shadow-sm">
                                                   {isImage ? (
                                                       <img src={photo} alt={`Gallery ${i}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                   ) : (
-                                                      <div className="absolute inset-0 flex items-center justify-center text-slate-400 p-4 text-center break-all font-medium text-xs">
+                                                      <div className="absolute inset-0 flex items-center justify-center text-[#6B5F4B] p-4 text-center break-all font-medium text-xs">
                                                           {photo}
                                                       </div>
                                                   )}
-                                                  <div className="absolute inset-0 bg-slate-950/40 group-hover:bg-slate-950/65 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                      <button onClick={() => removeGalleryPhoto(i)} className="p-3 bg-white text-red-600 rounded-full hover:scale-110 shadow-lg transition-transform" title="Remove Photo">
+                                                  <div className="absolute inset-0 bg-[#012419]/45 group-hover:bg-[#012419]/65 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                                      <button onClick={() => removeGalleryPhoto(i)} className="p-3 bg-[#FFFDF8] text-red-600 rounded-full hover:scale-110 shadow-lg transition-transform cursor-pointer" title="Remove Photo">
                                                           <X size={20} />
                                                       </button>
                                                   </div>
@@ -669,22 +687,22 @@ export default function AdminEditCaterer() {
       
       {/* Password Reset Modal */}
       {isResetOpen && (
-          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
-                  <h3 className="text-xl font-bold font-display text-slate-800 mb-6 flex items-center gap-2"><Key size={20} className="text-brand-green-600"/> Reset Login Credentials</h3>
+          <div className="fixed inset-0 bg-[#011F16]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+                  <h3 className="text-xl font-bold font-display text-[#0F241C] mb-6 flex items-center gap-2"><Key size={20} className="text-[#D4961B]"/> Reset Login Credentials</h3>
                   <div className="space-y-4 mb-8">
                       <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-1.5">New Username</label>
-                          <input required value={resetData.username} onChange={e => setResetData({...resetData, username: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-brand-green-500" placeholder="Username" />
+                          <label className="block text-sm font-bold text-[#0F241C] mb-1.5">New Username</label>
+                          <input required value={resetData.username} onChange={e => setResetData({...resetData, username: e.target.value})} className={inputCls} placeholder="Username" />
                       </div>
                       <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-1.5">New Password</label>
-                          <input type="text" value={resetData.password} onChange={e => setResetData({...resetData, password: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-brand-green-500" placeholder="Leave empty to keep current" />
+                          <label className="block text-sm font-bold text-[#0F241C] mb-1.5">New Password</label>
+                          <input type="text" value={resetData.password} onChange={e => setResetData({...resetData, password: e.target.value})} className={inputCls} placeholder="Leave empty to keep current" />
                       </div>
                   </div>
                   <div className="flex gap-3">
-                      <button onClick={() => setIsResetOpen(false)} className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition">Cancel</button>
-                      <button onClick={handlePasswordReset} className="flex-1 px-4 py-3 bg-brand-green-900 text-white font-bold rounded-xl hover:bg-brand-green-800 transition">Save Credentials</button>
+                      <button onClick={() => setIsResetOpen(false)} className="flex-1 px-4 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#F3DFAB] transition cursor-pointer">Cancel</button>
+                      <button onClick={handlePasswordReset} className="flex-1 px-4 py-3 bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border border-[#D4961B]/60 font-bold rounded-xl hover:brightness-110 transition cursor-pointer">Save Credentials</button>
                   </div>
               </div>
           </div>

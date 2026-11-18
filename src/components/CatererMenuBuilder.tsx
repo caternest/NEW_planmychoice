@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { UploadCloud, CheckCircle2, Loader2, Trash2, Edit2, Plus, GripVertical, X, Copy, ChevronDown, Check, ChefHat, AlertCircle } from 'lucide-react';
+import { UploadCloud, CheckCircle2, Loader2, Trash2, Edit2, Plus, GripVertical, X, Copy, ChevronDown, Check, ChefHat, AlertCircle, Layers, Tag, Upload } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSupabase, uploadToSupabaseBucket, uploadMenuDocumentToStorage } from '../lib/supabase';
+import { toast } from './Toast';
 
 interface MenuCategory {
   categoryName: string;
@@ -197,7 +198,7 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      alert("File size is too large. Max limit is 2MB.");
+      toast("File size is too large. Max limit is 2MB.", "error");
       return;
     }
 
@@ -240,16 +241,16 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert("Image submitted successfully! It will be shown instantly, pending Admin approval.");
+          toast("Image submitted successfully! It will be shown instantly, pending Admin approval.", "success");
           setCatererEditingItem(null);
           refreshBuilderImages();
         } else {
-          alert(data.error || "Failed to submit image.");
+          toast(data.error || "Failed to submit image.", "error");
         }
       })
       .catch(err => {
         console.error("Error submitting custom image:", err);
-        alert("An error occurred. Please try again.");
+        toast("An error occurred. Please try again.", "error");
       });
   };
 
@@ -851,16 +852,32 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
   };
 
   return (
-    <div className="font-poppins bg-white p-2 md:p-4 rounded-[2rem] relative">
-      {/* Title & Banner styling matching image */}
-      <div className="text-left mb-6">
-        <h2 className="text-2xl font-display font-semibold text-slate-900 flex items-center gap-2">
-          Build Your Menu with AI <span className="text-brand-gold-500 font-sans">✨</span>
+    <div className="font-poppins bg-transparent relative">
+      {/* Title & Subtitle */}
+      <div className="text-left mb-5">
+        <h2 className="text-2xl md:text-[28px] font-display font-bold text-[#0F241C] flex items-center gap-2 tracking-tight leading-tight">
+          <span>Build Your Menu with AI</span>
+          <span className="text-[#E6A823] font-sans text-xl">✨</span>
         </h2>
-        <p className="text-slate-500 text-xs mt-1">Upload your catering menu and let our AI extract dishes, categories & pricing</p>
+        <p className="text-[#5C5240] text-xs md:text-[13px] mt-1">
+          Upload your catering menu and let our AI extract dishes, categories &amp; pricing automatically.
+        </p>
       </div>
 
-      <div className="mb-8 bg-[#f2f7f5] rounded-3xl p-6 border-2 border-dashed border-[#6ea494] flex flex-col items-center justify-center min-h-[200px] relative transition-all">
+      {/* Drag & Drop Upload Box */}
+      <div className="mb-6 bg-gradient-to-b from-[#F4FAF6] via-[#EFF8F3] to-[#E2F2E8] rounded-2xl p-6 sm:p-8 border-2 border-dashed border-[#6AA38C] flex flex-col items-center justify-center min-h-[220px] relative overflow-hidden transition-all">
+        {/* Delicate Layered Emerald Wave Background Accent */}
+        <svg
+          viewBox="0 0 800 120"
+          fill="none"
+          preserveAspectRatio="none"
+          className="pointer-events-none select-none absolute inset-x-0 bottom-0 w-full h-24 opacity-80"
+          aria-hidden="true"
+        >
+          <path d="M0 90 C180 36 330 112 520 74 C650 48 730 32 800 52 L800 120 L0 120 Z" fill="#D5ECE0" fillOpacity="0.65" />
+          <path d="M0 105 C210 68 410 118 610 82 C700 66 760 56 800 68 L800 120 L0 120 Z" fill="#C4E3D3" fillOpacity="0.55" />
+        </svg>
+
         <input 
           type="file" 
           multiple
@@ -871,14 +888,14 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
         />
         
         {isParsing ? (
-          <div className="w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-500 py-4">
-              <div className="flex flex-col items-center mb-6">
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg mb-4 text-[#00483C] relative shadow-brand-green-900/5">
-                       <ChefHat size={32} className="animate-pulse" />
-                       <div className="absolute inset-0 border-4 border-brand-green-400 border-t-brand-green-600 rounded-full animate-spin"></div>
+          <div className="relative z-10 w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-500 py-3">
+              <div className="flex flex-col items-center mb-5">
+                  <div className="w-16 h-16 bg-[#FFFDF8] rounded-full flex items-center justify-center shadow-lg mb-4 text-[#024731] relative border border-[#E4C987]">
+                       <ChefHat size={30} className="animate-pulse text-[#024731]" />
+                       <div className="absolute inset-0 border-4 border-[#9EE2BA] border-t-[#024731] rounded-full animate-spin"></div>
                   </div>
-                  <h3 className="font-bold text-base text-slate-800">{scanStatus || 'Processing...'}</h3>
-                  <p className="text-[11px] font-medium text-slate-500 mt-1">
+                  <h3 className="font-bold text-base text-[#0F241C]">{scanStatus || 'Processing...'}</h3>
+                  <p className="text-[11px] font-medium text-[#5C5240] mt-1">
                       {timeRemaining > 20 ? `Estimated time remaining: 00:${timeRemaining.toString().padStart(2, '0')}` : 
                        timeRemaining > 10 ? "Approx 15 seconds remaining" :
                        timeRemaining > 0 ? "Almost done..." : "Finalizing extraction..."}
@@ -886,126 +903,143 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
               </div>
 
               <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <div className="flex justify-between text-[10px] font-bold text-[#4A3B22] uppercase tracking-wider">
                      <span>Uploading Documents</span>
                      <span>{Math.min(100, uploadProgress)}%</span>
                   </div>
-                  <div className="h-2 bg-[#e0eee8] rounded-full overflow-hidden">
-                     <div className="h-full bg-brand-green-400 transition-all duration-300" style={{width: `${uploadProgress}%`}} />
+                  <div className="h-2 bg-[#DCECE3] rounded-full overflow-hidden">
+                     <div className="h-full bg-[#024731] transition-all duration-300" style={{width: `${uploadProgress}%`}} />
                   </div>
               </div>
 
               <div className="space-y-1.5">
-                 <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                 <div className="flex justify-between text-[10px] font-bold text-[#4A3B22] uppercase tracking-wider">
                     <span>AI Menu Extraction</span>
                     <span>{Math.min(100, scanProgress)}%</span>
                  </div>
-                 <div className="h-2 bg-brand-gold-200/50 rounded-full overflow-hidden">
-                    <div className={cn("h-full transition-all duration-500", scanProgress === 100 ? "bg-green-500" : "bg-[#DEAA38]")} style={{width: `${scanProgress}%`}} />
+                 <div className="h-2 bg-[#F3E2B8] rounded-full overflow-hidden">
+                    <div className={cn("h-full transition-all duration-500", scanProgress === 100 ? "bg-[#15803D]" : "bg-[#D99B1E]")} style={{width: `${scanProgress}%`}} />
                  </div>
               </div>
           </div>
         ) : scanError ? (
-          <div className="flex flex-col items-center justify-center text-red-800 w-full py-4">
+          <div className="relative z-10 flex flex-col items-center justify-center text-red-800 w-full py-3">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shadow-sm mb-3 text-red-600 animate-bounce">
               <AlertCircle size={24} />
             </div>
             <p className="font-bold mb-1">Scan Failed</p>
             <p className="text-xs text-red-800/80 font-medium mb-4 text-center max-w-sm">{scanError}</p>
             <div className="flex gap-3">
-               <button onClick={(e) => { e.stopPropagation(); setScanError(''); setScanStatus(''); setUploadProgress(0); setScanProgress(0); }} className="text-xs font-bold bg-white text-slate-700 px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">Cancel</button>
-               <button onClick={(e) => { e.stopPropagation(); if(lastFiles) processFiles(lastFiles); }} className="text-xs font-bold bg-red-600 text-white px-4 py-2 rounded-xl shadow min-w-[100px] hover:bg-red-700 transition-colors">Retry Scan</button>
+               <button type="button" onClick={(e) => { e.stopPropagation(); setScanError(''); setScanStatus(''); setUploadProgress(0); setScanProgress(0); }} className="text-xs font-bold bg-white text-slate-700 px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">Cancel</button>
+               <button type="button" onClick={(e) => { e.stopPropagation(); if(lastFiles) processFiles(lastFiles); }} className="text-xs font-bold bg-red-600 text-white px-4 py-2 rounded-xl shadow min-w-[100px] hover:bg-red-700 transition-colors cursor-pointer">Retry Scan</button>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center py-2 select-none text-center">
-            {/* White rounded upload circle icon */}
-            <div className="w-16 h-16 rounded-full bg-white text-brand-green-600 flex items-center justify-center mb-3 shadow-[0_4px_16px_rgba(15,41,34,0.06)] group-hover:scale-105 transition-transform">
-              <UploadCloud size={28} className="text-[#00483C]" />
+          <div className="relative z-10 flex flex-col items-center py-1 select-none text-center">
+            {/* Scan Bracket Menu Icon matching Reference */}
+            <div className="relative p-2.5 mb-3">
+              <span className="absolute top-0 left-0 w-3.5 h-3.5 border-t-[2.5px] border-l-[2.5px] border-[#024731] rounded-tl" />
+              <span className="absolute top-0 right-0 w-3.5 h-3.5 border-t-[2.5px] border-r-[2.5px] border-[#024731] rounded-tr" />
+              <span className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-[2.5px] border-l-[2.5px] border-[#024731] rounded-bl" />
+              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-[2.5px] border-r-[2.5px] border-[#024731] rounded-br" />
+              <div className="w-12 h-14 rounded-lg bg-gradient-to-b from-[#6ED39D] to-[#42B97C] border border-[#2C9D63] px-2 py-1.5 flex flex-col items-center justify-between shadow-sm text-white">
+                <span className="text-[7px] font-extrabold tracking-widest uppercase">▲ MENU</span>
+                <div className="w-6 h-1 bg-white/85 rounded-full" />
+                <div className="w-full space-y-1">
+                  <div className="h-1 bg-white/85 rounded-full w-full" />
+                  <div className="h-1 bg-white/75 rounded-full w-4/5" />
+                  <div className="h-1 bg-white/70 rounded-full w-3/4" />
+                </div>
+              </div>
             </div>
             
-            <p className="text-base font-bold text-slate-900 font-display">Drag & Drop Menu Here</p>
-            <p className="text-[11px] text-slate-500 mt-0.5 mb-4">Supports: JPG, PNG, PDF (Max 25MB)</p>
+            <p className="text-lg font-bold text-[#0F241C] font-display tracking-tight">Drag &amp; Drop Menu Here</p>
+            <p className="text-xs text-[#5C5240] mt-0.5 mb-4">Supports: JPG, PNG, PDF (Max 25MB)</p>
             
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="bg-[#00483C] text-white font-semibold font-sans text-xs px-6 py-2.5 rounded-full hover:bg-brand-green-800 transition-all shadow-md active:scale-95"
+              className="bg-gradient-to-r from-[#024731] to-[#013122] hover:from-[#03583D] hover:to-[#023C2A] border border-[#D9A323]/45 text-[#FFFDF8] font-semibold font-sans text-xs px-7 py-2.5 rounded-full transition-all shadow-[0_6px_16px_rgba(1,49,34,0.22)] active:scale-95 inline-flex items-center gap-2 cursor-pointer"
             >
-              Choose File
+              <Upload size={14} className="text-[#F5C642]" />
+              <span>Choose File</span>
             </button>
           </div>
         )}
       </div>
 
       {/* AI automatically bullet highlights row */}
-      <div className="mb-8">
-        <p className="text-xs font-bold text-slate-900 tracking-wide font-poppins mb-3">Our AI will automatically:</p>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-slate-50 border border-slate-100 p-4 rounded-2xl">
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
-            <span className="w-2 h-2 rounded-full bg-[#DEAA38] inline-block shrink-0"></span>
+      <div className="mb-6">
+        <p className="text-xs font-bold text-[#0F241C] tracking-wide font-poppins mb-2.5">Our AI will automatically:</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 bg-[#FCF7E8] border border-[#EAE0C8] rounded-2xl divide-y sm:divide-y-0 sm:divide-x divide-[#E8D9B5] overflow-hidden">
+          <div className="flex items-center gap-2.5 px-4 py-3 text-xs font-semibold text-[#30281E]">
+            <span className="w-7 h-7 rounded-lg bg-[#FAF0D4] border border-[#E4C987] text-[#C48E22] flex items-center justify-center shrink-0">
+              <Layers size={14} />
+            </span>
             <span>Extract all menu items</span>
           </div>
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
-            <span className="w-2 h-2 rounded-full bg-[#DEAA38] inline-block shrink-0"></span>
+          <div className="flex items-center gap-2.5 px-4 py-3 text-xs font-semibold text-[#30281E]">
+            <span className="w-7 h-7 rounded-lg bg-[#FAF0D4] border border-[#E4C987] text-[#C48E22] flex items-center justify-center shrink-0">
+              <Tag size={14} />
+            </span>
             <span>Suggest pricing slabs</span>
           </div>
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
-            <span className="w-2 h-2 rounded-full bg-[#DEAA38] inline-block shrink-0"></span>
-            <span>Organize dishes</span>
+          <div className="flex items-center gap-2.5 px-4 py-3 text-xs font-semibold text-[#30281E]">
+            <span className="w-7 h-7 rounded-lg bg-[#FAF0D4] border border-[#E4C987] text-[#C48E22] flex items-center justify-center shrink-0">
+              <ChefHat size={14} />
+            </span>
+            <span>Organize dishes by category</span>
           </div>
         </div>
       </div>
 
       {/* Separator - Or create packages manually */}
-      <div className="relative flex items-center justify-center my-6">
+      <div className="relative flex items-center justify-center my-5">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-slate-200"></div>
+          <div className="w-full border-t border-[#E6D8B8]"></div>
         </div>
-        <div className="relative bg-white px-4 text-xs font-semibold text-slate-400 font-poppins uppercase tracking-wider">
+        <div className="relative bg-[#FFFDF8] px-4 text-[11px] font-bold text-[#6B5F4B] font-poppins uppercase tracking-wider">
           Or create packages manually
         </div>
       </div>
 
       {/* Add package manually button centered */}
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mb-4">
         <button 
+          type="button"
           onClick={handleAddPackageManually}
-          className="border-2 border-dashed border-slate-300 hover:border-[#DEAA38] hover:bg-brand-gold-50/20 text-slate-700 font-semibold text-xs px-6 py-3 rounded-2xl flex items-center gap-2 transition-all"
+          className="border-2 border-dashed border-[#D9BE7D] bg-[#FFFDF8] hover:border-[#D9A323] hover:bg-[#FAF0D4]/55 text-[#0F241C] font-bold text-xs px-7 py-2.5 rounded-full flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
         >
-          <span className="text-[#DEAA38] text-base font-bold">+</span> Add Package Manually
+          <span className="text-[#D99B1E] text-base font-bold leading-none">+</span> Add Package Manually
         </button>
       </div>
 
       {/* Your Packages list (Extracted items) - hidden during scanning or when scan error occurs */}
       {!isParsing && !scanError && packages.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-xs font-bold tracking-wider text-slate-400 uppercase font-poppins mb-4">Your Packages (AI Extracted)</h3>
+        <div className="mb-8 mt-6 pt-6 border-t border-[#EFE3C4]">
+          <h3 className="text-xs font-bold tracking-wider text-[#6B5F4B] uppercase font-poppins mb-4">Your Packages (AI Extracted)</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {packages.map((pkg, idx) => {
-              const totalItems = pkg.categories.reduce((acc, cat) => acc + (cat.items?.length || 0), 0);
               const totalCats = pkg.categories?.length || 0;
               const minGuestsVal = pkg.minimumGuests || (pkg.pricingSlabs?.[0]?.minGuests) || 100;
               const basePrice = pkg.pricePerPlate || (pkg.pricingSlabs?.[0]?.price) || 0;
               
-              // Colors based on names or defaults
               const isGold = pkg.packageName?.toLowerCase().includes('gold') || idx === 1;
               const isPlatinum = pkg.packageName?.toLowerCase().includes('platinum') || pkg.packageName?.toLowerCase().includes('premium') || idx === 2;
               
-              // Preset badges and palettes matching screen 1
               let badge = "PURE VEG";
-              let cardBg = "bg-slate-50 border-slate-200";
-              let badgeStyle = "bg-green-100 text-green-700 border border-green-200/50";
+              let cardBg = "bg-[#FCF8EE] border-[#E4C987]";
+              let badgeStyle = "bg-[#E6F9ED] text-[#15803D] border border-[#A7DCBA]";
               
               if (isGold) {
                 badge = "MOST POPULAR";
-                cardBg = "bg-amber-50/40 border-amber-200/60";
-                badgeStyle = "bg-[#DEAA38] text-slate-900 font-bold";
+                cardBg = "bg-[#FAF0D4]/65 border-[#DFB95B]";
+                badgeStyle = "bg-[#E5B84B] text-[#0F241C] font-bold";
               } else if (isPlatinum) {
                 badge = "PREMIUM";
-                cardBg = "bg-indigo-50/30 border-indigo-100";
-                badgeStyle = "bg-indigo-600 text-white font-bold";
+                cardBg = "bg-[#F4FAF6] border-[#9ECDB4]";
+                badgeStyle = "bg-[#024731] text-[#F5C642] font-bold";
               }
 
               return (
@@ -1017,38 +1051,33 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                   )}
                 >
                   <div>
-                    {/* Badge */}
                     <div className="mb-3">
-                      <span className={cn("text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block", badgeStyle)}>
+                      <span className={cn("text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block", badgeStyle)}>
                         {badge}
                       </span>
                     </div>
 
-                    {/* Package Name */}
-                    <h4 className="font-display font-bold text-lg text-slate-900 group-hover:text-brand-green-800 transition-colors">
+                    <h4 className="font-display font-bold text-lg text-[#0F241C] group-hover:text-[#024731] transition-colors">
                       {pkg.packageName || `Package ${idx + 1}`}
                     </h4>
 
-                    {/* Price banner */}
-                    <p className="text-xl font-bold text-[#DEAA38] font-sans mt-2">
-                      ₹{basePrice} <span className="text-xs text-slate-500 font-normal">/ pax</span>
+                    <p className="text-xl font-bold text-[#B87D16] font-sans mt-2 tabular-nums">
+                      ₹{basePrice} <span className="text-xs text-[#6B5F4B] font-normal">/ pax</span>
                     </p>
 
-                    {/* Meta stats list */}
-                    <div className="mt-4 space-y-2 border-t border-slate-100 pt-3">
-                      <div className="flex items-center gap-2 text-xs text-slate-600">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                    <div className="mt-4 space-y-2 border-t border-[#E6D8B8] pt-3">
+                      <div className="flex items-center gap-2 text-xs text-[#4A3B22]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#C48E22]"></span>
                         <span>Min {minGuestsVal} Guests</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-600">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      <div className="flex items-center gap-2 text-xs text-[#4A3B22]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#C48E22]"></span>
                         <span>{totalCats || 8} Categories</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Preview action trigger */}
-                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div className="mt-5 pt-3 border-t border-[#E6D8B8] flex items-center justify-between">
                     <button 
                       type="button"
                       onClick={() => {
@@ -1057,9 +1086,9 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                           targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                       }}
-                      className="text-xs font-bold text-brand-green-700 hover:text-brand-green-900 hover:underline flex items-center gap-1.5 transition-all text-left"
+                      className="text-xs font-bold text-[#024731] hover:text-[#01291C] hover:underline flex items-center gap-1.5 transition-all text-left cursor-pointer"
                     >
-                      Preview & Edit Menu <span className="text-[#DEAA38]">→</span>
+                      Preview &amp; Edit Menu <span className="text-[#C48E22]">→</span>
                     </button>
                   </div>
                 </div>
@@ -1077,22 +1106,22 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
           const totalCats = pkg.categories?.length || 0;
           
           return (
-          <div key={pIdx} id={`pkg-edit-${pIdx}`} className="border border-slate-200 rounded-2xl bg-white overflow-hidden shadow-sm">
+          <div key={pIdx} id={`pkg-edit-${pIdx}`} className="border border-[#E4C987] rounded-2xl bg-[#FFFDF8] overflow-hidden shadow-sm">
             
             {/* Extraction Review Panel */}
-            <div className="bg-brand-gold-50/50 border-b border-brand-gold-100 px-6 py-3 flex flex-wrap gap-6 items-center">
+            <div className="bg-[#FCF7E8] border-b border-[#EFE3C4] px-6 py-3 flex flex-wrap gap-6 items-center">
                 <div>
-                   <p className="text-xs text-brand-gold-700 font-bold uppercase tracking-wider mb-0.5">Extraction Review</p>
-                   <p className="text-sm text-slate-700">Check and edit your package details before saving.</p>
+                   <p className="text-xs text-[#B87D16] font-bold uppercase tracking-wider mb-0.5">Extraction Review</p>
+                   <p className="text-sm text-[#4A3B22]">Check and edit your package details before saving.</p>
                 </div>
                 <div className="flex gap-4 ml-auto">
-                    <div className="text-center font-bold text-slate-800 bg-white px-3 py-1.5 rounded-lg border border-brand-gold-200 text-sm"><span className="text-brand-gold-600">{totalCats}</span> Categories</div>
-                    <div className="text-center font-bold text-slate-800 bg-white px-3 py-1.5 rounded-lg border border-brand-gold-200 text-sm"><span className="text-brand-gold-600">{totalItems}</span> Items</div>
-                    <div className="text-center font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-lg border border-green-200 text-sm flex items-center gap-1"><CheckCircle2 size={16}/> 98% Confidence</div>
+                    <div className="text-center font-bold text-[#0F241C] bg-[#FFFDF8] px-3 py-1.5 rounded-lg border border-[#E4C987] text-sm"><span className="text-[#B87D16]">{totalCats}</span> Categories</div>
+                    <div className="text-center font-bold text-[#0F241C] bg-[#FFFDF8] px-3 py-1.5 rounded-lg border border-[#E4C987] text-sm"><span className="text-[#B87D16]">{totalItems}</span> Items</div>
+                    <div className="text-center font-bold text-[#024731] bg-[#E8F6EE] px-3 py-1.5 rounded-lg border border-[#9ECDB4] text-sm flex items-center gap-1"><CheckCircle2 size={16}/> 98% Confidence</div>
                 </div>
             </div>
 
-            <div className="bg-white border-b border-slate-200 p-5 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-[#FFFDF8] border-b border-[#EFE3C4] p-5 flex flex-wrap items-center justify-between gap-4">
               <div className="flex-1 min-w-[200px]">
                 {editPackageIdx === pIdx ? (
                     <div className="flex flex-col gap-2">
@@ -1101,35 +1130,35 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                type="text" 
                                value={editPackageNameStr}
                                onChange={(e) => setEditPackageNameStr(e.target.value)}
-                               className="text-xl font-bold bg-white border-2 border-brand-green-500 focus:outline-none rounded-lg px-2 py-1 w-full max-w-[300px]"
+                               className="text-xl font-bold bg-[#FFFDF9] border-2 border-[#065239] text-[#0F241C] focus:outline-none rounded-xl px-3 py-1.5 w-full max-w-[300px]"
                                autoFocus
                                onKeyDown={(e) => e.key === 'Enter' && savePackageName(pIdx)}
                             />
-                            <button onClick={() => savePackageName(pIdx)} className="p-2 bg-brand-green-900 text-white rounded-lg hover:bg-brand-green-800"><Check size={16}/></button>
-                            <button onClick={() => setEditPackageIdx(null)} className="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200"><X size={16}/></button>
+                            <button onClick={() => savePackageName(pIdx)} className="p-2 bg-[#024731] text-[#FFFDF8] rounded-lg hover:bg-[#013122] cursor-pointer"><Check size={16}/></button>
+                            <button onClick={() => setEditPackageIdx(null)} className="p-2 bg-[#FAF3E2] border border-[#DFC78A] text-[#5C5240] rounded-lg hover:bg-[#F3E5C3] cursor-pointer"><X size={16}/></button>
                         </div>
                     </div>
                 ) : (
                     <div>
-                        <h3 className="text-xl font-bold text-slate-800 flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-display font-bold text-[#0F241C] flex items-center gap-3 mb-2">
                         {pkg.packageName || 'Unnamed Package'}
-                        <button onClick={() => { setEditPackageNameStr(pkg.packageName); setEditPackageIdx(pIdx); }} className="text-slate-400 hover:text-brand-gold-600"><Edit2 size={16}/></button>
-                        <span className={cn("text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider", pkg.packageType?.toLowerCase() === 'veg' ? "bg-green-100 text-green-700" : pkg.packageType?.toLowerCase() === 'non veg' ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700")}>
+                        <button onClick={() => { setEditPackageNameStr(pkg.packageName); setEditPackageIdx(pIdx); }} className="text-[#8E7D5E] hover:text-[#9A6A0F] cursor-pointer"><Edit2 size={16}/></button>
+                        <span className={cn("text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border", pkg.packageType?.toLowerCase() === 'veg' ? "bg-[#DCF8E6] text-[#116E39] border-[#9EE2BA]" : pkg.packageType?.toLowerCase() === 'non veg' ? "bg-red-50 text-red-700 border-red-200" : "bg-[#FAF0D4] text-[#8E5B08] border-[#DFC78A]")}>
                             {pkg.packageType || 'Mixed'}
                         </span>
                         </h3>
                         
                         <div className="flex flex-col gap-3 mt-4">
-                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Pricing Slabs</div>
-                            <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden">
-                                <div className="grid grid-cols-4 bg-slate-100 p-2 text-xs font-bold text-slate-600 border-b border-slate-200">
+                            <div className="text-xs font-bold text-[#7D6E52] uppercase tracking-wider mb-1">Pricing Slabs</div>
+                            <div className="bg-[#FAF3E2]/55 border border-[#DFC78A] rounded-xl overflow-hidden">
+                                <div className="grid grid-cols-4 bg-[#FAF0D4]/90 p-2.5 text-xs font-bold text-[#0F241C] border-b border-[#DFC78A]">
                                     <div className="px-2">Min Guests</div>
                                     <div className="px-2">Max Guests</div>
                                     <div className="px-2">Price (₹)</div>
                                     <div className="px-2 text-right">Actions</div>
                                 </div>
                                 {pkg.pricingSlabs?.map((slab, sIdx) => (
-                                    <div key={sIdx} className="grid grid-cols-4 p-2 items-center text-sm border-b border-slate-100 last:border-0 hover:bg-white transition-colors">
+                                    <div key={sIdx} className="grid grid-cols-4 p-2 items-center text-sm border-b border-[#EFE3C4] last:border-0 hover:bg-[#FFFDF8] transition-colors">
                                         <div className="px-2">
                                             <input 
                                                 type="number" 
@@ -1139,7 +1168,7 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                                     if(newPkgs[pIdx].pricingSlabs) newPkgs[pIdx].pricingSlabs![sIdx].minGuests = Number(e.target.value);
                                                     onChange(newPkgs);
                                                 }}
-                                                className="w-full bg-transparent border-b border-transparent focus:border-brand-green-500 outline-none"
+                                                className="w-full bg-transparent text-[#0F241C] font-medium tabular-nums border-b border-transparent focus:border-[#065239] outline-none"
                                                 placeholder="Min"
                                             />
                                         </div>
@@ -1152,12 +1181,12 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                                     if(newPkgs[pIdx].pricingSlabs) newPkgs[pIdx].pricingSlabs![sIdx].maxGuests = e.target.value ? Number(e.target.value) : null;
                                                     onChange(newPkgs);
                                                 }}
-                                                className="w-full bg-transparent border-b border-transparent focus:border-brand-green-500 outline-none"
+                                                className="w-full bg-transparent text-[#0F241C] font-medium tabular-nums border-b border-transparent focus:border-[#065239] outline-none"
                                                 placeholder="Max (optional)"
                                             />
                                         </div>
                                         <div className="px-2 flex items-center gap-1">
-                                            <span className="text-slate-400">₹</span>
+                                            <span className="text-[#9A6A0F] font-bold">₹</span>
                                             <input 
                                                 type="number" 
                                                 value={slab.price || ''}
@@ -1169,7 +1198,7 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                                     }
                                                     onChange(newPkgs);
                                                 }}
-                                                className="w-full bg-transparent border-b border-transparent focus:border-brand-green-500 outline-none font-bold"
+                                                className="w-full bg-transparent text-[#0F241C] tabular-nums border-b border-transparent focus:border-[#065239] outline-none font-bold"
                                                 placeholder="Price"
                                             />
                                         </div>
@@ -1180,7 +1209,7 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                                     newPkgs[pIdx].pricingSlabs?.splice(sIdx, 1);
                                                     onChange(newPkgs);
                                                 }}
-                                                className="text-slate-400 hover:text-red-500 p-1 rounded hover:bg-red-50 transition-colors"
+                                                className="text-[#8E7D5E] hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors cursor-pointer"
                                                 title="Delete Slab"
                                             >
                                                 <Trash2 size={14} />
@@ -1196,7 +1225,7 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                     newPkgs[pIdx].pricingSlabs!.push({ minGuests: 100, maxGuests: null, price: 0 });
                                     onChange(newPkgs);
                                 }}
-                                className="text-xs font-bold text-brand-green-600 self-start flex items-center gap-1 hover:text-brand-green-800 transition-colors bg-brand-green-50 px-3 py-1.5 rounded-lg"
+                                className="text-xs font-bold text-[#065239] self-start flex items-center gap-1 hover:text-[#01291D] transition-colors bg-[#E8F6EE] border border-[#9EE2BA] px-3 py-1.5 rounded-lg cursor-pointer"
                             >
                                 <Plus size={14} /> Add Pricing Slab
                             </button>
@@ -1205,19 +1234,19 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                 )}
               </div>
               <div className="flex gap-2">
-                <button onClick={() => duplicatePackage(pIdx)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium text-sm transition-colors">
+                <button onClick={() => duplicatePackage(pIdx)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#DFC78A] bg-[#FAF3E2]/70 text-[#0F241C] hover:bg-[#FAF0D4] font-semibold text-sm transition-colors cursor-pointer">
                   <Copy size={16} /> Duplicate
                 </button>
-                <button onClick={() => setDeletePackageModal({pkgIdx: pIdx, name: pkg.packageName})} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 font-medium text-sm transition-colors">
+                <button onClick={() => setDeletePackageModal({pkgIdx: pIdx, name: pkg.packageName})} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 font-semibold text-sm transition-colors cursor-pointer">
                   <Trash2 size={16} /> Delete Package
                 </button>
               </div>
             </div>
 
-            <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6 bg-[#FFFDF8]">
               {pkg.categories?.map((cat, cIdx) => (
-                <div key={cIdx} className="bg-white border border-slate-200 rounded-xl shadow-sm relative flex flex-col">
-                  <div className="p-4 border-b border-slate-100 flex justify-between items-start bg-slate-50/50 rounded-t-xl">
+                <div key={cIdx} className="bg-[#FFFDF8] border border-[#E6D8B8] rounded-xl shadow-sm relative flex flex-col">
+                  <div className="p-4 border-b border-[#EFE3C4] flex justify-between items-start bg-[#FCF7E8]/75 rounded-t-xl">
                     <div className="flex-1 mr-4">
                       {editCategoryIdx?.pkg === pIdx && editCategoryIdx?.cat === cIdx ? (
                           <div className="flex items-center gap-2 mb-2">
@@ -1225,17 +1254,17 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                  type="text" 
                                  value={editCategoryNameStr}
                                  onChange={(e) => setEditCategoryNameStr(e.target.value)}
-                                 className="font-bold bg-white border-2 border-brand-green-500 rounded px-2 py-1 flex-1 min-w-0 text-sm focus:outline-none"
+                                 className="font-bold bg-[#FFFDF9] border-2 border-[#065239] text-[#0F241C] rounded-lg px-2 py-1 flex-1 min-w-0 text-sm focus:outline-none"
                                  autoFocus
                                  onKeyDown={(e) => e.key === 'Enter' && saveCategoryName(pIdx, cIdx)}
                               />
-                              <button onClick={() => saveCategoryName(pIdx, cIdx)} className="text-green-600 p-1 hover:bg-green-50 rounded"><Check size={16}/></button>
-                              <button onClick={() => setEditCategoryIdx(null)} className="text-slate-400 p-1 hover:bg-slate-100 rounded"><X size={16}/></button>
+                              <button onClick={() => saveCategoryName(pIdx, cIdx)} className="text-[#065239] p-1 hover:bg-[#E8F6EE] rounded cursor-pointer"><Check size={16}/></button>
+                              <button onClick={() => setEditCategoryIdx(null)} className="text-[#7D6E52] p-1 hover:bg-[#FAF0D4] rounded cursor-pointer"><X size={16}/></button>
                           </div>
                       ) : (
                           <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-bold text-slate-800">{cat.categoryName}</h4>
-                              <button onClick={() => { setEditCategoryNameStr(cat.categoryName); setEditCategoryIdx({pkg: pIdx, cat: cIdx}); }} className="text-slate-400 hover:text-brand-gold-600 opacity-50 hover:opacity-100"><Edit2 size={14}/></button>
+                              <h4 className="font-bold text-[#0F241C]">{cat.categoryName}</h4>
+                              <button onClick={() => { setEditCategoryNameStr(cat.categoryName); setEditCategoryIdx({pkg: pIdx, cat: cIdx}); }} className="text-[#8E7D5E] hover:text-[#9A6A0F] opacity-60 hover:opacity-100 cursor-pointer"><Edit2 size={14}/></button>
                           </div>
                       )}
                       
@@ -1243,7 +1272,7 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                         <select
                           value={normalizeCategoryRule(cat.selectionRule)} 
                           onChange={(e) => updateRule(pIdx, cIdx, e.target.value)}
-                          className="text-xs bg-white border border-slate-200 rounded px-2 py-1 focus:border-brand-gold-500 focus:outline-none font-semibold text-brand-gold-700 cursor-pointer hover:bg-slate-50 w-full max-w-[140px]" 
+                          className="text-xs bg-[#FFFDF9] border border-[#DFC78A] rounded-lg px-2 py-1 focus:border-[#D4961B] focus:outline-none font-semibold text-[#8E5B08] cursor-pointer hover:bg-[#FAF0D4]/50 w-full max-w-[140px]" 
                         >
                           {STANDARD_SELECTION_RULES.map((ruleOption) => (
                             <option key={ruleOption} value={ruleOption}>{ruleOption}</option>
@@ -1254,17 +1283,17 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                             </option>
                           )}
                         </select>
-                        <span className="bg-slate-200 text-slate-600 text-[10px] font-bold px-2 py-1 rounded">
+                        <span className="bg-[#FAF0D4] border border-[#DFC78A] text-[#6B4A10] text-[10px] font-bold px-2 py-1 rounded-md tabular-nums">
                           {cat.items?.length || 0} Items
                         </span>
                       </div>
                     </div>
                     
                     <div className="flex gap-1 flex-shrink-0">
-                        <button onClick={() => duplicateCategory(pIdx, cIdx)} className="p-1.5 text-slate-400 hover:text-brand-gold-600 hover:bg-brand-gold-50 rounded-lg transition-colors" title="Duplicate Category">
+                        <button onClick={() => duplicateCategory(pIdx, cIdx)} className="p-1.5 text-[#8E7D5E] hover:text-[#9A6A0F] hover:bg-[#FAF0D4] rounded-lg transition-colors cursor-pointer" title="Duplicate Category">
                           <Copy size={16} />
                         </button>
-                        <button onClick={() => setDeleteCategoryModal({pkgIdx: pIdx, catIdx: cIdx, name: cat.categoryName})} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete Category">
+                        <button onClick={() => setDeleteCategoryModal({pkgIdx: pIdx, catIdx: cIdx, name: cat.categoryName})} className="p-1.5 text-[#8E7D5E] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Delete Category">
                           <Trash2 size={16} />
                         </button>
                     </div>
@@ -1272,16 +1301,16 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
 
                   <div className="p-4 flex-1 space-y-2">
                     {cat.items?.map((item, iIdx) => (
-                      <div key={iIdx} className="flex flex-row items-center gap-3 py-1 group/item border-b border-dashed border-slate-100 last:border-0 hover:bg-slate-50/50 px-1.5 rounded-lg transition-all">
-                        <div className="text-slate-300 group-hover/item:text-slate-500 cursor-grab px-1"><GripVertical size={14}/></div>
+                      <div key={iIdx} className="flex flex-row items-center gap-3 py-1 group/item border-b border-dashed border-[#EFE3C4] last:border-0 hover:bg-[#FAF3E2]/55 px-1.5 rounded-lg transition-all">
+                        <div className="text-[#B8A582] group-hover/item:text-[#6B5F4B] cursor-grab px-1"><GripVertical size={14}/></div>
                         
                         <div className="flex-1 flex flex-col justify-center min-w-0">
-                          <span className="text-sm font-bold text-slate-800 truncate">{item}</span>
+                          <span className="text-sm font-bold text-[#0F241C] truncate">{item}</span>
                           <span className={cn(
                             "text-[8px] font-black uppercase tracking-wider block mt-0.5",
-                            getBuilderItemStatus(item) === 'Approved' ? "text-emerald-600" :
-                            getBuilderItemStatus(item) === 'Pending Admin Review' ? "text-amber-500 animate-pulse" :
-                            getBuilderItemStatus(item) === 'Rejected' ? "text-red-500" : "text-slate-400"
+                            getBuilderItemStatus(item) === 'Approved' ? "text-emerald-700" :
+                            getBuilderItemStatus(item) === 'Pending Admin Review' ? "text-[#B87D16]" :
+                            getBuilderItemStatus(item) === 'Rejected' ? "text-red-600" : "text-[#8E7D5E]"
                           )}>
                             {getBuilderItemStatus(item) === 'Pending Admin Review' ? 'Review Pending' : getBuilderItemStatus(item)}
                           </span>
@@ -1290,16 +1319,16 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                         <div className="opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center gap-1 shrink-0">
                             {/* Move to Category Dropdown */}
                             <div className="relative group/move">
-                                <button className="p-1 text-slate-400 hover:text-blue-500 rounded hover:bg-blue-50 flex items-center gap-1" title="Move to Category">
+                                <button className="p-1 text-[#7D6E52] hover:text-[#065239] rounded hover:bg-[#E8F6EE] flex items-center gap-1 cursor-pointer" title="Move to Category">
                                    <ChevronDown size={14} />
                                 </button>
-                                <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-xl p-1 hidden group-hover/move:block z-10">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">Move to:</p>
+                                <div className="absolute right-0 top-full mt-1 w-48 bg-[#FFFDF8] border border-[#DFC78A] shadow-xl rounded-xl p-1 hidden group-hover/move:block z-10">
+                                    <p className="text-[10px] font-bold text-[#8E7D5E] uppercase tracking-wider px-2 py-1">Move to:</p>
                                     {pkg.categories.map((targetCat, tIdx) => (
                                         <button 
                                            key={tIdx} 
                                            onClick={(e) => { e.stopPropagation(); moveItem(pIdx, cIdx, iIdx, tIdx); }}
-                                           className={cn("w-full text-left px-2 py-1.5 text-xs rounded-lg transition-colors", tIdx === cIdx ? "bg-brand-green-50 text-brand-green-900 font-bold" : "hover:bg-slate-50 text-slate-700")}
+                                           className={cn("w-full text-left px-2 py-1.5 text-xs rounded-lg transition-colors cursor-pointer", tIdx === cIdx ? "bg-[#E8F6EE] text-[#065239] font-bold" : "hover:bg-[#FAF0D4]/60 text-[#0F241C]")}
                                         >
                                             {targetCat.categoryName}
                                         </button>
@@ -1312,24 +1341,24 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                                 setCatererEditingItem({ item_name: item, package_idx: pIdx, category_idx: cIdx, item_idx: iIdx });
                                 setCatererImgPreview(getBuilderItemImage(item));
                               }} 
-                              className="p-1 text-slate-400 hover:text-emerald-600 rounded hover:bg-emerald-50" 
+                              className="p-1 text-[#7D6E52] hover:text-[#065239] rounded hover:bg-[#E8F6EE] cursor-pointer" 
                               title="Change/Upload Image"
                             >
                                 <UploadCloud size={14} />
                             </button>
                             
-                            <button onClick={() => setShowEditItemModal({pkgIdx: pIdx, catIdx: cIdx, itemIdx: iIdx, currentName: item})} className="p-1 text-slate-400 hover:text-brand-gold-600 rounded hover:bg-brand-gold-50" title="Edit Item">
+                            <button onClick={() => setShowEditItemModal({pkgIdx: pIdx, catIdx: cIdx, itemIdx: iIdx, currentName: item})} className="p-1 text-[#7D6E52] hover:text-[#9A6A0F] rounded hover:bg-[#FAF0D4] cursor-pointer" title="Edit Item">
                                 <Edit2 size={14} />
                             </button>
  
-                            <button onClick={() => setDeleteItemModal({pkgIdx: pIdx, catIdx: cIdx, itemIdx: iIdx, name: item})} className="p-1 text-slate-400 hover:text-red-500 rounded hover:bg-red-50" title="Delete Item">
+                            <button onClick={() => setDeleteItemModal({pkgIdx: pIdx, catIdx: cIdx, itemIdx: iIdx, name: item})} className="p-1 text-[#7D6E52] hover:text-red-600 rounded hover:bg-red-50 cursor-pointer" title="Delete Item">
                                 <Trash2 size={14} />
                             </button>
                         </div>
                       </div>
                     ))}
                     
-                    <button onClick={() => openAddItemModal(pIdx, cIdx)} className="mt-2 text-brand-green-600 text-sm font-semibold flex items-center gap-1 hover:text-brand-green-800 px-1 py-2 w-full hover:bg-brand-green-50 rounded-lg transition-colors">
+                    <button onClick={() => openAddItemModal(pIdx, cIdx)} className="mt-2 text-[#065239] text-sm font-semibold flex items-center gap-1 hover:text-[#01291D] px-2 py-2 w-full hover:bg-[#E8F6EE] rounded-lg transition-colors cursor-pointer">
                       <Plus size={16} /> Add Item
                     </button>
                   </div>
@@ -1337,9 +1366,9 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
               ))}
             </div>
             
-            <div className="p-4 bg-slate-100 border-t border-slate-200 flex justify-center">
-                 <button onClick={() => openAddCategory(pIdx)} className="px-6 py-2.5 bg-brand-green-900 text-white rounded-xl text-sm font-bold shadow-sm shadow-brand-green-900/20 hover:bg-brand-green-800 flex items-center gap-2 transition-colors">
-                    <Plus size={18}/> Add Category
+            <div className="p-4 bg-[#FCF7E8] border-t border-[#EFE3C4] flex justify-center">
+                 <button onClick={() => openAddCategory(pIdx)} className="px-6 py-2.5 bg-gradient-to-r from-[#024731] to-[#013122] text-[#FFFDF8] border border-[#D9A323]/45 rounded-xl text-sm font-bold shadow-sm hover:from-[#03583D] hover:to-[#023C2A] flex items-center gap-2 transition-colors cursor-pointer">
+                    <Plus size={18} className="text-[#F5C642]"/> Add Category
                  </button>
             </div>
           </div>
@@ -1350,35 +1379,35 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
       {/* Add Category Modal */}
       <AnimatePresence>
         {showAddCategoryModal && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
                    exit={{ opacity: 0, scale: 0.95 }}
-                   className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl relative"
+                   className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 w-full max-w-md shadow-2xl relative"
                 >
-                    <button onClick={() => setShowAddCategoryModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2"><X size={20}/></button>
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">Add New Category</h3>
+                    <button onClick={() => setShowAddCategoryModal(false)} className="absolute top-4 right-4 text-[#7D6E52] hover:text-[#0F241C] bg-[#FAF3E2] hover:bg-[#FAF0D4] rounded-full p-2 cursor-pointer transition-colors"><X size={18}/></button>
+                    <h3 className="text-xl font-display font-bold text-[#0F241C] mb-6">Add New Category</h3>
                     
                     <div className="space-y-4 mb-8">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Category Name</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Category Name</label>
                             <input 
                                type="text" 
                                value={newCatName}
                                onChange={(e) => setNewCatName(e.target.value)}
                                placeholder="e.g. Premium Desserts"
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] placeholder:text-[#8E7D5E] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none"
                                autoFocus
                                onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Selection Rule</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Selection Rule</label>
                             <select 
                                value={normalizeCategoryRule(newCatRule)}
                                onChange={(e) => setNewCatRule(e.target.value)}
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none cursor-pointer"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none cursor-pointer"
                             >
                                {STANDARD_SELECTION_RULES.map((ruleOption) => (
                                  <option key={ruleOption} value={ruleOption}>{ruleOption}</option>
@@ -1388,8 +1417,8 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                     </div>
 
                     <div className="flex gap-3">
-                        <button onClick={() => setShowAddCategoryModal(false)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-                        <button onClick={handleAddCategory} className="flex-1 py-3 bg-brand-green-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-green-800 transition-colors">Create Category</button>
+                        <button onClick={() => setShowAddCategoryModal(false)} className="flex-1 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#FAF0D4] transition-colors cursor-pointer">Cancel</button>
+                        <button onClick={handleAddCategory} className="flex-1 py-3 bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 text-[#FFFDF8] font-bold rounded-xl shadow-lg hover:brightness-110 transition-all cursor-pointer">Create Category</button>
                     </div>
                 </motion.div>
             </div>
@@ -1399,25 +1428,25 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
       {/* Add Item Modal */}
       <AnimatePresence>
         {showAddItemModal && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
                    exit={{ opacity: 0, scale: 0.95 }}
-                   className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
+                   className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
                 >
-                    <button onClick={() => setShowAddItemModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2"><X size={20}/></button>
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">Add New Item</h3>
+                    <button onClick={() => setShowAddItemModal(null)} className="absolute top-4 right-4 text-[#7D6E52] hover:text-[#0F241C] bg-[#FAF3E2] hover:bg-[#FAF0D4] rounded-full p-2 cursor-pointer transition-colors"><X size={18}/></button>
+                    <h3 className="text-xl font-display font-bold text-[#0F241C] mb-6">Add New Item</h3>
                     
                     <div className="space-y-4 mb-8">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Item Name</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Item Name</label>
                             <input 
                                type="text" 
                                value={newItemName}
                                onChange={(e) => setNewItemName(e.target.value)}
                                placeholder="e.g. Paneer Butter Masala"
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] placeholder:text-[#8E7D5E] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none"
                                autoFocus
                                onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
                             />
@@ -1425,8 +1454,8 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                     </div>
 
                     <div className="flex gap-3">
-                        <button onClick={() => setShowAddItemModal(null)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-                        <button onClick={handleAddItem} className="flex-1 py-3 bg-brand-green-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-green-800 transition-colors">Add Item</button>
+                        <button onClick={() => setShowAddItemModal(null)} className="flex-1 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#FAF0D4] transition-colors cursor-pointer">Cancel</button>
+                        <button onClick={handleAddItem} className="flex-1 py-3 bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 text-[#FFFDF8] font-bold rounded-xl shadow-lg hover:brightness-110 transition-all cursor-pointer">Add Item</button>
                     </div>
                 </motion.div>
             </div>
@@ -1436,24 +1465,24 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
       {/* Edit Item Modal */}
       <AnimatePresence>
         {showEditItemModal && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
                    exit={{ opacity: 0, scale: 0.95 }}
-                   className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
+                   className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
                 >
-                    <button onClick={() => setShowEditItemModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2"><X size={20}/></button>
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">Edit Item</h3>
+                    <button onClick={() => setShowEditItemModal(null)} className="absolute top-4 right-4 text-[#7D6E52] hover:text-[#0F241C] bg-[#FAF3E2] hover:bg-[#FAF0D4] rounded-full p-2 cursor-pointer transition-colors"><X size={18}/></button>
+                    <h3 className="text-xl font-display font-bold text-[#0F241C] mb-6">Edit Item</h3>
                     
                     <div className="space-y-4 mb-8">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Item Name</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Item Name</label>
                             <input 
                                type="text" 
                                value={showEditItemModal.currentName}
                                onChange={(e) => setShowEditItemModal({...showEditItemModal, currentName: e.target.value})}
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none"
                                autoFocus
                                onKeyDown={(e) => e.key === 'Enter' && saveEditedItem()}
                             />
@@ -1461,8 +1490,8 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                     </div>
 
                     <div className="flex gap-3">
-                        <button onClick={() => setShowEditItemModal(null)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-                        <button onClick={saveEditedItem} className="flex-1 py-3 bg-brand-green-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-green-800 transition-colors">Save Changes</button>
+                        <button onClick={() => setShowEditItemModal(null)} className="flex-1 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#FAF0D4] transition-colors cursor-pointer">Cancel</button>
+                        <button onClick={saveEditedItem} className="flex-1 py-3 bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 text-[#FFFDF8] font-bold rounded-xl shadow-lg hover:brightness-110 transition-all cursor-pointer">Save Changes</button>
                     </div>
                 </motion.div>
             </div>
@@ -1472,33 +1501,33 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
       {/* Add Package Modal */}
       <AnimatePresence>
         {showAddPackageModal && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
                    exit={{ opacity: 0, scale: 0.95 }}
-                   className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                   className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto"
                 >
-                    <button onClick={() => setShowAddPackageModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2"><X size={20}/></button>
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">Create Package Manually</h3>
+                    <button onClick={() => setShowAddPackageModal(false)} className="absolute top-4 right-4 text-[#7D6E52] hover:text-[#0F241C] bg-[#FAF3E2] hover:bg-[#FAF0D4] rounded-full p-2 cursor-pointer transition-colors"><X size={18}/></button>
+                    <h3 className="text-xl font-display font-bold text-[#0F241C] mb-6">Create Package Manually</h3>
                     
                     <div className="space-y-4 mb-8">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Package Name</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Package Name</label>
                             <input 
                                type="text" 
                                value={newPkgData.name}
                                onChange={(e) => setNewPkgData({...newPkgData, name: e.target.value})}
                                placeholder="e.g. Premium Wedding Buffet"
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] placeholder:text-[#8E7D5E] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Package Type</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Package Type</label>
                             <select 
                                value={newPkgData.type}
                                onChange={(e) => setNewPkgData({...newPkgData, type: e.target.value})}
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none cursor-pointer"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none cursor-pointer"
                             >
                                <option value="Veg">Veg</option>
                                <option value="Non-Veg">Non-Veg</option>
@@ -1507,30 +1536,30 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Price Per Plate (₹)</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Price Per Plate (₹)</label>
                             <input 
                                type="number" 
                                value={newPkgData.price}
                                onChange={(e) => setNewPkgData({...newPkgData, price: e.target.value})}
                                placeholder="e.g. 450"
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] placeholder:text-[#8E7D5E] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none tabular-nums"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Minimum Guests</label>
+                            <label className="block text-sm font-bold text-[#0F241C] mb-1.5">Minimum Guests</label>
                             <input 
                                type="number" 
                                value={newPkgData.minGuests}
                                onChange={(e) => setNewPkgData({...newPkgData, minGuests: e.target.value})}
                                placeholder="e.g. 100"
-                               className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:border-brand-gold-500 focus:ring-1 focus:ring-brand-gold-500 outline-none"
+                               className="w-full border border-[#DFC78A] bg-[#FFFDF9] text-[#0F241C] placeholder:text-[#8E7D5E] px-4 py-3 rounded-xl focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/20 outline-none tabular-nums"
                             />
                         </div>
                     </div>
 
                     <div className="flex gap-3">
-                        <button onClick={() => setShowAddPackageModal(false)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-                        <button onClick={createManualPackage} className="flex-1 py-3 bg-brand-green-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-green-800 transition-colors">Create Package</button>
+                        <button onClick={() => setShowAddPackageModal(false)} className="flex-1 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#FAF0D4] transition-colors cursor-pointer">Cancel</button>
+                        <button onClick={createManualPackage} className="flex-1 py-3 bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 text-[#FFFDF8] font-bold rounded-xl shadow-lg hover:brightness-110 transition-all cursor-pointer">Create Package</button>
                     </div>
                 </motion.div>
             </div>
@@ -1539,20 +1568,20 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
 
       <AnimatePresence>
         {deletePackageModal && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
                    exit={{ opacity: 0, scale: 0.95 }}
-                   className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
+                   className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
                 >
-                    <button onClick={() => setDeletePackageModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2"><X size={20}/></button>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Delete Package?</h3>
-                    <p className="text-slate-600 text-sm mb-6">Are you sure you want to delete <span className="font-bold">"{deletePackageModal.name}"</span>? All categories and items inside it will be permanently removed.</p>
+                    <button onClick={() => setDeletePackageModal(null)} className="absolute top-4 right-4 text-[#7D6E52] hover:text-[#0F241C] bg-[#FAF3E2] hover:bg-[#FAF0D4] rounded-full p-2 cursor-pointer transition-colors"><X size={18}/></button>
+                    <h3 className="text-xl font-display font-bold text-[#0F241C] mb-2">Delete Package?</h3>
+                    <p className="text-[#5C5240] text-sm mb-6">Are you sure you want to delete <span className="font-bold text-[#0F241C]">"{deletePackageModal.name}"</span>? All categories and items inside it will be permanently removed.</p>
 
                     <div className="flex gap-3">
-                        <button onClick={() => setDeletePackageModal(null)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-                        <button onClick={confirmDeletePackage} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition-colors">Delete Package</button>
+                        <button onClick={() => setDeletePackageModal(null)} className="flex-1 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#FAF0D4] transition-colors cursor-pointer">Cancel</button>
+                        <button onClick={confirmDeletePackage} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition-colors cursor-pointer">Delete Package</button>
                     </div>
                 </motion.div>
             </div>
@@ -1561,23 +1590,23 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
 
       <AnimatePresence>
         {deleteCategoryModal && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
                    exit={{ opacity: 0, scale: 0.95 }}
-                   className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
+                   className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
                 >
-                    <button onClick={() => setDeleteCategoryModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2"><X size={20}/></button>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Delete Category?</h3>
+                    <button onClick={() => setDeleteCategoryModal(null)} className="absolute top-4 right-4 text-[#7D6E52] hover:text-[#0F241C] bg-[#FAF3E2] hover:bg-[#FAF0D4] rounded-full p-2 cursor-pointer transition-colors"><X size={18}/></button>
+                    <h3 className="text-xl font-display font-bold text-[#0F241C] mb-2">Delete Category?</h3>
                     <div className="mb-6">
-                        <p className="text-slate-600 text-sm mb-1">Category Name:</p>
-                        <p className="font-bold text-slate-800 bg-slate-50 border border-slate-200 p-3 rounded-lg">{deleteCategoryModal.name}</p>
+                        <p className="text-[#5C5240] text-sm mb-1">Category Name:</p>
+                        <p className="font-bold text-[#0F241C] bg-[#FAF3E2] border border-[#DFC78A] p-3 rounded-xl">{deleteCategoryModal.name}</p>
                     </div>
 
                     <div className="flex gap-3">
-                        <button onClick={() => setDeleteCategoryModal(null)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-                        <button onClick={confirmDeleteCategory} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition-colors">Delete</button>
+                        <button onClick={() => setDeleteCategoryModal(null)} className="flex-1 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#FAF0D4] transition-colors cursor-pointer">Cancel</button>
+                        <button onClick={confirmDeleteCategory} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition-colors cursor-pointer">Delete</button>
                     </div>
                 </motion.div>
             </div>
@@ -1586,20 +1615,20 @@ export default function CatererMenuBuilder({ packages, onChange, isParsing, setI
 
       <AnimatePresence>
         {deleteItemModal && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
                    exit={{ opacity: 0, scale: 0.95 }}
-                   className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
+                   className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
                 >
-                    <button onClick={() => setDeleteItemModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2"><X size={20}/></button>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Delete Item?</h3>
-                    <p className="text-slate-600 text-sm mb-6">Are you sure you want to delete <span className="font-bold">"{deleteItemModal.name}"</span>?</p>
+                    <button onClick={() => setDeleteItemModal(null)} className="absolute top-4 right-4 text-[#7D6E52] hover:text-[#0F241C] bg-[#FAF3E2] hover:bg-[#FAF0D4] rounded-full p-2 cursor-pointer transition-colors"><X size={18}/></button>
+                    <h3 className="text-xl font-display font-bold text-[#0F241C] mb-2">Delete Item?</h3>
+                    <p className="text-[#5C5240] text-sm mb-6">Are you sure you want to delete <span className="font-bold text-[#0F241C]">"{deleteItemModal.name}"</span>?</p>
 
                     <div className="flex gap-3">
-                        <button onClick={() => setDeleteItemModal(null)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-                        <button onClick={confirmDeleteItem} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition-colors">Delete Item</button>
+                        <button onClick={() => setDeleteItemModal(null)} className="flex-1 py-3 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl hover:bg-[#FAF0D4] transition-colors cursor-pointer">Cancel</button>
+                        <button onClick={confirmDeleteItem} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition-colors cursor-pointer">Delete Item</button>
                     </div>
                 </motion.div>
             </div>

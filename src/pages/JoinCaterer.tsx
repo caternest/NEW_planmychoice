@@ -15,7 +15,6 @@ import {
   Lock,
   Sparkles,
   AlertCircle,
-  HelpCircle,
   Bold,
   Italic,
   List,
@@ -28,6 +27,8 @@ import {
   Utensils,
   Award,
   X,
+  Headphones,
+  MessageCircle,
 } from "lucide-react";
 import { cn, compressImageFile, safeSaveRegistrations } from "../lib/utils";
 import { toast } from "../components/Toast";
@@ -127,7 +128,7 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({
 
   return (
     <div className="space-y-2">
-      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+      <label className="block text-xs font-bold text-[#083A28] uppercase tracking-wider">
         {label}
       </label>
 
@@ -137,15 +138,15 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({
         onDragLeave={handleDrag}
         onDrop={handleDrop}
         className={cn(
-          "border-2 border-dashed rounded-2xl p-4 transition-all flex flex-col items-center justify-center min-h-[160px] bg-slate-50 relative overflow-hidden",
+          "border-2 border-dashed rounded-2xl p-4 transition-all flex flex-col items-center justify-center min-h-[160px] bg-[#FAF3E2]/45 relative overflow-hidden",
           dragActive
-            ? "border-brand-gold-500 bg-brand-gold-50/20"
-            : "border-slate-200 hover:border-slate-300",
-          value ? "border-brand-gold-300 bg-white" : "",
+            ? "border-[#D4961B] bg-[#FAF1DA]"
+            : "border-[#DFC78A] hover:border-[#D4961B]",
+          value ? "border-[#D9A323] bg-[#FFFDF8]" : "",
         )}
       >
         {value ? (
-          <div className="relative w-full h-[140px] flex items-center justify-center group rounded-xl overflow-hidden bg-white">
+          <div className="relative w-full h-[140px] flex items-center justify-center group rounded-xl overflow-hidden bg-[#FFFDF9]">
             <img
               src={value}
               alt="Preview"
@@ -155,8 +156,8 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({
                 (e.target as HTMLElement).style.opacity = "0.3";
               }}
             />
-            <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-              <label className="cursor-pointer bg-white text-slate-800 text-xs font-black px-4 py-2 rounded-xl hover:bg-slate-100 transition-all select-none col-span-2">
+            <div className="absolute inset-0 bg-[#011610]/65 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+              <label className="cursor-pointer bg-[#FFFDF8] text-[#083A28] border border-[#DFC78A] text-xs font-black px-4 py-2 rounded-xl hover:bg-[#FAF3E2] transition-all select-none col-span-2">
                 Change Image
                 <input
                   type="file"
@@ -173,19 +174,19 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({
                 Clear
               </button>
             </div>
-            <span className="absolute bottom-2 left-2 bg-brand-gold-500 text-slate-900 font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow">
+            <span className="absolute bottom-2 left-2 bg-[#D9A323] text-[#052419] font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow">
               {isBase64 ? "Uploaded File" : "URL Image"}
             </span>
           </div>
         ) : (
           <div className="text-center flex flex-col items-center py-2 select-none">
-            <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-              <UploadCloud size={22} className="text-brand-gold-600" />
+            <div className="w-12 h-12 rounded-full bg-[#FAF1DA] border border-[#DFC78A] text-[#B87D16] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+              <UploadCloud size={22} className="text-[#B87D16]" />
             </div>
-            <p className="text-xs font-bold text-slate-700">
+            <p className="text-xs font-bold text-[#083A28]">
               Drag & drop your image here, or
             </p>
-            <label className="mt-1 text-xs font-extrabold text-brand-gold-600 hover:text-brand-gold-700 cursor-pointer underline decoration-2 underline-offset-2">
+            <label className="mt-1 text-xs font-extrabold text-[#B87D16] hover:text-[#8E5F0F] cursor-pointer underline decoration-2 underline-offset-2">
               browse files
               <input
                 type="file"
@@ -194,7 +195,7 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({
                 onChange={onFileChange}
               />
             </label>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[10px] text-[#7B6947] mt-1">
               Supports PNG, JPG, JPEG, WEBP, GIF
             </p>
           </div>
@@ -202,7 +203,7 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({
       </div>
 
       <div className="relative mt-2">
-        <label className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
+        <label className="block text-[10px] text-[#8A754A] font-bold uppercase tracking-wider mb-1">
           Or paste image URL
         </label>
         <input
@@ -211,10 +212,10 @@ const ImageUploaderField: React.FC<ImageUploaderProps> = ({
           value={isBase64 ? "" : value}
           disabled={!!isBase64}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-brand-gold-500 outline-none placeholder:text-slate-400 disabled:opacity-50"
+          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-[#D9A323]/25 outline-none placeholder:text-[#9A8A68] text-[#142C24] disabled:opacity-50"
         />
         {isBase64 && (
-          <p className="text-[10px] text-brand-gold-600 mt-1 font-semibold font-poppins">
+          <p className="text-[10px] text-[#B87D16] mt-1 font-semibold font-poppins">
             Using uploaded file. Clear image to paste a custom URL.
           </p>
         )}
@@ -254,6 +255,7 @@ export default function JoinCaterer() {
   });
   const [isParsing, setIsParsing] = useState(false);
   const [isUsernameManual, setIsUsernameManual] = useState(false);
+  const [showNoPackagesConfirm, setShowNoPackagesConfirm] = useState(false);
 
   const popularAreas = [
     "Kondapur",
@@ -495,13 +497,8 @@ export default function JoinCaterer() {
   const handleNext = () => {
     if (step === 1) {
       if (menuPackages.length === 0) {
-        if (
-          !window.confirm(
-            "You haven't added any menu packages. Are you sure you want to continue?",
-          )
-        ) {
-          return;
-        }
+        setShowNoPackagesConfirm(true);
+        return;
       }
     } else if (step === 2) {
       if (
@@ -751,80 +748,80 @@ export default function JoinCaterer() {
 
   if (status === "pending") {
     return (
-      <div className="min-h-screen relative bg-[#051410] font-poppins flex flex-col items-center justify-center py-20 px-4 overflow-hidden text-white">
+      <div className="min-h-screen relative bg-gradient-to-b from-[#01291D] via-[#023A28] to-[#011B13] font-poppins flex flex-col items-center justify-center py-20 px-4 overflow-hidden text-[#FFFDF8]">
         {/* Decorative background light sources */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#DEAA38]/5 rounded-full blur-[120px] pointer-events-none select-none" />
-        <div className="absolute bottom-1/4 right-1/2 w-96 h-96 bg-[#00483C]/30 rounded-full blur-[140px] pointer-events-none select-none" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#D9A323]/10 rounded-full blur-[120px] pointer-events-none select-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#035C41]/30 rounded-full blur-[140px] pointer-events-none select-none" />
 
         {/* Content container */}
         <div className="max-w-2xl w-full text-center relative z-10 animate-in fade-in duration-700">
           {/* Header brand logo */}
-          <div className="flex flex-col items-center mb-10 select-none">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <Sparkles className="text-[#DEAA38]" size={22} />
-              <span className="font-display font-medium text-xl text-[#DEAA38] tracking-widest uppercase">
-                PlanMyChoice
-              </span>
-            </div>
-            <p className="text-[10px] tracking-wider text-[#6ea494] font-bold font-poppins uppercase">
+          <div className="flex flex-col items-center mb-8 select-none">
+            <img
+              src="/assets/aistudio/image_6ce019e3.png"
+              alt="PlanMyChoice"
+              className="w-52 h-auto object-contain brightness-105 contrast-110 drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)] mb-1"
+            />
+            <p className="text-[10px] tracking-[0.2em] text-[#F8D76A] font-bold font-poppins uppercase">
               Making Every Event Special
             </p>
           </div>
 
           {/* Laurel wreath check indicator */}
           <div className="relative w-40 h-40 mx-auto mb-8 flex items-center justify-center select-none">
-            <div className="absolute inset-0 bg-brand-gold-500/5 rounded-full border border-brand-gold-500/10 animate-pulse" />
-            <div className="absolute inset-3 bg-brand-gold-500/10 rounded-full border border-brand-gold-500/20" />
+            <div className="absolute inset-0 bg-[#D9A323]/10 rounded-full border border-[#D9A323]/25" />
+            <div className="absolute inset-3 bg-[#D9A323]/15 rounded-full border border-[#D9A323]/35" />
 
-            <div className="absolute -inset-1 flex justify-between items-center px-1 pointer-events-none text-[#DEAA38]/60">
+            <div className="absolute -inset-1 flex justify-between items-center px-1 pointer-events-none text-[#F8D76A]/70">
               <div className="text-xl rotate-[-25deg] font-serif">✿ ✿ ✿</div>
               <div className="text-xl rotate-[25deg] font-serif">✿ ✿ ✿</div>
             </div>
 
             {/* Inner central gold check circle */}
-            <div className="w-22 h-22 rounded-full bg-gradient-to-tr from-amber-600 via-[#DEAA38] to-yellow-300 shadow-[0_10px_25px_rgba(222,170,56,0.3)] flex items-center justify-center relative">
-              <Check size={40} className="text-[#051410]" strokeWidth={4} />
+            <div className="w-22 h-22 rounded-full bg-gradient-to-tr from-[#C28816] via-[#F2BE3B] to-[#FCE69A] shadow-[0_10px_28px_rgba(217,163,35,0.4)] flex items-center justify-center relative">
+              <Check size={40} className="text-[#052419]" strokeWidth={4} />
 
-              {/* Floating sparkles */}
-              <div className="absolute -top-1 -right-1 text-white animate-bounce duration-1000">
+              <div className="absolute -top-1 -right-1 text-[#FFFDF8]">
                 <Sparkles size={16} />
               </div>
-              <div className="absolute -bottom-1 -left-1 text-yellow-105 animate-pulse">
+              <div className="absolute -bottom-1 -left-1 text-[#FCE69A]">
                 <Sparkles size={12} />
               </div>
             </div>
           </div>
 
           {/* Primary Submit Success heading */}
-          <h2 className="text-3xl font-display font-semibold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-amber-200 to-amber-100 mt-6 mb-3">
+          <h2
+            className="text-3xl sm:text-4xl font-display font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#FFFDF8] via-[#FCE69A] to-[#F5C642] mt-6 mb-3"
+            style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+          >
             Application Submitted!
           </h2>
-          <p className="text-slate-300 text-sm max-w-md mx-auto font-poppins leading-relaxed mb-8 font-light">
+          <p className="text-[#E7EFEA]/85 text-sm max-w-md mx-auto font-poppins leading-relaxed mb-8 font-light">
             Thank you for registering with PlanMyChoice. Your application is under
             review. Our team will verify your details and list your profile
             shortly.
           </p>
 
           {/* Custom Steps Progress Timeline */}
-          <div className="bg-black/30 border border-[#DEAA38]/10 rounded-[2rem] p-6 sm:p-7 max-w-xl mx-auto mb-8 backdrop-blur-md text-left">
-            <span className="block text-[10px] font-bold text-[#DEAA38] uppercase tracking-widest mb-5 font-poppins">
+          <div className="bg-[#011F15]/80 border border-[#D9A323]/40 rounded-[2rem] p-6 sm:p-7 max-w-xl mx-auto mb-8 backdrop-blur-md text-left shadow-[0_12px_32px_rgba(0,0,0,0.3)]">
+            <span className="block text-[10px] font-bold text-[#F8D76A] uppercase tracking-widest mb-5 font-poppins">
               What happens next?
             </span>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-2 relative">
-              {/* Connecting line */}
-              <div className="absolute top-[16px] left-[16px] right-[16px] h-[1px] bg-slate-800 hidden md:block select-none pointer-events-none" />
+              <div className="absolute top-[16px] left-[16px] right-[16px] h-[1px] bg-[#D9A323]/25 hidden md:block select-none pointer-events-none" />
 
               {/* Stage 1: Submitted */}
               <div className="flex md:flex-col items-center md:text-center gap-3 relative z-10">
-                <div className="w-8 h-8 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center shrink-0">
-                  <Check size={14} className="text-green-400" strokeWidth={3} />
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shrink-0">
+                  <Check size={14} className="text-emerald-300" strokeWidth={3} />
                 </div>
                 <div className="pt-0.5">
-                  <p className="text-[11px] font-bold text-white uppercase tracking-wider md:leading-none">
+                  <p className="text-[11px] font-bold text-[#FFFDF8] uppercase tracking-wider md:leading-none">
                     Submitted
                   </p>
-                  <p className="text-[9px] text-slate-400 mt-0.5">
+                  <p className="text-[9px] text-[#E7EFEA]/70 mt-0.5">
                     Application received
                   </p>
                 </div>
@@ -832,48 +829,48 @@ export default function JoinCaterer() {
 
               {/* Stage 2: Under Review */}
               <div className="flex md:flex-col items-center md:text-center gap-3 relative z-10">
-                <div className="w-8 h-8 rounded-full bg-[#DEAA38]/20 border-2 border-[#DEAA38] flex items-center justify-center shrink-0 animate-pulse shadow-[0_10px_25px_rgba(222,170,56,0.3)]">
-                  <Clock size={14} className="text-[#DEAA38]" />
+                <div className="w-8 h-8 rounded-full bg-[#D9A323]/20 border-2 border-[#F5C642] flex items-center justify-center shrink-0 shadow-[0_10px_25px_rgba(217,163,35,0.3)]">
+                  <Clock size={14} className="text-[#F8D76A]" />
                 </div>
                 <div className="pt-0.5">
-                  <p className="text-[11px] font-bold text-[#DEAA38] uppercase tracking-wider md:leading-none">
+                  <p className="text-[11px] font-bold text-[#F8D76A] uppercase tracking-wider md:leading-none">
                     Under Review
                   </p>
-                  <p className="text-[9px] text-slate-300 mt-0.5">
+                  <p className="text-[9px] text-[#E7EFEA]/80 mt-0.5">
                     Checking qualifications
                   </p>
                 </div>
               </div>
 
               {/* Stage 3: Moderation */}
-              <div className="flex md:flex-col items-center md:text-center gap-3 relative z-10 opacity-30">
-                <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-705 flex items-center justify-center shrink-0">
-                  <span className="text-[11px] font-bold text-slate-400 font-sans">
+              <div className="flex md:flex-col items-center md:text-center gap-3 relative z-10 opacity-45">
+                <div className="w-8 h-8 rounded-full bg-[#023224] border border-[#D9A323]/40 flex items-center justify-center shrink-0">
+                  <span className="text-[11px] font-bold text-[#F8D76A] font-sans">
                     3
                   </span>
                 </div>
                 <div className="pt-0.5">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider md:leading-none">
+                  <p className="text-[11px] font-bold text-[#E7EFEA] uppercase tracking-wider md:leading-none">
                     Approval
                   </p>
-                  <p className="text-[9px] text-slate-500 mt-0.5 font-normal">
+                  <p className="text-[9px] text-[#E7EFEA]/70 mt-0.5 font-normal">
                     Account activated
                   </p>
                 </div>
               </div>
 
               {/* Stage 4: Live Listing */}
-              <div className="flex md:flex-col items-center md:text-center gap-3 relative z-10 opacity-30">
-                <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-705 flex items-center justify-center shrink-0">
-                  <span className="text-[11px] font-bold text-slate-400 font-sans">
+              <div className="flex md:flex-col items-center md:text-center gap-3 relative z-10 opacity-45">
+                <div className="w-8 h-8 rounded-full bg-[#023224] border border-[#D9A323]/40 flex items-center justify-center shrink-0">
+                  <span className="text-[11px] font-bold text-[#F8D76A] font-sans">
                     4
                   </span>
                 </div>
                 <div className="pt-0.5">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider md:leading-none">
+                  <p className="text-[11px] font-bold text-[#E7EFEA] uppercase tracking-wider md:leading-none">
                     Public Live
                   </p>
-                  <p className="text-[9px] text-slate-500 mt-0.5 font-normal">
+                  <p className="text-[9px] text-[#E7EFEA]/70 mt-0.5 font-normal">
                     Receive bookings
                   </p>
                 </div>
@@ -882,16 +879,16 @@ export default function JoinCaterer() {
           </div>
 
           {/* Time frame summary card */}
-          <div className="inline-block bg-[#0e2720]/80 border border-[#DEAA38]/10 rounded-2xl px-6 py-3.5 mb-8 backdrop-blur">
-            <span className="text-[10px] text-[#DEAA38] font-bold block uppercase tracking-widest">
+          <div className="inline-block bg-[#012218]/90 border border-[#D9A323]/40 rounded-2xl px-6 py-3.5 mb-8 backdrop-blur">
+            <span className="text-[10px] text-[#F8D76A] font-bold block uppercase tracking-widest">
               Expected Verification Status
             </span>
-            <span className="text-xs font-semibold text-slate-100 mt-0.5 block">
+            <span className="text-xs font-semibold text-[#FFFDF8] mt-0.5 block">
               Pending Review • 1 - 3 Business Days
             </span>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[10px] text-[#E7EFEA]/75 mt-1">
               Status notification email:{" "}
-              <span className="text-slate-200 font-sans">
+              <span className="text-[#F8D76A] font-sans">
                 {formData.email || "your registered email"}
               </span>
             </p>
@@ -901,13 +898,13 @@ export default function JoinCaterer() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-sm mx-auto">
             <button
               onClick={() => navigate("/")}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-slate-700 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-[#D9A323]/60 hover:bg-[#024230] text-[#FFFDF8] text-xs font-semibold transition-all cursor-pointer"
             >
               Go to Homepage
             </button>
             <button
-              onClick={() => navigate("/caterers")}
-              className="w-full sm:w-auto bg-[#DEAA38] hover:bg-[#c28824] text-[#051410] px-7 py-2.5 rounded-full text-xs font-bold shadow-lg shadow-brand-gold-500/20 transition-all active:scale-95 cursor-pointer"
+              onClick={() => navigate("/explore")}
+              className="w-full sm:w-auto bg-gradient-to-r from-[#FAE18D] via-[#E8B839] to-[#D2951B] hover:brightness-105 text-[#052419] px-7 py-2.5 rounded-full text-xs font-bold shadow-[0_8px_20px_rgba(217,163,35,0.28)] transition-all active:scale-95 cursor-pointer"
             >
               Explore Marketplace
             </button>
@@ -918,100 +915,198 @@ export default function JoinCaterer() {
   }
 
   return (
-    <div className="pt-28 pb-20 bg-[#f2f7f5] min-h-screen border-t border-brand-green-100 font-poppins">
-      <div className="max-w-6xl mx-auto px-4 lg:px-8">
-        {/* Embedded Top Brand Header spanning the card style */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 animate-in slide-in-from-top-6 duration-500">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-full bg-[#00483C] text-[#DEAA38] flex items-center justify-center font-display font-bold text-lg select-none shadow-brand-green-900/10 shadow-md">
-              PMC
-            </div>
-            <div>
-              <div className="flex items-center gap-1">
-                <span className="font-display font-semibold text-lg text-brand-green-950 uppercase tracking-widest leading-none">
-                  PlanMyChoice
-                </span>
-                <span className="text-[#DEAA38] font-sans">★</span>
-              </div>
-              <p className="text-[10px] tracking-wider text-slate-400 font-bold font-poppins uppercase leading-none mt-1">
-                Making Every Event Special
-              </p>
-            </div>
+    <div className="pt-[76px] pb-12 bg-gradient-to-br from-[#FAF3E3] via-[#FDF8EC] to-[#FAF0DC] min-h-screen font-poppins overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
+        {/* Top Feature Banner matching reference image */}
+        <div className="relative rounded-[22px] border border-[#E4C987] shadow-[0_8px_28px_rgba(92,70,22,0.08)] overflow-hidden mb-5 bg-[#FFFDF8] animate-in slide-in-from-top-6 duration-500">
+          {/* Split Cream-to-Emerald Swoop Backdrop */}
+          <div className="pointer-events-none select-none hidden md:block absolute inset-0" aria-hidden="true">
+            <svg viewBox="0 0 1200 130" fill="none" preserveAspectRatio="none" className="w-full h-full">
+              <defs>
+                <linearGradient id="joinBannerEmerald" x1="340" y1="0" x2="1200" y2="130" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#04523A" />
+                  <stop offset="55%" stopColor="#023A28" />
+                  <stop offset="100%" stopColor="#012419" />
+                </linearGradient>
+                <linearGradient id="joinBannerGold" x1="280" y1="120" x2="1190" y2="10" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#E6BC52" stopOpacity="0.15" />
+                  <stop offset="45%" stopColor="#F5C642" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#D4971D" stopOpacity="0.85" />
+                </linearGradient>
+              </defs>
+              <path d="M295 130 C410 122 440 16 540 0 L1200 0 L1200 130 Z" fill="url(#joinBannerEmerald)" />
+              <path d="M280 128 C410 125 450 22 575 4" stroke="url(#joinBannerGold)" strokeWidth="2.5" fill="none" />
+              <path d="M890 126 C990 112 1085 68 1196 12" stroke="#F5C642" strokeOpacity="0.55" strokeWidth="2" fill="none" />
+            </svg>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-[11px] text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-bold font-poppins">
-              Step {step} of 5
-            </span>
-            <button
-              onClick={() => {
-                toast(
-                  "Draft saved successfully! You can resume registration anytime.",
-                  "success",
-                );
-              }}
-              className="text-xs font-semibold px-4 py-2 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 flex items-center gap-1 bg-white cursor-pointer"
-            >
-              <Save size={12} /> Save Draft
-            </button>
+          <div className="relative z-10 px-5 sm:px-7 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Left Brand Emblem */}
+            <div className="flex items-center gap-3.5 shrink-0">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#044530] to-[#01291C] border-2 border-[#D9A323] text-[#F5C642] flex items-center justify-center font-display font-bold text-base select-none shadow-md">
+                PMC
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-bold text-lg text-[#0F241C] uppercase tracking-wider leading-none">
+                    PlanMyChoice
+                  </span>
+                  <span className="text-[#D99B1E] text-base leading-none">★</span>
+                </div>
+                <p className="text-[10px] tracking-[0.14em] text-[#5C5240] font-bold uppercase leading-none mt-1.5">
+                  Making Every Event Special
+                </p>
+              </div>
+            </div>
+
+            {/* Center AI Menu Extraction Visual Diagram */}
+            <div className="hidden lg:flex items-center gap-4 select-none">
+              <div className="relative p-2">
+                <span className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#E6C065] rounded-tl" />
+                <span className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#E6C065] rounded-tr" />
+                <span className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#E6C065] rounded-bl" />
+                <span className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#E6C065] rounded-br" />
+                <div className="w-14 h-16 rounded-lg bg-[#FFF8E6] border border-[#E5BA4B] px-2 py-1.5 flex flex-col items-center justify-between shadow-sm">
+                  <span className="text-[7px] font-extrabold tracking-widest text-[#B87D16] uppercase">▲ Menu</span>
+                  <div className="w-6 h-3.5 rounded-t-full bg-[#DFA833]/85 border-b border-[#B87D16]" />
+                  <div className="w-full space-y-1">
+                    <div className="h-1 bg-[#D9B86C] rounded-full w-full" />
+                    <div className="h-1 bg-[#D9B86C] rounded-full w-4/5" />
+                    <div className="h-1 bg-[#D9B86C] rounded-full w-3/4" />
+                  </div>
+                </div>
+              </div>
+
+              <svg width="46" height="16" viewBox="0 0 46 16" fill="none" aria-hidden="true">
+                <path d="M2 8 H40 M34 3 L41 8 L34 13" stroke="#F5C642" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+
+              <div className="w-12 h-12 rounded-xl bg-[#03402D] border-2 border-[#F5C642] flex items-center justify-center text-[#F5C642] font-display font-bold text-base shadow-[0_0_18px_rgba(245,198,66,0.28)]">
+                AI
+              </div>
+            </div>
+
+            {/* Right Feature Checklist Box */}
+            <div className="w-full md:w-auto rounded-xl bg-gradient-to-br from-[#023525] to-[#012016] border border-[#D9A323]/45 px-4 py-2.5 text-[#FDF8EC] shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-1 text-[11.5px] font-medium">
+                <div className="flex items-center gap-2">
+                  <Check size={13} className="text-[#F5C642] shrink-0" strokeWidth={2.8} />
+                  <span>Extract Menu Items</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check size={13} className="text-[#F5C642] shrink-0" strokeWidth={2.8} />
+                  <span>Identify Categories</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check size={13} className="text-[#F5C642] shrink-0" strokeWidth={2.8} />
+                  <span>Suggest Pricing</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8 items-start">
-          {/* Progress Sidebar */}
-          <div className="w-full md:w-[280px] shrink-0">
-            <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 sticky top-32 space-y-8 animate-in slide-in-from-left-6 duration-500">
-              <div>
-                <h3 className="font-poppins font-bold text-[11px] tracking-wider text-slate-400 uppercase mb-4">
-                  Registration Progress
-                </h3>
-                <JoinSteps currentStep={step} />
+        <div className="flex flex-col lg:flex-row gap-5 items-start">
+          {/* Registration Progress Sidebar */}
+          <div className="w-full lg:w-[295px] shrink-0">
+            <div className="bg-[#FFFDF8] rounded-[24px] shadow-[0_8px_28px_rgba(92,70,22,0.08)] border border-[#E4C987] overflow-hidden lg:sticky lg:top-[76px] animate-in slide-in-from-left-6 duration-500">
+              {/* Dark Emerald Top Header Block */}
+              <div className="bg-gradient-to-br from-[#023A28] via-[#033223] to-[#012217] px-5 py-4 border-b-2 border-[#D9A323] flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#0A4633] border border-[#D9A323]/55 flex items-center justify-center text-[#F5C642] shrink-0 shadow-xs">
+                  <ShieldCheck size={18} />
+                </div>
+                <div>
+                  <h3 className="font-poppins font-bold text-[12px] tracking-[0.08em] text-[#FFFDF8] uppercase leading-tight">
+                    Registration Progress
+                  </h3>
+                  <p className="text-[11px] text-[#E6ECE8]/85 mt-1 leading-snug">
+                    Complete 5 simple steps to get listed on PlanMyChoice
+                  </p>
+                </div>
               </div>
 
-              {/* Sidebar Support Widget precisely matching design */}
-              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                <div className="w-8 h-8 rounded-full bg-[#00483C]/5 flex items-center justify-center text-brand-green-800 mb-2.5">
-                  <HelpCircle size={16} />
+              <div className="p-4 space-y-5 relative">
+                <JoinSteps currentStep={step} />
+
+                {/* Sidebar Support Widget */}
+                <div className="bg-[#FCF7E8] rounded-2xl p-4 border border-[#EAE0C8] relative z-10">
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-[#FAF0D4] border border-[#E4C987] flex items-center justify-center text-[#B87D16] shrink-0">
+                      <Headphones size={15} />
+                    </div>
+                    <h4 className="font-bold text-sm text-[#0F241C] font-poppins">
+                      Need Help?
+                    </h4>
+                  </div>
+                  <p className="text-[11px] text-[#5C5240] mb-3.5 leading-relaxed font-poppins">
+                    Have questions about registration? Our onboarding team is here to assist you.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.open("https://wa.me/919999999999", "_blank")
+                    }
+                    className="w-full bg-gradient-to-r from-[#024731] to-[#013122] hover:from-[#03583D] hover:to-[#023C2A] border border-[#D9A323]/45 text-[#FFFDF8] font-bold text-[11px] uppercase tracking-wider py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    <MessageCircle size={14} className="text-[#F5C642]" />
+                    <span>Chat with Support</span>
+                  </button>
                 </div>
-                <h4 className="font-bold text-xs text-slate-900 font-poppins">
-                  Need Help?
-                </h4>
-                <p className="text-[11px] text-slate-500 mt-1 mb-3.5 leading-relaxed font-poppins">
-                  Or have questions about documentation? Our onboarding team is
-                  here to assist you.
-                </p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    window.open("https://wa.me/919999999999", "_blank")
-                  }
-                  className="w-full bg-[#00483C] text-white font-bold text-[10px] uppercase tracking-wider py-2 rounded-xl hover:bg-[#00362c] transition-all block text-center cursor-pointer"
+
+                {/* Subtle Bottom Gold Cloche Accent */}
+                <svg
+                  viewBox="0 0 260 54"
+                  fill="none"
+                  className="pointer-events-none select-none w-full h-11 opacity-75"
+                  aria-hidden="true"
                 >
-                  Chat with Support
-                </button>
+                  <path d="M0 44 C68 54 146 28 260 12 L260 54 L0 54 Z" fill="#F5E6C2" fillOpacity="0.65" />
+                  <circle cx="130" cy="14" r="3" fill="#DFA833" />
+                  <path d="M98 40 C98 24 112 16 130 16 C148 16 162 24 162 40 Z" fill="#E6BC52" fillOpacity="0.55" />
+                  <rect x="92" y="40" width="76" height="3.5" rx="1.75" fill="#C48E22" fillOpacity="0.7" />
+                </svg>
               </div>
             </div>
           </div>
 
           {/* Wizard Form container card */}
-          <div className="flex-1 w-full bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden min-h-[500px] flex flex-col justify-between animate-in fade-in duration-500">
+          <div className="flex-1 w-full min-w-0 bg-[#FFFDF8] rounded-[24px] shadow-[0_8px_28px_rgba(92,70,22,0.08)] border border-[#E4C987] overflow-hidden min-h-[540px] flex flex-col justify-between animate-in fade-in duration-500">
             {/* Internal Step Header Banner */}
-            <div className="bg-slate-50/50 border-b border-slate-100 px-8 py-5 flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-bold uppercase tracking-wider font-poppins">
-                {step === 1 && "1. MENU EXTRACTION"}
-                {step === 2 && "2. CONTACT DETAILS"}
-                {step === 3 && "3. BRAND & OPERATIONS"}
-                {step === 4 && "4. BACKUP VERIFICATION"}
-                {step === 5 && "5. FINAL CONFIRMATION"}
-              </span>
+            <div className="bg-gradient-to-r from-[#FCF7EA] via-[#FFFDF8] to-[#FCF7EA] border-b border-[#EFE3C4] px-5 sm:px-7 py-3.5 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-[3px] h-4 rounded-full bg-gradient-to-b from-[#E8BA42] to-[#B77A12]" />
+                <span className="text-xs text-[#0F3D2E] font-extrabold uppercase tracking-wider font-poppins">
+                  {step === 1 && "1. MENU EXTRACTION"}
+                  {step === 2 && "2. CONTACT DETAILS"}
+                  {step === 3 && "3. BRAND & OPERATIONS"}
+                  {step === 4 && "4. BACKUP VERIFICATION"}
+                  {step === 5 && "5. FINAL CONFIRMATION"}
+                </span>
+              </div>
 
-              <span className="flex items-center gap-1.5 text-xs text-[#DEAA38] font-bold font-poppins">
-                <ShieldCheck size={14} className="text-[#DEAA38]" /> Safe &
-                Secure
-              </span>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="text-[11px] text-[#5C5240] bg-[#FAF3E3] border border-[#E6CA82] px-2.5 py-1 rounded-full font-bold font-poppins">
+                  Step {step} of 5
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast(
+                      "Draft saved successfully! You can resume registration anytime.",
+                      "success",
+                    );
+                  }}
+                  className="text-[11px] font-bold px-3 py-1 rounded-full border border-[#DFC689] text-[#0F3D2E] hover:bg-[#FAF0D4] transition-all flex items-center gap-1 bg-white cursor-pointer"
+                >
+                  <Save size={12} className="text-[#B87D16]" /> Save Draft
+                </button>
+                <span className="inline-flex items-center gap-1.5 text-[11px] bg-[#FAF0D4] border border-[#E4C987] text-[#6B4A10] px-3 py-1 rounded-full font-bold font-poppins">
+                  <Lock size={11} className="text-[#C48E22]" /> Safe &amp; Secure
+                </span>
+              </div>
             </div>
 
-            <div className="p-6 md:p-8 flex-1">
+            <div className="p-5 sm:p-7 flex-1">
               {/* STEP 1: Menu Upload & AI Scan */}
               {step === 1 && (
                 <div className="font-poppins animate-in fade-in duration-300">
@@ -1029,10 +1124,13 @@ export default function JoinCaterer() {
               {step === 2 && (
                 <div className="space-y-6 font-poppins animate-in fade-in duration-300">
                   <div>
-                    <h3 className="font-display font-semibold text-xl text-slate-900 mb-1">
+                    <h3
+                      className="font-display font-bold text-2xl text-[#083A28] mb-1"
+                      style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                    >
                       Caterer Contact Information
                     </h3>
-                    <p className="text-xs text-slate-500 font-poppins">
+                    <p className="text-xs text-[#6B5A38] font-poppins">
                       Provide the owner contacts and account credentials for
                       your Caterer Panel login.
                     </p>
@@ -1041,7 +1139,7 @@ export default function JoinCaterer() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Owner Name <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -1053,12 +1151,12 @@ export default function JoinCaterer() {
                               owner: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="Enter owner's full legal name"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Mobile Number <span className="text-red-500">*</span>{" "}
                           (Primary WhatsApp Number)
                         </label>
@@ -1068,14 +1166,14 @@ export default function JoinCaterer() {
                           onChange={(e) =>
                             setFormData({ ...formData, phone: e.target.value })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="e.g. +91 98765 43210"
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Line 2: Secondary Number
                         </label>
                         <input
@@ -1087,12 +1185,12 @@ export default function JoinCaterer() {
                               alternatePhone: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="e.g. Backup manager number"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Line 3: Additional Number (Optional)
                         </label>
                         <input
@@ -1104,10 +1202,10 @@ export default function JoinCaterer() {
                               additionalMobile: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all mb-4"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24] mb-4"
                           placeholder="e.g. backup or landline"
                         />
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Email Address <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -1120,7 +1218,7 @@ export default function JoinCaterer() {
                               email: val,
                             });
                           }}
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all text-slate-900 font-sans"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24] font-sans"
                           placeholder="e.g. delicious@caterer.com"
                         />
                       </div>
@@ -1131,16 +1229,16 @@ export default function JoinCaterer() {
                         className="absolute inset-0 flex items-center"
                         aria-hidden="true"
                       >
-                        <div className="w-full border-t border-slate-150"></div>
+                        <div className="w-full border-t border-[#DFC78A]/70"></div>
                       </div>
-                      <div className="relative bg-white px-4 text-xs font-semibold text-slate-400 font-poppins uppercase tracking-wider">
+                      <div className="relative bg-[#FFFDF8] px-4 text-xs font-bold text-[#8A754A] font-poppins uppercase tracking-wider">
                         Choose Login Credentials
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="md:col-span-2">
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Choose Username{" "}
                           <span className="text-red-500">*</span>
                         </label>
@@ -1154,14 +1252,14 @@ export default function JoinCaterer() {
                               username: e.target.value,
                             });
                           }}
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all text-slate-900"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="e.g. gourmet_kitchens"
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Choose Password{" "}
                           <span className="text-red-500">*</span>
                         </label>
@@ -1174,12 +1272,12 @@ export default function JoinCaterer() {
                               password: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all text-slate-900"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="Choose a secure password"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Confirm Password{" "}
                           <span className="text-red-500">*</span>
                         </label>
@@ -1192,7 +1290,7 @@ export default function JoinCaterer() {
                               confirmPassword: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all text-slate-900"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="Retype password to confirm"
                         />
                       </div>
@@ -1200,15 +1298,15 @@ export default function JoinCaterer() {
                   </div>
 
                   {/* Security Shield Callout block */}
-                  <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-start gap-3 mt-6">
-                    <span className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                  <div className="p-4 bg-[#FAF3E2]/70 border border-[#DFC78A] rounded-2xl flex items-start gap-3 mt-6">
+                    <span className="w-8 h-8 rounded-full bg-[#01291D] text-[#F8D76A] border border-[#D9A323]/60 flex items-center justify-center shrink-0">
                       <Lock size={15} />
                     </span>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 leading-none font-poppins">
+                      <h4 className="text-xs font-bold text-[#083A28] leading-none font-poppins">
                         Security Encryption
                       </h4>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-normal font-poppins">
+                      <p className="text-[11px] text-[#5C5240] mt-1 leading-normal font-poppins">
                         Your password and confidential business logs are fully
                         hashed and encrypted. We never share or sell onboarding
                         registry records.
@@ -1222,10 +1320,13 @@ export default function JoinCaterer() {
               {step === 3 && (
                 <div className="space-y-6 font-poppins animate-in fade-in duration-300">
                   <div>
-                    <h3 className="font-display font-semibold text-xl text-slate-900 mb-1">
-                      Business Setup & Branding
+                    <h3
+                      className="font-display font-bold text-2xl text-[#083A28] mb-1"
+                      style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                    >
+                      Business Setup &amp; Branding
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[#6B5A38]">
                       How customers see your brand listing. Add high quality
                       logos and banner assets.
                     </p>
@@ -1234,7 +1335,7 @@ export default function JoinCaterer() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="md:col-span-2">
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Caterer Name / Brand Name{" "}
                           <span className="text-red-500">*</span>
                         </label>
@@ -1247,14 +1348,14 @@ export default function JoinCaterer() {
                               businessName: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="e.g. Royal Taste Caterers"
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Years of Experience{" "}
                           <span className="text-red-500">*</span>
                         </label>
@@ -1268,11 +1369,11 @@ export default function JoinCaterer() {
                               experience: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           City <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -1281,7 +1382,7 @@ export default function JoinCaterer() {
                           onChange={(e) =>
                             setFormData({ ...formData, city: e.target.value })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="e.g. Hyderabad"
                         />
                       </div>
@@ -1290,14 +1391,14 @@ export default function JoinCaterer() {
                     <div className="grid grid-cols-1 gap-4">
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                          <label className="block text-xs font-bold text-[#083A28] uppercase tracking-wider">
                             Kitchen Office Address{" "}
                             <span className="text-red-500">*</span>
                           </label>
                           <button
                             type="button"
                             onClick={() => setIsMapOpen(true)}
-                            className="text-xs font-bold text-[#DEAA38] hover:text-[#b08427] transition flex items-center gap-1 cursor-pointer"
+                            className="text-xs font-bold text-[#B87D16] hover:text-[#8E5F0F] transition flex items-center gap-1 cursor-pointer"
                           >
                             <span>📍 Pick Branch Location</span>
                           </button>
@@ -1320,14 +1421,14 @@ export default function JoinCaterer() {
                           }}
                           placeholder="Enter complete physical address of central kitchen"
                           theme="gold"
-                          leftIcon={<MapPin className="text-[#DEAA38] w-4 h-4 hover:text-[#b08427] transition-colors" />}
+                          leftIcon={<MapPin className="text-[#D4961B] w-4 h-4 hover:text-[#B87D16] transition-colors" />}
                           onIconClick={() => setIsMapOpen(true)}
-                          className="bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all"
                         />
                         {formData.latitude && formData.longitude && (
-                          <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                          <div className="mt-2 flex items-center gap-1.5 text-xs text-[#6B5A38] font-medium">
                             <span>📍 Serving location set. Delivery coverage:</span>
-                            <span className="font-bold text-[#DEAA38] bg-[#DEAA38]/5 border border-[#DEAA38]/20 rounded-full px-2.5 py-0.5">{formData.serviceRadiusKm || 15} KM radius</span>
+                            <span className="font-bold text-[#7B5610] bg-[#FAF1DA] border border-[#DFC78A] rounded-full px-2.5 py-0.5">{formData.serviceRadiusKm || 15} KM radius</span>
                           </div>
                         )}
                         <MapPickerModal
@@ -1354,7 +1455,7 @@ export default function JoinCaterer() {
                       {/* Service Areas with interactive quick chips and premium toggle */}
                       <div className="space-y-3">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                          <label className="block text-xs font-bold text-[#083A28] uppercase tracking-wider">
                             Service Areas <span className="text-red-500">*</span>
                           </label>
                           <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -1368,20 +1469,20 @@ export default function JoinCaterer() {
                                   setFormData({ ...formData, serviceAreas: "" });
                                 }
                               }}
-                              className="rounded border-slate-300 text-[#DEAA38] focus:ring-[#DEAA38] h-4 w-4"
+                              className="rounded border-[#DFC78A] text-[#083A28] focus:ring-[#D9A323] h-4 w-4"
                             />
-                            <span className="text-xs font-bold text-[#DEAA38] uppercase tracking-wider">
+                            <span className="text-xs font-bold text-[#B87D16] uppercase tracking-wider">
                               Serve Entire Hyderabad
                             </span>
                           </label>
                         </div>
 
                         {formData.serviceAreas === "Entire Hyderabad" ? (
-                          <div className="p-4 bg-[#DEAA38]/5 border border-[#DEAA38]/20 rounded-2xl flex items-center gap-3">
-                            <span className="text-[#DEAA38] text-lg">🌐</span>
+                          <div className="p-4 bg-[#FAF1DA]/75 border border-[#DFC78A] rounded-2xl flex items-center gap-3">
+                            <span className="text-[#B87D16] text-lg">🌐</span>
                             <div>
-                              <p className="text-xs font-bold text-slate-800">Serving Entire Hyderabad Area</p>
-                              <p className="text-[10px] text-slate-500 mt-0.5">Your catering services will be listed as available across all locations in Hyderabad.</p>
+                              <p className="text-xs font-bold text-[#083A28]">Serving Entire Hyderabad Area</p>
+                              <p className="text-[10px] text-[#5C5240] mt-0.5">Your catering services will be listed as available across all locations in Hyderabad.</p>
                             </div>
                           </div>
                         ) : (
@@ -1396,11 +1497,11 @@ export default function JoinCaterer() {
                                   setIsAreaDropdownOpen(true);
                                 }}
                                 onFocus={() => setIsAreaDropdownOpen(true)}
-                                className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                                className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                               />
                               {isAreaDropdownOpen && filteredAreaSuggestions.length > 0 && (
-                                <div className="absolute left-0 right-0 mt-1.5 bg-white border border-slate-100 rounded-xl shadow-xl max-h-48 overflow-y-auto z-[999]">
-                                  <div className="p-1.5 divide-y divide-slate-50">
+                                <div className="absolute left-0 right-0 mt-1.5 bg-[#FFFDF8] border border-[#DFC78A] rounded-xl shadow-xl max-h-48 overflow-y-auto z-[999]">
+                                  <div className="p-1.5 divide-y divide-[#DFC78A]/40">
                                     {filteredAreaSuggestions.map((area) => (
                                       <button
                                         key={area}
@@ -1410,9 +1511,9 @@ export default function JoinCaterer() {
                                           setAreaSearch("");
                                           setIsAreaDropdownOpen(false);
                                         }}
-                                        className="w-full text-left px-3 py-2.5 hover:bg-slate-50 text-xs font-medium text-slate-700 transition rounded-lg flex items-center gap-2"
+                                        className="w-full text-left px-3 py-2.5 hover:bg-[#FAF3E2] text-xs font-medium text-[#142C24] transition rounded-lg flex items-center gap-2"
                                       >
-                                        <span className="text-[#DEAA38]">📍</span> {area}
+                                        <span className="text-[#D4961B]">📍</span> {area}
                                       </button>
                                     ))}
                                   </div>
@@ -1426,13 +1527,13 @@ export default function JoinCaterer() {
                                 {serviceAreaChips.map((area) => (
                                   <span
                                     key={area}
-                                    className="inline-flex items-center gap-1.5 bg-amber-55/10 text-brand-gold-900 border border-brand-gold-300/35 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider"
+                                    className="inline-flex items-center gap-1.5 bg-[#FAF1DA] text-[#083A28] border border-[#D9A323]/65 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider"
                                   >
                                     {area}
                                     <button
                                       type="button"
                                       onClick={() => removeServiceAreaChip(area)}
-                                      className="text-brand-gold-500 hover:text-brand-gold-700 hover:bg-brand-gold-100/50 rounded-full p-0.5 transition"
+                                      className="text-[#B87D16] hover:text-[#083A28] hover:bg-[#F3E6C6] rounded-full p-0.5 transition"
                                     >
                                       <X size={10} />
                                     </button>
@@ -1443,7 +1544,7 @@ export default function JoinCaterer() {
 
                             {/* Quick selection popular areas */}
                             <div className="pt-1">
-                              <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">
+                              <span className="block text-[10px] text-[#8A754A] font-bold uppercase tracking-wider mb-2">
                                 Popular Hyderabad Areas
                               </span>
                               <div className="flex flex-wrap gap-1.5">
@@ -1463,8 +1564,8 @@ export default function JoinCaterer() {
                                       className={cn(
                                         "text-[10px] font-bold px-3 py-1 rounded-full border transition-all uppercase tracking-wide cursor-pointer",
                                         contains
-                                          ? "bg-brand-gold-500 border-brand-gold-500 text-slate-900 shadow"
-                                          : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100",
+                                          ? "bg-gradient-to-r from-[#FAE18D] via-[#F2BE3B] to-[#D99B16] border-[#D4961B] text-[#052419] shadow"
+                                          : "bg-[#FAF3E2]/70 border-[#DFC78A] text-[#5C5240] hover:bg-[#F3E6C6]",
                                       )}
                                     >
                                       {contains ? "✓" : "+"} {area}
@@ -1479,50 +1580,50 @@ export default function JoinCaterer() {
 
                       {/* Description with visual WYSIWYG editor mockup toolbar */}
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Public Description{" "}
                           <span className="text-red-500">*</span>
                         </label>
 
-                        <div className="flex flex-wrap items-center gap-1 bg-slate-100 border border-slate-200 border-b-0 px-3 py-1.5 rounded-t-xl text-slate-500 select-none">
+                        <div className="flex flex-wrap items-center gap-1 bg-[#FAF3E2] border border-[#DFC78A] border-b-0 px-3 py-1.5 rounded-t-xl text-[#6B5A38] select-none">
                           <button
                             type="button"
-                            className="p-1 hover:bg-white hover:text-slate-800 rounded transition-colors"
+                            className="p-1 hover:bg-[#FFFDF8] hover:text-[#083A28] rounded transition-colors"
                             title="Bold"
                           >
                             <Bold size={13} />
                           </button>
                           <button
                             type="button"
-                            className="p-1 hover:bg-white hover:text-slate-800 rounded transition-colors"
+                            className="p-1 hover:bg-[#FFFDF8] hover:text-[#083A28] rounded transition-colors"
                             title="Italic"
                           >
                             <Italic size={13} />
                           </button>
                           <button
                             type="button"
-                            className="p-1 hover:bg-white hover:text-slate-800 rounded transition-colors"
+                            className="p-1 hover:bg-[#FFFDF8] hover:text-[#083A28] rounded transition-colors"
                             title="Underline"
                           >
                             <Underline size={13} />
                           </button>
-                          <div className="w-[1px] h-3 bg-slate-300 mx-1" />
+                          <div className="w-[1px] h-3 bg-[#DFC78A] mx-1" />
                           <button
                             type="button"
-                            className="p-1 hover:bg-white hover:text-slate-800 rounded transition-colors"
+                            className="p-1 hover:bg-[#FFFDF8] hover:text-[#083A28] rounded transition-colors"
                             title="List"
                           >
                             <List size={13} />
                           </button>
                           <button
                             type="button"
-                            className="p-1 hover:bg-white hover:text-slate-800 rounded transition-colors"
+                            className="p-1 hover:bg-[#FFFDF8] hover:text-[#083A28] rounded transition-colors"
                             title="Numbered List"
                           >
                             <ListOrdered size={13} />
                           </button>
-                          <div className="w-[1px] h-3 bg-slate-300 mx-1" />
-                          <span className="text-[9px] font-bold text-slate-400 ml-auto uppercase tracking-wider font-poppins">
+                          <div className="w-[1px] h-3 bg-[#DFC78A] mx-1" />
+                          <span className="text-[9px] font-bold text-[#8A754A] ml-auto uppercase tracking-wider font-poppins">
                             Visual Editor
                           </span>
                         </div>
@@ -1536,7 +1637,7 @@ export default function JoinCaterer() {
                             })
                           }
                           rows={4}
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-b-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-b-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="Write details about your cuisine specialties, corporate history, client list, safety certifications..."
                         />
                       </div>
@@ -1544,7 +1645,7 @@ export default function JoinCaterer() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Awards (Optional)
                         </label>
                         <input
@@ -1553,12 +1654,12 @@ export default function JoinCaterer() {
                           onChange={(e) =>
                             setFormData({ ...formData, awards: e.target.value })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="Best Caterer Award 2024"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#083A28] mb-1 uppercase tracking-wider">
                           Achievements (Optional)
                         </label>
                         <input
@@ -1570,16 +1671,19 @@ export default function JoinCaterer() {
                               achievements: e.target.value,
                             })
                           }
-                          className="w-full bg-slate-50/40 border border-slate-200 focus:border-[#DEAA38]/80 focus:bg-white rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-brand-gold-500/10 outline-none transition-all"
+                          className="w-full bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#D4961B] focus:bg-[#FFFDF8] rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-[#D9A323]/15 outline-none transition-all text-[#142C24]"
                           placeholder="Served 500+ premium wedding events"
                         />
                       </div>
                     </div>
 
-                    <div className="pt-6 mt-8 border-t border-slate-100">
-                      <h3 className="font-display font-semibold text-base text-slate-900 mb-4 flex items-center gap-1.5">
-                        <Sparkles size={16} className="text-[#DEAA38]" />{" "}
-                        Profile Media & Branding Assets
+                    <div className="pt-6 mt-8 border-t border-[#DFC78A]/60">
+                      <h3
+                        className="font-display font-bold text-lg text-[#083A28] mb-4 flex items-center gap-1.5"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                      >
+                        <Sparkles size={16} className="text-[#D4961B]" />{" "}
+                        Profile Media &amp; Branding Assets
                       </h3>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -1630,9 +1734,9 @@ export default function JoinCaterer() {
                       </div>
 
                       <div className="space-y-3">
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider font-poppins">
+                        <label className="block text-xs font-bold text-[#083A28] uppercase tracking-wider font-poppins">
                           Gallery Showcase Images{" "}
-                          <span className="text-slate-400 font-normal capitalize font-poppins">
+                          <span className="text-[#8A754A] font-normal capitalize font-poppins">
                             (Food Prep, Live Stalls, Catering Teams)
                           </span>
                         </label>
@@ -1645,7 +1749,7 @@ export default function JoinCaterer() {
                             return (
                               <div
                                 key={i}
-                                className="relative aspect-video rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden group shadow-sm hover:shadow transition-shadow"
+                                className="relative aspect-video rounded-xl border border-[#DFC78A] bg-[#FAF3E2]/45 flex items-center justify-center overflow-hidden group shadow-sm hover:shadow transition-shadow"
                               >
                                 {isImage ? (
                                   <img
@@ -1655,7 +1759,7 @@ export default function JoinCaterer() {
                                     referrerPolicy="no-referrer"
                                   />
                                 ) : (
-                                  <div className="p-2 text-center text-xs text-slate-500 font-medium truncate max-w-full font-poppins">
+                                  <div className="p-2 text-center text-xs text-[#6B5A38] font-medium truncate max-w-full font-poppins">
                                     {photo}
                                   </div>
                                 )}
@@ -1672,10 +1776,10 @@ export default function JoinCaterer() {
                               </div>
                             );
                           })}
-                          <label className="aspect-video border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-brand-gold-500 rounded-xl cursor-pointer flex flex-col items-center justify-center text-xs font-bold text-slate-600 transition-all gap-1 select-none text-center p-2">
-                            <UploadCloud size={20} className="text-[#DEAA38]" />
+                          <label className="aspect-video border-2 border-dashed border-[#DFC78A] bg-[#FAF3E2]/45 hover:bg-[#FAF1DA] hover:border-[#D4961B] rounded-xl cursor-pointer flex flex-col items-center justify-center text-xs font-bold text-[#083A28] transition-all gap-1 select-none text-center p-2">
+                            <UploadCloud size={20} className="text-[#B87D16]" />
                             <span>+ Add Photo</span>
-                            <span className="text-[9px] text-slate-400 font-normal font-poppins">
+                            <span className="text-[9px] text-[#8A754A] font-normal font-poppins">
                               JPG, PNG, WEBP
                             </span>
                             <input
@@ -1697,10 +1801,13 @@ export default function JoinCaterer() {
               {step === 4 && (
                 <div className="space-y-6 font-poppins animate-in fade-in duration-300">
                   <div>
-                    <h3 className="font-display font-semibold text-xl text-slate-900 mb-1">
+                    <h3
+                      className="font-display font-bold text-2xl text-[#083A28] mb-1"
+                      style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                    >
                       Corporate Verification Docs
                     </h3>
-                    <p className="text-xs text-slate-500 font-poppins">
+                    <p className="text-xs text-[#6B5A38] font-poppins">
                       Provide legal identification and licensing scans to
                       fast-track moderation. Safe and encrypted storage.
                     </p>
@@ -1708,35 +1815,35 @@ export default function JoinCaterer() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {/* Aadhaar card uploader */}
-                    <div className="border border-slate-200 bg-slate-50/50 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
+                    <div className="border border-[#DFC78A] bg-[#FAF3E2]/45 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
                       <div>
-                        <h4 className="font-bold text-sm text-slate-800 flex items-center justify-between font-poppins">
+                        <h4 className="font-bold text-sm text-[#083A28] flex items-center justify-between font-poppins">
                           Aadhaar Card{" "}
-                          <span className="text-[10px] font-normal text-slate-400 uppercase font-poppins">
+                          <span className="text-[10px] font-normal text-[#8A754A] uppercase font-poppins">
                             Optional
                           </span>
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5 font-poppins">
+                        <p className="text-[11px] text-[#6B5A38] mt-0.5 font-poppins">
                           Owner or company signatory's ID scanned copy
                         </p>
                       </div>
                       <div className="mt-4">
-                        <label className="flex items-center justify-center border border-dashed border-slate-300 hover:border-[#DEAA38] bg-white rounded-xl py-2.5 cursor-pointer transition-all">
+                        <label className="flex items-center justify-center border border-dashed border-[#DFC78A] hover:border-[#D4961B] bg-[#FFFDF8] rounded-xl py-2.5 cursor-pointer transition-all">
                           <input
                             type="file"
                             className="hidden"
                             onChange={(e) => handleFileChange(e, "aadhaarFile")}
                           />
-                          <span className="text-xs font-semibold text-slate-600 px-4 truncate flex items-center gap-2 font-poppins">
+                          <span className="text-xs font-semibold text-[#142C24] px-4 truncate flex items-center gap-2 font-poppins">
                             {formData.aadhaarFile ? (
                               <CheckCircle2
                                 size={14}
-                                className="text-green-600 shrink-0"
+                                className="text-emerald-600 shrink-0"
                               />
                             ) : (
                               <UploadCloud
                                 size={14}
-                                className="text-[#DEAA38] shrink-0"
+                                className="text-[#B87D16] shrink-0"
                               />
                             )}
                             {formData.aadhaarFile || "Upload Aadhaar PDF/Image"}
@@ -1744,42 +1851,42 @@ export default function JoinCaterer() {
                         </label>
                       </div>
                       {formData.aadhaarFile && (
-                        <span className="absolute top-4 right-4 text-green-600">
+                        <span className="absolute top-4 right-4 text-emerald-600">
                           <CheckCircle2 size={16} />
                         </span>
                       )}
                     </div>
 
                     {/* PAN Card uploader */}
-                    <div className="border border-slate-200 bg-slate-50/50 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
+                    <div className="border border-[#DFC78A] bg-[#FAF3E2]/45 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
                       <div>
-                        <h4 className="font-bold text-sm text-slate-800 flex items-center justify-between font-poppins">
+                        <h4 className="font-bold text-sm text-[#083A28] flex items-center justify-between font-poppins">
                           PAN Card{" "}
-                          <span className="text-[10px] font-normal text-slate-400 uppercase font-poppins">
+                          <span className="text-[10px] font-normal text-[#8A754A] uppercase font-poppins">
                             Optional
                           </span>
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5 font-poppins">
+                        <p className="text-[11px] text-[#6B5A38] mt-0.5 font-poppins">
                           Corporate PAN or Proprietor PAN certificate scan
                         </p>
                       </div>
                       <div className="mt-4">
-                        <label className="flex items-center justify-center border border-dashed border-slate-300 hover:border-[#DEAA38] bg-white rounded-xl py-2.5 cursor-pointer transition-all">
+                        <label className="flex items-center justify-center border border-dashed border-[#DFC78A] hover:border-[#D4961B] bg-[#FFFDF8] rounded-xl py-2.5 cursor-pointer transition-all">
                           <input
                             type="file"
                             className="hidden"
                             onChange={(e) => handleFileChange(e, "panFile")}
                           />
-                          <span className="text-xs font-semibold text-slate-600 px-4 truncate flex items-center gap-2 font-poppins">
+                          <span className="text-xs font-semibold text-[#142C24] px-4 truncate flex items-center gap-2 font-poppins">
                             {formData.panFile ? (
                               <CheckCircle2
                                 size={14}
-                                className="text-green-600 shrink-0"
+                                className="text-emerald-600 shrink-0"
                               />
                             ) : (
                               <UploadCloud
                                 size={14}
-                                className="text-[#DEAA38] shrink-0"
+                                className="text-[#B87D16] shrink-0"
                               />
                             )}
                             {formData.panFile || "Upload PAN Scan"}
@@ -1787,43 +1894,43 @@ export default function JoinCaterer() {
                         </label>
                       </div>
                       {formData.panFile && (
-                        <span className="absolute top-4 right-4 text-green-600">
+                        <span className="absolute top-4 right-4 text-emerald-600">
                           <CheckCircle2 size={16} />
                         </span>
                       )}
                     </div>
 
                     {/* FSSAI License */}
-                    <div className="border border-slate-200 bg-slate-50/50 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
+                    <div className="border border-[#DFC78A] bg-[#FAF3E2]/45 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
                       <div>
-                        <h4 className="font-bold text-sm text-slate-800 flex items-center justify-between font-poppins">
+                        <h4 className="font-bold text-sm text-[#083A28] flex items-center justify-between font-poppins">
                           FSSAI Licence{" "}
-                          <span className="text-[10px] font-normal text-slate-400 uppercase font-poppins">
+                          <span className="text-[10px] font-normal text-[#8A754A] uppercase font-poppins">
                             Optional
                           </span>
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5 font-poppins">
+                        <p className="text-[11px] text-[#6B5A38] mt-0.5 font-poppins">
                           Food Safety Standard Authority registry certificate
                           copy
                         </p>
                       </div>
                       <div className="mt-4">
-                        <label className="flex items-center justify-center border border-dashed border-slate-300 hover:border-[#DEAA38] bg-white rounded-xl py-2.5 cursor-pointer transition-all">
+                        <label className="flex items-center justify-center border border-dashed border-[#DFC78A] hover:border-[#D4961B] bg-[#FFFDF8] rounded-xl py-2.5 cursor-pointer transition-all">
                           <input
                             type="file"
                             className="hidden"
                             onChange={(e) => handleFileChange(e, "fssaiFile")}
                           />
-                          <span className="text-xs font-semibold text-slate-600 px-4 truncate flex items-center gap-2 font-poppins">
+                          <span className="text-xs font-semibold text-[#142C24] px-4 truncate flex items-center gap-2 font-poppins">
                             {formData.fssaiFile ? (
                               <CheckCircle2
                                 size={14}
-                                className="text-green-600 shrink-0"
+                                className="text-emerald-600 shrink-0"
                               />
                             ) : (
                               <UploadCloud
                                 size={14}
-                                className="text-[#DEAA38] shrink-0"
+                                className="text-[#B87D16] shrink-0"
                               />
                             )}
                             {formData.fssaiFile ||
@@ -1832,42 +1939,42 @@ export default function JoinCaterer() {
                         </label>
                       </div>
                       {formData.fssaiFile && (
-                        <span className="absolute top-4 right-4 text-green-600">
+                        <span className="absolute top-4 right-4 text-emerald-600">
                           <CheckCircle2 size={16} />
                         </span>
                       )}
                     </div>
 
                     {/* GST Certificate */}
-                    <div className="border border-slate-200 bg-slate-50/50 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
+                    <div className="border border-[#DFC78A] bg-[#FAF3E2]/45 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px]">
                       <div>
-                        <h4 className="font-bold text-sm text-slate-800 flex items-center justify-between font-poppins">
+                        <h4 className="font-bold text-sm text-[#083A28] flex items-center justify-between font-poppins">
                           GSTIN Form{" "}
-                          <span className="text-[10px] font-normal text-slate-400 uppercase font-poppins">
+                          <span className="text-[10px] font-normal text-[#8A754A] uppercase font-poppins">
                             Optional
                           </span>
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5 font-poppins">
+                        <p className="text-[11px] text-[#6B5A38] mt-0.5 font-poppins">
                           Goods and Services Tax registration certificate copy
                         </p>
                       </div>
                       <div className="mt-4">
-                        <label className="flex items-center justify-center border border-dashed border-slate-300 hover:border-[#DEAA38] bg-white rounded-xl py-2.5 cursor-pointer transition-all">
+                        <label className="flex items-center justify-center border border-dashed border-[#DFC78A] hover:border-[#D4961B] bg-[#FFFDF8] rounded-xl py-2.5 cursor-pointer transition-all">
                           <input
                             type="file"
                             className="hidden"
                             onChange={(e) => handleFileChange(e, "gstFile")}
                           />
-                          <span className="text-xs font-semibold text-slate-600 px-4 truncate flex items-center gap-2 font-poppins">
+                          <span className="text-xs font-semibold text-[#142C24] px-4 truncate flex items-center gap-2 font-poppins">
                             {formData.gstFile ? (
                               <CheckCircle2
                                 size={14}
-                                className="text-green-600 shrink-0"
+                                className="text-emerald-600 shrink-0"
                               />
                             ) : (
                               <UploadCloud
                                 size={14}
-                                className="text-[#DEAA38] shrink-0"
+                                className="text-[#B87D16] shrink-0"
                               />
                             )}
                             {formData.gstFile || "Upload GST Reg Form (REG-06)"}
@@ -1875,43 +1982,43 @@ export default function JoinCaterer() {
                         </label>
                       </div>
                       {formData.gstFile && (
-                        <span className="absolute top-4 right-4 text-green-600">
+                        <span className="absolute top-4 right-4 text-emerald-600">
                           <CheckCircle2 size={16} />
                         </span>
                       )}
                     </div>
 
                     {/* Additional validation attachments */}
-                    <div className="border border-slate-200 bg-slate-50/50 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px] md:col-span-2">
+                    <div className="border border-[#DFC78A] bg-[#FAF3E2]/45 p-5 rounded-2xl relative flex flex-col justify-between min-h-[180px] md:col-span-2">
                       <div>
-                        <h4 className="font-bold text-sm text-slate-800 flex items-center justify-between font-poppins">
+                        <h4 className="font-bold text-sm text-[#083A28] flex items-center justify-between font-poppins">
                           Other ISO or Municipal Certificates{" "}
-                          <span className="text-[10px] font-normal text-slate-400 uppercase font-poppins">
+                          <span className="text-[10px] font-normal text-[#8A754A] uppercase font-poppins">
                             Optional
                           </span>
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5 font-poppins">
+                        <p className="text-[11px] text-[#6B5A38] mt-0.5 font-poppins">
                           Any health clearance certificates from local
                           authorities or ISO standard copies
                         </p>
                       </div>
                       <div className="mt-4">
-                        <label className="flex items-center justify-center border border-dashed border-slate-300 hover:border-[#DEAA38] bg-white rounded-xl py-2.5 cursor-pointer transition-all">
+                        <label className="flex items-center justify-center border border-dashed border-[#DFC78A] hover:border-[#D4961B] bg-[#FFFDF8] rounded-xl py-2.5 cursor-pointer transition-all">
                           <input
                             type="file"
                             className="hidden"
                             onChange={(e) => handleFileChange(e, "otherDocs")}
                           />
-                          <span className="text-xs font-semibold text-slate-600 px-4 truncate flex items-center gap-2 font-poppins">
+                          <span className="text-xs font-semibold text-[#142C24] px-4 truncate flex items-center gap-2 font-poppins">
                             {formData.otherDocs ? (
                               <CheckCircle2
                                 size={14}
-                                className="text-green-600 shrink-0"
+                                className="text-emerald-600 shrink-0"
                               />
                             ) : (
                               <UploadCloud
                                 size={14}
-                                className="text-[#DEAA38] shrink-0"
+                                className="text-[#B87D16] shrink-0"
                               />
                             )}
                             {formData.otherDocs ||
@@ -1920,7 +2027,7 @@ export default function JoinCaterer() {
                         </label>
                       </div>
                       {formData.otherDocs && (
-                        <span className="absolute top-4 right-4 text-green-600">
+                        <span className="absolute top-4 right-4 text-emerald-600">
                           <CheckCircle2 size={16} />
                         </span>
                       )}
@@ -1932,12 +2039,15 @@ export default function JoinCaterer() {
               {/* STEP 5: Review & Submit */}
               {step === 5 && (
                 <div className="space-y-6 font-poppins animate-in fade-in duration-300">
-                  <div className="text-left bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-2xl border border-[#cbdcd5] mb-4">
-                    <h3 className="font-display font-semibold text-lg text-[#00483C] leading-none mb-1.5 flex items-center gap-1.5">
-                      <ShieldCheck size={20} className="text-[#DEAA38]" />{" "}
-                      Verify & Clear Application
+                  <div className="text-left bg-gradient-to-br from-[#023224] via-[#012218] to-[#011610] p-6 rounded-2xl border border-[#D9A323]/60 mb-4 shadow-sm">
+                    <h3
+                      className="font-display font-bold text-xl text-[#FFFDF8] leading-none mb-1.5 flex items-center gap-2"
+                      style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                    >
+                      <ShieldCheck size={20} className="text-[#F8D76A]" />{" "}
+                      Verify &amp; Clear Application
                     </h3>
-                    <p className="text-slate-600 text-xs leading-relaxed font-poppins">
+                    <p className="text-[#E7EFEA]/85 text-xs leading-relaxed font-poppins">
                       Please review your catering records before signing off for
                       onboarding clearance. Approval verification generally
                       succeeds faster when details match document archives.
@@ -1945,64 +2055,64 @@ export default function JoinCaterer() {
                   </div>
 
                   {/* Card 1: Contact Details */}
-                  <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
-                    <div className="bg-slate-50/50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
-                      <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider font-poppins">
-                        Owner & Contacts
+                  <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-2xl overflow-hidden shadow-xs">
+                    <div className="bg-[#FAF3E2]/70 px-6 py-3 border-b border-[#DFC78A]/80 flex justify-between items-center">
+                      <h4 className="font-bold text-[#083A28] text-xs uppercase tracking-wider font-poppins">
+                        Owner &amp; Contacts
                       </h4>
                       <button
                         onClick={() => setStep(2)}
-                        className="text-[#00483C] text-xs font-bold hover:underline cursor-pointer"
+                        className="text-[#B87D16] text-xs font-bold hover:underline cursor-pointer"
                       >
                         Edit
                       </button>
                     </div>
                     <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-6">
                       <div>
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-0.5 font-poppins">
+                        <span className="block text-[10px] text-[#8A754A] uppercase font-bold mb-0.5 font-poppins">
                           Owner Name
                         </span>
-                        <span className="text-xs text-slate-800 font-semibold font-poppins">
+                        <span className="text-xs text-[#142C24] font-semibold font-poppins">
                           {formData.owner || "-"}
                         </span>
                       </div>
                       <div>
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-0.5 font-poppins">
+                        <span className="block text-[10px] text-[#8A754A] uppercase font-bold mb-0.5 font-poppins">
                           Mobile Number
                         </span>
-                        <span className="text-xs text-slate-800 font-semibold font-poppins">
+                        <span className="text-xs text-[#142C24] font-semibold font-poppins">
                           {formData.phone || "-"}
                         </span>
                       </div>
                       <div>
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-0.5 font-poppins">
+                        <span className="block text-[10px] text-[#8A754A] uppercase font-bold mb-0.5 font-poppins">
                           Email Signature
                         </span>
-                        <span className="text-xs text-slate-800 font-semibold break-all font-poppins">
+                        <span className="text-xs text-[#142C24] font-semibold break-all font-poppins">
                           {formData.email || "-"}
                         </span>
                       </div>
                       <div>
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-0.5 font-poppins">
+                        <span className="block text-[10px] text-[#8A754A] uppercase font-bold mb-0.5 font-poppins">
                           Login Account
                         </span>
-                        <span className="text-xs text-slate-800 font-semibold font-poppins">
+                        <span className="text-xs text-[#142C24] font-semibold font-poppins">
                           @{formData.username || "-"}
                         </span>
                       </div>
                       <div>
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-0.5 font-poppins">
+                        <span className="block text-[10px] text-[#8A754A] uppercase font-bold mb-0.5 font-poppins">
                           Experience Slabs
                         </span>
-                        <span className="text-xs text-slate-800 font-semibold font-poppins">
+                        <span className="text-xs text-[#142C24] font-semibold font-poppins">
                           {formData.experience || "0"} Years
                         </span>
                       </div>
                       <div>
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-0.5 font-poppins">
+                        <span className="block text-[10px] text-[#8A754A] uppercase font-bold mb-0.5 font-poppins">
                           Service Location
                         </span>
-                        <span className="text-xs text-slate-800 font-semibold font-poppins">
+                        <span className="text-xs text-[#142C24] font-semibold font-poppins">
                           {formData.city || "-"}
                         </span>
                       </div>
@@ -2010,14 +2120,14 @@ export default function JoinCaterer() {
                   </div>
 
                   {/* Card 2: Menus & Packages */}
-                  <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
-                    <div className="bg-slate-50/50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
-                      <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider font-poppins">
+                  <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-2xl overflow-hidden shadow-xs">
+                    <div className="bg-[#FAF3E2]/70 px-6 py-3 border-b border-[#DFC78A]/80 flex justify-between items-center">
+                      <h4 className="font-bold text-[#083A28] text-xs uppercase tracking-wider font-poppins">
                         Public Offerings / Packages
                       </h4>
                       <button
                         onClick={() => setStep(1)}
-                        className="text-[#00483C] text-xs font-bold hover:underline cursor-pointer font-poppins"
+                        className="text-[#B87D16] text-xs font-bold hover:underline cursor-pointer font-poppins"
                       >
                         Edit
                       </button>
@@ -2036,21 +2146,21 @@ export default function JoinCaterer() {
                             return (
                               <div
                                 key={i}
-                                className="border border-slate-100 rounded-xl p-4 bg-slate-50/40 relative flex items-center justify-between animate-in fade-in duration-300"
+                                className="border border-[#DFC78A]/85 rounded-xl p-4 bg-[#FAF3E2]/45 relative flex items-center justify-between animate-in fade-in duration-300"
                               >
                                 <div>
-                                  <span className="block font-bold text-slate-900 text-sm leading-none mb-1 font-poppins">
+                                  <span className="block font-bold text-[#083A28] text-sm leading-none mb-1 font-poppins">
                                     {pkg.packageName || "Package " + (i + 1)}
                                   </span>
-                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-poppins">
+                                  <span className="text-[10px] font-bold text-[#8A754A] uppercase tracking-wider font-poppins">
                                     {pkg.categories?.length || 0} Categories
                                   </span>
                                 </div>
                                 <div className="text-right">
-                                  <span className="font-sans font-bold text-sm text-[#DEAA38] block font-poppins">
+                                  <span className="font-sans font-bold text-sm text-[#B87D16] block font-poppins">
                                     ₹{basePrice}
                                   </span>
-                                  <span className="text-[10px] text-slate-500 block font-poppins">
+                                  <span className="text-[10px] text-[#6B5A38] block font-poppins">
                                     per plate
                                   </span>
                                 </div>
@@ -2059,7 +2169,7 @@ export default function JoinCaterer() {
                           })}
                         </div>
                       ) : (
-                        <p className="text-xs text-slate-400 italic font-poppins">
+                        <p className="text-xs text-[#8A754A] italic font-poppins">
                           No catering packages compiled.
                         </p>
                       )}
@@ -2067,71 +2177,71 @@ export default function JoinCaterer() {
                   </div>
 
                   {/* Card 3: Verification Credentials */}
-                  <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
-                    <div className="bg-slate-50/50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
-                      <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider font-poppins">
+                  <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-2xl overflow-hidden shadow-xs">
+                    <div className="bg-[#FAF3E2]/70 px-6 py-3 border-b border-[#DFC78A]/80 flex justify-between items-center">
+                      <h4 className="font-bold text-[#083A28] text-xs uppercase tracking-wider font-poppins">
                         Corporate Documents Checklist
                       </h4>
                       <button
                         onClick={() => setStep(4)}
-                        className="text-[#00483C] text-xs font-bold hover:underline cursor-pointer font-poppins"
+                        className="text-[#B87D16] text-xs font-bold hover:underline cursor-pointer font-poppins"
                       >
                         Edit
                       </button>
                     </div>
                     <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                      <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-100">
-                        <span className="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 font-poppins">
+                      <div className="bg-[#FAF3E2]/55 p-3 rounded-xl border border-[#DFC78A]/70">
+                        <span className="block text-[9px] text-[#8A754A] font-bold uppercase tracking-wider mb-1.5 font-poppins">
                           Aadhaar Card
                         </span>
                         {formData.aadhaarFile ? (
-                          <span className="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-100 inline-block font-poppins">
+                          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block font-poppins">
                             ✓ Attached
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400 font-poppins">
+                          <span className="text-xs text-[#8A754A] font-poppins">
                             N/A
                           </span>
                         )}
                       </div>
-                      <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-100">
-                        <span className="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 font-poppins">
+                      <div className="bg-[#FAF3E2]/55 p-3 rounded-xl border border-[#DFC78A]/70">
+                        <span className="block text-[9px] text-[#8A754A] font-bold uppercase tracking-wider mb-1.5 font-poppins">
                           PAN Card
                         </span>
                         {formData.panFile ? (
-                          <span className="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-100 inline-block font-poppins font-poppins">
+                          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block font-poppins">
                             ✓ Attached
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400 font-poppins font-poppins font-poppins font-poppins font-poppins">
+                          <span className="text-xs text-[#8A754A] font-poppins">
                             N/A
                           </span>
                         )}
                       </div>
-                      <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-100">
-                        <span className="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 font-poppins font-poppins">
+                      <div className="bg-[#FAF3E2]/55 p-3 rounded-xl border border-[#DFC78A]/70">
+                        <span className="block text-[9px] text-[#8A754A] font-bold uppercase tracking-wider mb-1.5 font-poppins">
                           FSSAI License
                         </span>
                         {formData.fssaiFile ? (
-                          <span className="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-100 inline-block font-poppins">
+                          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block font-poppins">
                             ✓ Attached
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400 font-poppins">
+                          <span className="text-xs text-[#8A754A] font-poppins">
                             N/A
                           </span>
                         )}
                       </div>
-                      <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-100">
-                        <span className="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 font-poppins font-poppins">
+                      <div className="bg-[#FAF3E2]/55 p-3 rounded-xl border border-[#DFC78A]/70">
+                        <span className="block text-[9px] text-[#8A754A] font-bold uppercase tracking-wider mb-1.5 font-poppins">
                           GST License
                         </span>
                         {formData.gstFile ? (
-                          <span className="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-100 inline-block font-poppins">
+                          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block font-poppins">
                             ✓ Attached
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400 font-poppins font-poppins">
+                          <span className="text-xs text-[#8A754A] font-poppins">
                             N/A
                           </span>
                         )}
@@ -2142,8 +2252,8 @@ export default function JoinCaterer() {
               )}
             </div>
 
-            {/* Fixed Action Footer precisely matching designs */}
-            <div className="bg-slate-50 p-5 md:p-6 border-t border-slate-150 flex justify-between items-center mt-auto">
+            {/* Action Footer */}
+            <div className="bg-[#FCF8EE]/80 px-5 sm:px-7 py-4 border-t border-[#EFE3C4] flex justify-between items-center mt-auto">
               <button
                 onClick={handleBack}
                 disabled={step === 1 || isParsing}
@@ -2151,7 +2261,7 @@ export default function JoinCaterer() {
                   "px-5 py-2.5 rounded-xl font-bold font-poppins text-xs uppercase tracking-wide flex items-center gap-1.5 transition-colors cursor-pointer",
                   step === 1 || isParsing
                     ? "opacity-0 pointer-events-none"
-                    : "text-slate-500 hover:bg-slate-200",
+                    : "text-[#4A3B22] bg-[#FAF0D4] border border-[#E4C987] hover:bg-[#F3DFAB]",
                 )}
               >
                 <ChevronLeft size={14} /> Back
@@ -2162,16 +2272,17 @@ export default function JoinCaterer() {
                   onClick={handleNext}
                   disabled={isParsing}
                   className={cn(
-                    "bg-[#00483C] text-white px-6 py-2.5 rounded-xl font-bold font-poppins text-xs uppercase tracking-wider flex items-center gap-1.5 hover:bg-brand-green-800 transition-colors shadow-lg shadow-brand-green-900/10 cursor-pointer",
+                    "bg-gradient-to-r from-[#024731] to-[#013122] hover:from-[#03583D] hover:to-[#023C2A] border border-[#D9A323]/45 text-[#FFFDF8] px-7 py-2.5 rounded-xl font-bold font-poppins text-xs tracking-wide flex items-center gap-2 transition-all shadow-[0_6px_18px_rgba(1,49,34,0.22)] cursor-pointer",
                     isParsing ? "opacity-50 cursor-not-allowed" : "",
                   )}
                 >
-                  Next Step <ChevronRight size={14} />
+                  <span>Next Step</span>
+                  <ChevronRight size={15} className="text-[#F5C642]" />
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  className="bg-[#DEAA38] hover:bg-[#c28824] text-[#051410] px-8 py-2.5 rounded-xl font-black font-poppins text-xs uppercase tracking-widest flex items-center gap-1.5 transition-colors shadow-lg shadow-brand-gold-500/10 active:scale-95 cursor-pointer animate-pulse"
+                  className="bg-gradient-to-r from-[#FAE18D] via-[#E8B839] to-[#D2951B] hover:brightness-105 text-[#052419] px-8 py-2.5 rounded-xl font-black font-poppins text-xs uppercase tracking-widest flex items-center gap-1.5 transition-all shadow-[0_6px_18px_rgba(217,163,35,0.28)] active:scale-95 cursor-pointer"
                 >
                   Submit For Approval
                 </button>
@@ -2180,6 +2291,36 @@ export default function JoinCaterer() {
           </div>
         </div>
       </div>
+
+      {showNoPackagesConfirm && (
+        <div className="fixed inset-0 bg-[#011B13]/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-3xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 className="text-lg font-display font-bold text-[#083A28] mb-2">Continue Without Packages?</h3>
+            <p className="text-sm text-[#5C5240] mb-6 leading-relaxed">
+              You haven&apos;t added any menu packages yet. Are you sure you want to continue to the next step?
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowNoPackagesConfirm(false)}
+                className="flex-1 py-2.5 bg-[#FAF3E2] border border-[#DFC78A] text-[#494032] font-bold rounded-xl text-xs hover:bg-[#FAF0D4] cursor-pointer"
+              >
+                Add Packages
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNoPackagesConfirm(false);
+                  setStep((s: number) => s + 1);
+                }}
+                className="flex-1 py-2.5 bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 text-[#FFFDF8] font-bold rounded-xl text-xs hover:brightness-110 cursor-pointer"
+              >
+                Continue Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChefHat, Mail, Phone, Lock, User as UserIcon, ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import { Mail, Phone, Lock, User as UserIcon, ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from '../components/Toast';
 import { getSupabase } from '../lib/supabase';
@@ -13,6 +13,11 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
   const { user, loading: authLoading, signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    setCurrentMode(mode);
+    setError('');
+  }, [mode]);
 
   // Automatic role-based redirect after login or if user session is already present
   useEffect(() => {
@@ -184,30 +189,30 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
   // If we are waiting for email verification
   if (unverifiedEmail) {
     return (
-      <div className="min-h-screen pt-24 pb-12 md:py-8 bg-brand-green-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-brand-green-900/5 overflow-hidden border border-brand-green-100/50">
-          <div className="bg-brand-green-900 px-6 py-6 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-brand-gold-900/20 mix-blend-overlay" />
+      <div className="min-h-screen pt-24 pb-12 md:py-12 bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md bg-[#FFFDF8] rounded-[24px] shadow-[0_18px_45px_rgba(116,84,22,0.12)] overflow-hidden border border-[#DFC78A]">
+          <div className="bg-gradient-to-br from-[#01291D] via-[#034431] to-[#01291D] px-6 py-7 text-center relative overflow-hidden border-b border-[#D9A323]/45">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(242,190,59,0.16),transparent_65%)] pointer-events-none" />
             <div className="relative z-10 flex flex-col items-center">
-              <div className="bg-brand-gold-500 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 text-white shadow-lg shadow-brand-gold-500/20">
-                <ChefHat size={28} />
+              <div className="bg-[#011F16]/85 border border-[#DFC78A]/50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-[0_6px_18px_rgba(0,0,0,0.28)]">
+                <img src="/assets/aistudio/image_6ce019e3.png" alt="PlanMyChoice" className="w-10 h-10 object-contain" />
               </div>
-              <h2 className="text-2xl font-display font-bold text-white tracking-tight mb-1">
+              <h2 className="text-2xl font-display font-bold text-[#FFFDF8] tracking-tight mb-1">
                 Verify Your Email
               </h2>
-              <p className="text-brand-green-100/80 font-poppins text-xs">
+              <p className="text-[#DFC78A]/90 font-poppins text-xs">
                 Activate your account to start ordering
               </p>
             </div>
           </div>
 
           <div className="p-6 md:p-8 space-y-6 text-center">
-            <div className="bg-brand-green-50 border border-brand-green-100/60 p-4 rounded-xl text-slate-700 font-poppins text-sm leading-relaxed text-left">
+            <div className="bg-[#FAF3E2] border border-[#DFC78A] p-4 rounded-xl text-[#132A1F] font-poppins text-sm leading-relaxed text-left">
               Verification email has been sent to your email address. Please verify your email before logging in.
             </div>
 
-            <div className="text-xs text-slate-500 font-poppins bg-slate-50 border border-slate-200/60 py-2 px-3 rounded-lg inline-block">
-              Email sent to: <span className="text-brand-green-900 font-semibold">{unverifiedEmail}</span>
+            <div className="text-xs text-[#6B5A38] font-poppins bg-[#F7EED7] border border-[#DFC78A]/80 py-2 px-3.5 rounded-lg inline-block">
+              Email sent to: <span className="text-[#024731] font-semibold">{unverifiedEmail}</span>
             </div>
 
             <div className="space-y-3">
@@ -215,7 +220,7 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resending}
-                className="w-full bg-brand-green-900 hover:bg-brand-green-800 text-white font-medium font-poppins py-3 rounded-xl transition-all shadow-md text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                className="w-full bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] font-semibold font-poppins py-3 rounded-xl transition-all shadow-[0_6px_16px_rgba(1,34,23,0.2)] text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
               >
                 {resending ? 'Resending verification...' : 'Resend Verification Email'}
               </button>
@@ -226,7 +231,7 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                   setUnverifiedEmail(null);
                   setCurrentMode('login');
                 }}
-                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/80 font-medium font-poppins py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-[#FAF3E2] hover:bg-[#F3E6C6] text-[#132A1F] border border-[#DFC78A] font-medium font-poppins py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
               >
                 Go To Login
               </button>
@@ -238,30 +243,30 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 md:py-8 bg-brand-green-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className={`w-full transition-all duration-300 max-w-md ${currentMode === 'signup' ? 'md:max-w-xl' : 'md:max-w-md'} bg-white rounded-3xl shadow-xl shadow-brand-green-900/5 overflow-hidden border border-brand-green-100/50`}>
+    <div className="min-h-screen pt-24 pb-12 md:py-12 bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className={`w-full transition-all duration-300 max-w-md ${currentMode === 'signup' ? 'md:max-w-xl' : 'md:max-w-md'} bg-[#FFFDF8] rounded-[24px] shadow-[0_18px_45px_rgba(116,84,22,0.12)] overflow-hidden border border-[#DFC78A]`}>
         
         {/* Header */}
-        <div className="bg-brand-green-900 px-6 py-6 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-brand-gold-900/20 mix-blend-overlay" />
+        <div className="bg-gradient-to-br from-[#01291D] via-[#034431] to-[#01291D] px-6 py-7 text-center relative overflow-hidden border-b border-[#D9A323]/45">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(242,190,59,0.16),transparent_65%)] pointer-events-none" />
           <div className="relative z-10 flex flex-col items-center">
             {currentMode === 'forgot' && (
               <button 
                 type="button"
                 onClick={() => setCurrentMode('login')} 
-                className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-brand-gold-300 hover:text-white transition-colors"
+                className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-[#F8D76A] hover:text-white transition-colors cursor-pointer"
                 aria-label="Back to login"
               >
                 <ChevronLeft size={24} />
               </button>
             )}
-            <div className="bg-brand-gold-500 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 text-white shadow-lg shadow-brand-gold-500/20">
-              <ChefHat size={28} />
+            <div className="bg-[#011F16]/85 border border-[#DFC78A]/50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-[0_6px_18px_rgba(0,0,0,0.28)]">
+              <img src="/assets/aistudio/image_6ce019e3.png" alt="PlanMyChoice" className="w-10 h-10 object-contain" />
             </div>
-            <h2 className="text-2xl font-display font-bold text-white tracking-tight mb-1">
+            <h2 className="text-2xl sm:text-[26px] font-display font-bold text-[#FFFDF8] tracking-tight mb-1">
               {currentMode === 'login' ? 'Welcome Back' : currentMode === 'signup' ? 'Create Account' : 'Reset Password'}
             </h2>
-            <p className="text-brand-green-100/80 font-poppins text-xs max-w-xs mx-auto">
+            <p className="text-[#DFC78A]/90 font-poppins text-xs max-w-xs mx-auto">
               {currentMode === 'login' 
                 ? 'Sign in to access your orders and favorites.' 
                 : currentMode === 'signup' 
@@ -274,13 +279,13 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
         {/* Content body */}
         <div className="p-6 md:p-8">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 text-red-600 p-3.5 rounded-xl text-xs font-semibold text-center mb-4 font-poppins flex flex-col items-center justify-center gap-1.5">
+            <div className="bg-red-500/10 border border-red-500/30 text-red-700 p-3.5 rounded-xl text-xs font-semibold text-center mb-4 font-poppins flex flex-col items-center justify-center gap-1.5">
               <span>{error}</span>
               {error.toLowerCase().includes("log in instead") && (
                 <button
                   type="button"
                   onClick={() => { setError(''); setCurrentMode('login'); }}
-                  className="text-brand-green-900 underline font-bold hover:text-brand-green-800 cursor-pointer transition-colors"
+                  className="text-[#024731] underline font-bold hover:text-[#043625] cursor-pointer transition-colors"
                 >
                   Click here to Log In
                 </button>
@@ -295,31 +300,31 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                 {/* 2-column on desktop: Full Name | Mobile Number */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1 font-poppins uppercase tracking-wide">Full Name</label>
+                    <label className="block text-xs font-semibold text-[#083A28] mb-1.5 font-poppins uppercase tracking-wide">Full Name</label>
                     <div className="relative">
-                      <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                      <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" size={17} />
                       <input 
                         required 
                         name="name" 
                         value={formData.name} 
                         onChange={handleChange} 
                         type="text" 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 focus:bg-white outline-none transition-all text-sm font-poppins text-slate-800 placeholder:text-slate-400" 
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white outline-none transition-all text-sm font-poppins text-[#132A1F] placeholder:text-[#8E7D5A]" 
                         placeholder="John Doe" 
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1 font-poppins uppercase tracking-wide">Mobile Number</label>
+                    <label className="block text-xs font-semibold text-[#083A28] mb-1.5 font-poppins uppercase tracking-wide">Mobile Number</label>
                     <div className="relative">
-                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" size={17} />
                       <input 
                         required 
                         name="phone" 
                         value={formData.phone} 
                         onChange={handleChange} 
                         type="tel" 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 focus:bg-white outline-none transition-all text-sm font-poppins text-slate-800 placeholder:text-slate-400" 
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white outline-none transition-all text-sm font-poppins text-[#132A1F] placeholder:text-[#8E7D5A]" 
                         placeholder="+91" 
                       />
                     </div>
@@ -328,16 +333,16 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
 
                 {/* Email Address - full width */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1 font-poppins uppercase tracking-wide">Email Address</label>
+                  <label className="block text-xs font-semibold text-[#083A28] mb-1.5 font-poppins uppercase tracking-wide">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" size={17} />
                     <input 
                       required 
                       name="email" 
                       value={formData.email} 
                       onChange={handleChange} 
                       type="email" 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 focus:bg-white outline-none transition-all text-sm font-poppins text-slate-800 placeholder:text-slate-400" 
+                      className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white outline-none transition-all text-sm font-poppins text-[#132A1F] placeholder:text-[#8E7D5A]" 
                       placeholder="you@example.com" 
                     />
                   </div>
@@ -346,22 +351,22 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                 {/* 2-column on desktop: Password | Confirm Password */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1 font-poppins uppercase tracking-wide">Password</label>
+                    <label className="block text-xs font-semibold text-[#083A28] mb-1.5 font-poppins uppercase tracking-wide">Password</label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" size={17} />
                       <input 
                         required 
                         name="password" 
                         value={formData.password} 
                         onChange={handleChange} 
                         type={showPassword ? 'text' : 'password'} 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 focus:bg-white outline-none transition-all text-sm font-poppins text-slate-800 placeholder:text-slate-400" 
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white outline-none transition-all text-sm font-poppins text-[#132A1F] placeholder:text-[#8E7D5A]" 
                         placeholder="••••••••" 
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8E7D5A] hover:text-[#083A28] focus:outline-none cursor-pointer"
                         tabIndex={-1}
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -369,22 +374,22 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1 font-poppins uppercase tracking-wide">Confirm Password</label>
+                    <label className="block text-xs font-semibold text-[#083A28] mb-1.5 font-poppins uppercase tracking-wide">Confirm Password</label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" size={17} />
                       <input 
                         required 
                         name="confirmPassword" 
                         value={formData.confirmPassword} 
                         onChange={handleChange} 
                         type={showConfirmPassword ? 'text' : 'password'} 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 focus:bg-white outline-none transition-all text-sm font-poppins text-slate-800 placeholder:text-slate-400" 
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white outline-none transition-all text-sm font-poppins text-[#132A1F] placeholder:text-[#8E7D5A]" 
                         placeholder="••••••••" 
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8E7D5A] hover:text-[#083A28] focus:outline-none cursor-pointer"
                         tabIndex={-1}
                       >
                         {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -398,16 +403,16 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
               /* Login and Reset Password flows - single column, highly compact */
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1 font-poppins uppercase tracking-wide">Email Address</label>
+                  <label className="block text-xs font-semibold text-[#083A28] mb-1.5 font-poppins uppercase tracking-wide">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" size={17} />
                     <input 
                       required 
                       name="email" 
                       value={formData.email} 
                       onChange={handleChange} 
                       type="email" 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 focus:bg-white outline-none transition-all text-sm font-poppins text-slate-800 placeholder:text-slate-400" 
+                      className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white outline-none transition-all text-sm font-poppins text-[#132A1F] placeholder:text-[#8E7D5A]" 
                       placeholder="you@example.com" 
                     />
                   </div>
@@ -415,34 +420,34 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
 
                 {currentMode !== 'forgot' && (
                   <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="block text-xs font-semibold text-slate-600 font-poppins uppercase tracking-wide">Password</label>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-xs font-semibold text-[#083A28] font-poppins uppercase tracking-wide">Password</label>
                       <button 
                         type="button" 
                         onClick={() => {
                           setCurrentMode('forgot');
                           setError('');
                         }} 
-                        className="text-xs font-bold text-brand-gold-600 hover:text-brand-gold-700 transition-colors"
+                        className="text-xs font-bold text-[#B57B0C] hover:text-[#8E5F07] transition-colors cursor-pointer"
                       >
                         Forgot Password?
                       </button>
                     </div>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" size={17} />
                       <input 
                         required 
                         name="password" 
                         value={formData.password} 
                         onChange={handleChange} 
                         type={showPassword ? 'text' : 'password'} 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 focus:bg-white outline-none transition-all text-sm font-poppins text-slate-800 placeholder:text-slate-400" 
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white outline-none transition-all text-sm font-poppins text-[#132A1F] placeholder:text-[#8E7D5A]" 
                         placeholder="••••••••" 
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8E7D5A] hover:text-[#083A28] focus:outline-none cursor-pointer"
                         tabIndex={-1}
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -456,7 +461,7 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-brand-green-900 hover:bg-brand-green-800 border-none text-white font-medium font-poppins py-3 rounded-xl transition-all shadow-md mt-6 text-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] font-semibold font-poppins py-3 rounded-xl transition-all shadow-[0_6px_16px_rgba(1,34,23,0.2)] mt-6 text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
             >
               {loading 
                 ? 'Processing...' 
@@ -472,15 +477,15 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
           {currentMode !== 'forgot' && (
             <>
               <div className="relative mt-5 mb-5 text-center">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"></div></div>
-                <span className="relative bg-white px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest font-poppins">Or continue with</span>
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#E8D7B0]"></div></div>
+                <span className="relative bg-[#FFFDF8] px-3 text-[10px] font-semibold text-[#8A754A] uppercase tracking-widest font-poppins">Or continue with</span>
               </div>
 
               <div className="flex gap-4">
                 <button 
                   type="button"
                   onClick={handleGoogleSignIn}
-                  className="w-full border border-slate-200/80 hover:bg-slate-50 py-2.5 rounded-xl text-slate-700 font-medium font-poppins transition-colors flex items-center justify-center gap-2 text-sm cursor-pointer"
+                  className="w-full bg-[#FAF3E2]/75 border border-[#DFC78A] hover:bg-[#F5E9CE] py-2.5 rounded-xl text-[#132A1F] font-medium font-poppins transition-colors flex items-center justify-center gap-2 text-sm cursor-pointer"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg>
                   Google
@@ -489,7 +494,7 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
             </>
           )}
 
-          <p className="text-center text-slate-500 mt-6 text-sm font-poppins">
+          <p className="text-center text-[#5D665F] mt-6 text-sm font-poppins">
             {currentMode === 'login' ? "Don't have an account? " : currentMode === 'signup' ? "Already have an account? " : "Remember your password? "}
             <button 
               type="button"
@@ -497,7 +502,7 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                 setError('');
                 setCurrentMode(currentMode === 'login' ? 'signup' : 'login');
               }} 
-              className="text-brand-gold-600 font-bold hover:text-brand-gold-700 transition-colors cursor-pointer"
+              className="text-[#B57B0C] font-bold hover:text-[#8E5F07] transition-colors cursor-pointer"
             >
               {currentMode === 'login' ? 'Sign Up' : 'Log In'}
             </button>

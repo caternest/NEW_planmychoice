@@ -653,11 +653,11 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     );
   };
 
-  const ringColor = theme === 'gold' ? 'focus:ring-brand-gold-500/15 focus:border-[#DEAA38]/80' : 'focus:ring-[#0F3D2E]/10 focus:border-[#0F3D2E]';
+  const ringColor = theme === 'gold' ? 'focus:ring-[#D9A323]/20 focus:border-[#D4961B]' : 'focus:ring-[#065239]/15 focus:border-[#065239]';
   const hasBg = className.includes('bg-');
   const defaultInputStyles = hasBg 
     ? '' 
-    : 'bg-white text-stone-900 border border-stone-200 hover:border-stone-300';
+    : 'bg-[#FFFDF9] text-[#0F241C] border border-[#DFC78A] hover:border-[#D4961B]';
 
   const rightPaddingClass = onIconClick || isLoading ? 'pr-11' : 'pr-4';
   const paddingClass = `${leftIcon ? 'pl-11' : 'pl-4'} ${rightPaddingClass}`;
@@ -674,7 +674,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                   e.stopPropagation();
                   onIconClick();
                 }}
-                className="cursor-pointer hover:scale-110 active:scale-95 transition-all p-1 rounded-lg hover:bg-amber-50 text-[#DEAA38]"
+                className="cursor-pointer hover:scale-110 active:scale-95 transition-all p-1 rounded-lg hover:bg-[#FAF0D4] text-[#D4961B]"
                 title="Open Map Picker"
               >
                 {leftIcon}
@@ -694,7 +694,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className={`w-full ${defaultInputStyles} rounded-xl ${paddingClass} py-3.5 text-sm focus:ring-4 outline-none transition-all placeholder:text-stone-400 ${ringColor} ${className}`}
+            className={`w-full ${defaultInputStyles} rounded-xl ${paddingClass} py-3.5 text-sm focus:ring-4 outline-none transition-all placeholder:text-[#8E7D5E] ${ringColor} ${className}`}
             onFocus={() => {
               setIsOpen(true);
             }}
@@ -706,7 +706,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className={`w-full ${defaultInputStyles} rounded-xl ${paddingClass} py-3.5 text-sm focus:ring-4 outline-none transition-all placeholder:text-stone-400 ${ringColor} ${className}`}
+            className={`w-full ${defaultInputStyles} rounded-xl ${paddingClass} py-3.5 text-sm focus:ring-4 outline-none transition-all placeholder:text-[#8E7D5E] ${ringColor} ${className}`}
             onFocus={() => {
               setIsOpen(true);
             }}
@@ -715,7 +715,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         
         <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 z-10">
           {isLoading && (
-            <Loader2 className="animate-spin text-stone-400 shrink-0" size={16} />
+            <Loader2 className="animate-spin text-[#9A6A0F] shrink-0" size={16} />
           )}
           {onIconClick && !isLoading && (
             <button
@@ -726,8 +726,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               }}
               className={`p-1.5 rounded-lg transition-all cursor-pointer hover:scale-110 active:scale-95 shrink-0 ${
                 theme === 'gold' 
-                  ? 'text-[#DEAA38] hover:bg-amber-50' 
-                  : 'text-[#0F3D2E] hover:bg-emerald-50'
+                  ? 'text-[#D4961B] hover:bg-[#FAF0D4]' 
+                  : 'text-[#065239] hover:bg-[#E7F4EC]'
               }`}
               title="Open Map Picker"
             >
@@ -738,13 +738,13 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-2 bg-white border border-stone-100 rounded-[12px] shadow-2xl max-h-[320px] overflow-y-auto z-[9999] animate-in fade-in slide-in-from-top-1 duration-250">
+        <div className="absolute left-0 right-0 mt-2 bg-[#FFFDF8] border border-[#DFC78A] rounded-2xl shadow-[0_18px_40px_rgba(1,34,23,0.18)] max-h-[320px] overflow-y-auto z-[9999] animate-in fade-in slide-in-from-top-1 duration-250">
           {isLoading ? (
-            <div className="px-4 py-8 text-center text-stone-500 font-sans text-xs flex flex-col items-center justify-center gap-3">
-              <div className="p-2 rounded-full bg-amber-50 text-[#DEAA38]">
-                <Loader2 className="animate-spin text-[#DEAA38]" size={20} />
+            <div className="px-4 py-8 text-center text-[#5C5240] font-sans text-xs flex flex-col items-center justify-center gap-3">
+              <div className="p-2 rounded-full bg-[#FAF0D4] text-[#9A6A0F] border border-[#DFC78A]">
+                <Loader2 className="animate-spin text-[#9A6A0F]" size={20} />
               </div>
-              <span className="font-semibold text-[#DEAA38] text-sm animate-pulse">Searching locations...</span>
+              <span className="font-semibold text-[#9A6A0F] text-sm">Searching locations...</span>
             </div>
           ) : trimmedLength >= 2 ? (
             suggestions.length > 0 ? (
@@ -756,28 +756,28 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                       key={item.id}
                       type="button"
                       onClick={() => handleSelect(item)}
-                      className={`w-full text-left px-4 py-3.5 hover:bg-amber-50/40 rounded-xl transition-all duration-200 flex items-start gap-4 group cursor-pointer border ${
+                      className={`w-full text-left px-4 py-3.5 hover:bg-[#FAF0D4]/60 rounded-xl transition-all duration-200 flex items-start gap-4 group cursor-pointer border ${
                         isSelected 
-                          ? 'bg-amber-50/60 border-amber-200/80 shadow-sm' 
+                          ? 'bg-[#FAF0D4]/80 border-[#DFC78A] shadow-sm' 
                           : 'border-transparent'
                       }`}
                     >
-                      <div className="p-2 rounded-xl bg-amber-50 text-[#DEAA38] group-hover:bg-[#DEAA38] group-hover:text-white transition-all duration-200 shrink-0 shadow-sm flex items-center justify-center">
+                      <div className="p-2 rounded-xl bg-[#FAF0D4] border border-[#DFC78A] text-[#9A6A0F] group-hover:bg-[#024731] group-hover:text-[#F5C642] group-hover:border-[#024731] transition-all duration-200 shrink-0 shadow-sm flex items-center justify-center">
                         <MapPin size={18} className="stroke-[2.5]" />
                       </div>
                       <div className="truncate font-sans flex-1">
                         <div className="flex items-center justify-between">
-                          <span className="block text-base font-semibold text-stone-900 truncate leading-snug group-hover:text-black">
+                          <span className="block text-base font-semibold text-[#0F241C] truncate leading-snug group-hover:text-[#01291D]">
                             {renderHighlighted(item.mainLabel, value)}
                           </span>
                           {item.rank && (
-                            <span className="text-amber-500 text-xs font-bold shrink-0 ml-2">
+                            <span className="text-[#D4961B] text-xs font-bold shrink-0 ml-2">
                               {"★".repeat(item.rank)}
                             </span>
                           )}
                         </div>
                         {item.subLabel && (
-                          <span className="block text-xs text-stone-500 font-medium leading-relaxed mt-1">
+                          <span className="block text-xs text-[#6B5F4B] font-medium leading-relaxed mt-1">
                             {item.subLabel}
                           </span>
                         )}
@@ -787,13 +787,13 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                 })}
               </div>
             ) : (
-              <div className="px-4 py-8 text-center text-stone-500 font-sans text-xs flex flex-col items-center justify-center gap-2">
-                <div className="p-2 rounded-full bg-stone-50 text-stone-400">
-                  <MapPin size={24} className="text-stone-300" />
+              <div className="px-4 py-8 text-center text-[#5C5240] font-sans text-xs flex flex-col items-center justify-center gap-2">
+                <div className="p-2 rounded-full bg-[#FAF0D4] text-[#9A6A0F] border border-[#DFC78A]">
+                  <MapPin size={24} className="text-[#9A6A0F]" />
                 </div>
-                <span className="font-bold text-stone-600 text-sm">No matching location found.</span>
-                <span className="text-[11px] text-stone-400 max-w-[240px] leading-normal space-y-1 block mt-1">
-                  <span className="block italic text-stone-500">Try searching:</span>
+                <span className="font-bold text-[#0F241C] text-sm">No matching location found.</span>
+                <span className="text-[11px] text-[#6B5F4B] max-w-[240px] leading-normal space-y-1 block mt-1">
+                  <span className="block italic text-[#5C5240]">Try searching:</span>
                   <span className="block">🏢 Apartment Name (e.g. My Home, Aparna)</span>
                   <span className="block">📍 Nearby Landmark (e.g. Inorbit, Metro)</span>
                   <span className="block">🛣️ Road Name or Street</span>
@@ -807,7 +807,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               {/* Favorites */}
               {favorites.length > 0 && (
                 <div>
-                  <div className="px-3 py-1 text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                  <div className="px-3 py-1 text-[10px] font-bold text-[#8E7D5E] uppercase tracking-wider">
                     Saved Favorites
                   </div>
                   <div className="space-y-0.5 mt-1">
@@ -818,16 +818,16 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                           key={fav.id}
                           type="button"
                           onClick={() => handleSelect({ display_name: fav.address, latitude: fav.latitude, longitude: fav.longitude, mainLabel: fav.label, subLabel: fav.address })}
-                          className={`w-full text-left px-3 py-2 hover:bg-amber-50/40 rounded-lg transition flex items-center gap-3 group border ${
-                            isSelected ? 'bg-amber-50/60 border-amber-200' : 'border-transparent'
+                          className={`w-full text-left px-3 py-2 hover:bg-[#FAF0D4]/60 rounded-lg transition flex items-center gap-3 group border ${
+                            isSelected ? 'bg-[#FAF0D4]/80 border-[#DFC78A]' : 'border-transparent'
                           }`}
                         >
                           <span className="text-lg shrink-0">{fav.icon}</span>
                           <div className="truncate flex-1">
-                            <span className="block text-sm font-bold text-stone-800 leading-tight">
+                            <span className="block text-sm font-bold text-[#0F241C] leading-tight">
                               {fav.label}
                             </span>
-                            <span className="block text-xs text-stone-400 truncate mt-0.5">
+                            <span className="block text-xs text-[#6B5F4B] truncate mt-0.5">
                               {fav.address}
                             </span>
                           </div>
@@ -841,7 +841,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               {/* Recents */}
               {recents.length > 0 && (
                 <div>
-                  <div className="px-3 py-1 text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                  <div className="px-3 py-1 text-[10px] font-bold text-[#8E7D5E] uppercase tracking-wider">
                     Recent Searches
                   </div>
                   <div className="space-y-0.5 mt-1">
@@ -853,12 +853,12 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                           key={rec}
                           type="button"
                           onClick={() => handleSelect({ display_name: rec, mainLabel: rec, subLabel: "Recent Search" })}
-                          className={`w-full text-left px-3 py-2 hover:bg-amber-50/40 rounded-lg transition flex items-center gap-3 group border ${
-                            isSelected ? 'bg-amber-50/60 border-amber-200' : 'border-transparent'
+                          className={`w-full text-left px-3 py-2 hover:bg-[#FAF0D4]/60 rounded-lg transition flex items-center gap-3 group border ${
+                            isSelected ? 'bg-[#FAF0D4]/80 border-[#DFC78A]' : 'border-transparent'
                           }`}
                         >
-                          <Clock size={14} className="text-stone-400 shrink-0" />
-                          <span className="block text-sm font-medium text-stone-600 truncate flex-1 leading-tight">
+                          <Clock size={14} className="text-[#9A6A0F] shrink-0" />
+                          <span className="block text-sm font-medium text-[#494032] truncate flex-1 leading-tight">
                             {rec}
                           </span>
                         </button>
@@ -869,7 +869,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               )}
 
               {favorites.length === 0 && recents.length === 0 && (
-                <div className="px-4 py-6 text-center text-stone-400 text-xs">
+                <div className="px-4 py-6 text-center text-[#7D6E52] text-xs">
                   Start typing to search Hyderabad locations...
                 </div>
               )}

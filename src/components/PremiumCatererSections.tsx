@@ -112,29 +112,31 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
   return (
     <div 
       id="about-us-section"
-      className="bg-[#f0e9e9] rounded-[24px] p-6 md:p-8 border border-[#D4AF37]/25 hover:border-[#D4AF37]/65 transition-all shadow-md duration-300 flex flex-col relative text-left"
+      className="bg-[#FFFDF8] rounded-[24px] p-6 md:p-8 border border-[#DFC78A] hover:border-[#D4961B]/80 transition-all shadow-[0_8px_24px_rgba(140,105,32,0.07)] duration-300 flex flex-col relative text-left"
     >
       {editingStat && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#0D0D0D] border-2 border-[#D4AF37] rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] w-full max-w-md p-6 text-white relative">
-            <button
-              type="button"
-              onClick={() => setEditingStat(null)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition cursor-pointer"
-            >
-              <X size={14} />
-            </button>
-            <h3 className="text-base font-bold uppercase text-[#D4AF37] tracking-wider mb-4 font-serif">
-              Edit {editingStat.label}
-            </h3>
-            <div className="space-y-4 font-sans">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#01291D]/60 backdrop-blur-sm p-4">
+          <div className="bg-[#FFFDF8] border-2 border-[#DFC78A] rounded-2xl shadow-[0_24px_60px_rgba(1,41,29,0.28)] w-full max-w-md overflow-hidden text-[#0F241C] relative">
+            <div className="bg-gradient-to-r from-[#01291D] to-[#034431] px-6 py-4 border-b border-[#DFC78A]/40 flex items-center justify-between">
+              <h3 className="text-base font-bold uppercase text-[#F5C642] tracking-wider font-serif">
+                Edit {editingStat.label}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingStat(null)}
+                className="text-[#E8C877] hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4 font-sans">
               <div className="flex flex-col gap-2">
-                <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">{editingStat.label}</label>
+                <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">{editingStat.label}</label>
                 {editingStat.key === "description" ? (
                   <textarea
                     value={editingStat.value}
                     onChange={(e) => setEditingStat({ ...editingStat, value: e.target.value })}
-                    className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 py-3 text-white text-sm h-32 outline-none transition resize-none w-full"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] focus:ring-2 focus:ring-[#D9A323]/25 rounded-xl px-4 py-3 text-[#0F241C] text-sm h-32 outline-none transition resize-none w-full"
                   />
                 ) : (
                   <input
@@ -142,7 +144,7 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
                     step={editingStat.key === "rating" ? "0.1" : "1"}
                     value={editingStat.value}
                     onChange={(e) => setEditingStat({ ...editingStat, value: e.target.value })}
-                    className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 h-12 text-white text-sm outline-none transition w-full"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] focus:ring-2 focus:ring-[#D9A323]/25 rounded-xl px-4 h-12 text-[#0F241C] text-sm outline-none transition w-full"
                   />
                 )}
               </div>
@@ -159,14 +161,14 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
                     }
                     setEditingStat(null);
                   }}
-                  className="bg-[#D4AF37] hover:bg-[#b08427] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer"
+                  className="bg-gradient-to-r from-[#01291D] to-[#034431] hover:from-[#034431] hover:to-[#065239] text-[#F5C642] border border-[#DFC78A]/45 font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap shadow-sm"
                 >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingStat(null)}
-                  className="bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer"
+                  className="bg-[#FAF3E2] hover:bg-[#F3E6C8] text-[#083A28] border border-[#DFC78A] font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap"
                 >
                   Cancel
                 </button>
@@ -260,7 +262,7 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2 border-t border-[#E8DCC7]/50 pt-6">
         {/* Years Experience Metric */}
-        <div className="flex flex-col items-center p-4 bg-white rounded-[18px] border border-[#DFC27A]/35 hover:border-[#D4AF37]/70 shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
+        <div className="flex flex-col items-center p-4 bg-[#FFFDF9] rounded-[18px] border border-[#DFC78A]/65 hover:border-[#D9A323] shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
           {isOwnerOrAdmin && (
             <button
               type="button"
@@ -291,7 +293,7 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
         </div>
 
         {/* Events Completed Metric */}
-        <div className="flex flex-col items-center p-4 bg-white rounded-[18px] border border-[#DFC27A]/35 hover:border-[#D4AF37]/70 shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
+        <div className="flex flex-col items-center p-4 bg-[#FFFDF9] rounded-[18px] border border-[#DFC78A]/65 hover:border-[#D9A323] shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
           {isOwnerOrAdmin && (
             <button
               type="button"
@@ -312,7 +314,7 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
             <CalendarDays size={18} strokeWidth={2} />
           </div>
           <>
-            <span className="text-2xl sm:text-3xl font-bold text-[#173D32] font-serif">
+            <span className="text-2xl sm:text-3xl font-bold text-[#173D32] font-serif tabular-nums">
               {targetCatererObj.eventsCompleted ? `${parseInt(targetCatererObj.eventsCompleted.toString()).toLocaleString()}+` : "400+"}
             </span>
             <span className="text-[10px] text-[#666666] font-sans font-semibold mt-1 uppercase tracking-wider">
@@ -322,7 +324,7 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
         </div>
 
         {/* Team Members Metric */}
-        <div className="flex flex-col items-center p-4 bg-white rounded-[18px] border border-[#DFC27A]/35 hover:border-[#D4AF37]/70 shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
+        <div className="flex flex-col items-center p-4 bg-[#FFFDF9] rounded-[18px] border border-[#DFC78A]/65 hover:border-[#D9A323] shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
           {isOwnerOrAdmin && (
             <button
               type="button"
@@ -342,7 +344,7 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
           <div className="w-11 h-11 rounded-full bg-[#FCFAF5] flex items-center justify-center text-[#D4AF37] mb-2.5 border border-[#E8DCC7] shadow-xs">
             <Users size={18} strokeWidth={2} />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold text-[#173D32] font-serif">
+          <span className="text-2xl sm:text-3xl font-bold text-[#173D32] font-serif tabular-nums">
             {targetCatererObj.menuCount || "52"}+
           </span>
           <span className="text-[10px] text-[#666666] font-sans font-semibold mt-1 uppercase tracking-wider">
@@ -351,7 +353,7 @@ export const AboutCatererCard: React.FC<SectionProps> = ({
         </div>
 
         {/* Customer Rating Metric */}
-        <div className="flex flex-col items-center p-4 bg-white rounded-[18px] border border-[#DFC27A]/35 hover:border-[#D4AF37]/70 shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
+        <div className="flex flex-col items-center p-4 bg-[#FFFDF9] rounded-[18px] border border-[#DFC78A]/65 hover:border-[#D9A323] shadow-xs text-center hover:shadow-md hover:scale-[1.02] transition-all duration-300 relative group">
           {isOwnerOrAdmin && (
             <button
               type="button"
@@ -695,7 +697,7 @@ export const FoodGalleryCard: React.FC<SectionProps & {
           {(editedCaterer && (editedCaterer.galleryPhotos || editedCaterer.images || [])).map((img: string, i: number) => (
             <div
               key={i}
-              className="aspect-[4/3] rounded-2xl overflow-hidden relative shadow-sm border border-slate-200 group"
+              className="aspect-[4/3] rounded-2xl overflow-hidden relative shadow-sm border border-[#DFC78A] group"
             >
               <img
                 src={img}
@@ -723,7 +725,7 @@ export const FoodGalleryCard: React.FC<SectionProps & {
             </div>
           ))}
           {(editedCaterer && (editedCaterer.galleryPhotos || editedCaterer.images || [])).length === 0 && (
-            <div className="col-span-full py-8 text-center text-slate-400 font-sans font-medium text-xs">
+            <div className="col-span-full py-8 text-center text-[#7D6E52] font-sans font-medium text-xs">
               No gallery photos uploaded yet. Click the button above to add photos.
             </div>
           )}
@@ -734,29 +736,29 @@ export const FoodGalleryCard: React.FC<SectionProps & {
             <div
               key={i}
               onClick={() => openLightbox(allGalleryPhotos, i)}
-              className="aspect-[4/3] rounded-2xl overflow-hidden relative cursor-zoom-in group shadow-sm border-2 border-slate-100 hover:border-[#D4AF37]/65 transition-all duration-300 hover:scale-[1.03]"
+              className="aspect-[4/3] rounded-2xl overflow-hidden relative cursor-zoom-in group shadow-sm border-2 border-[#DFC78A]/65 hover:border-[#D4AF37] transition-all duration-300 hover:scale-[1.03]"
             >
               <img
                 src={img}
                 alt="Gallery"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/20 transition-colors"></div>
+              <div className="absolute inset-0 bg-[#01291D]/0 group-hover:bg-[#01291D]/20 transition-colors"></div>
             </div>
           ))}
           {allGalleryPhotos.length > 5 ? (
             <div
               onClick={() => openLightbox(allGalleryPhotos, 5)}
-              className="aspect-[4/3] rounded-2xl bg-slate-50 border-2 border-dashed border-[#DFC27A]/50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors group"
+              className="aspect-[4/3] rounded-2xl bg-[#FAF3E2]/75 border-2 border-dashed border-[#D9A323]/60 flex flex-col items-center justify-center cursor-pointer hover:bg-[#FAF0D4] transition-colors group"
             >
               <div className="bg-[#0B3D2E] text-white rounded-full p-3 mb-2 group-hover:scale-110 transition-transform shadow-md">
                 <PlayCircle size={24} className="text-[#DFC27A]" />
               </div>
-              <span className="text-sm font-bold text-slate-700 font-sans">
+              <span className="text-sm font-bold text-[#083A28] font-sans">
                 View More
               </span>
-              <span className="text-xs text-slate-500 font-sans">
-                Photos & Videos
+              <span className="text-xs text-[#6B5A38] font-sans">
+                Photos &amp; Videos
               </span>
             </div>
           ) : null}
@@ -949,38 +951,39 @@ export const MenuPackagesCard: React.FC<SectionProps & {
 
       {/* Edit Package Modal */}
       {isEditingPackage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#0D0D0D] border-2 border-[#D4AF37] rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] w-full max-w-2xl p-6 text-white relative flex flex-col max-h-[90vh]">
-            <button
-              type="button"
-              onClick={() => setIsEditingPackage(false)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition cursor-pointer"
-            >
-              <X size={14} />
-            </button>
-            
-            <h3 className="text-lg font-serif font-bold text-[#D4AF37] mb-4 uppercase tracking-wide">
-              Edit Menu Package
-            </h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#01291D]/60 backdrop-blur-sm p-4">
+          <div className="bg-[#FFFDF8] border-2 border-[#DFC78A] rounded-2xl shadow-[0_24px_60px_rgba(1,41,29,0.28)] w-full max-w-2xl overflow-hidden text-[#0F241C] relative flex flex-col max-h-[90vh]">
+            <div className="bg-gradient-to-r from-[#01291D] to-[#034431] px-6 py-4 border-b border-[#DFC78A]/40 flex items-center justify-between">
+              <h3 className="text-lg font-serif font-bold text-[#F5C642] uppercase tracking-wide">
+                Edit Menu Package
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsEditingPackage(false)}
+                className="text-[#E8C877] hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1 font-sans text-left">
+            <div className="flex-1 overflow-y-auto space-y-4 p-6 font-sans text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Package Name</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Package Name</label>
                   <input
                     type="text"
                     value={packageNameInput}
                     onChange={(e) => setPackageNameInput(e.target.value)}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Package Type</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Package Type</label>
                   <select
                     value={packageTypeInput}
                     onChange={(e) => setPackageTypeInput(e.target.value)}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition cursor-pointer"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition cursor-pointer"
                   >
                     <option value="Veg">Veg Package</option>
                     <option value="Non-Veg">Non-Veg Package</option>
@@ -988,75 +991,75 @@ export const MenuPackagesCard: React.FC<SectionProps & {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Price per Plate (₹)</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Price per Plate (₹)</label>
                   <input
                     type="number"
                     value={priceInput}
                     onChange={(e) => setPriceInput(Number(e.target.value))}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Minimum Guests</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Minimum Guests</label>
                   <input
                     type="number"
                     value={minGuestsInput}
                     onChange={(e) => setMinGuestsInput(Number(e.target.value))}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5 col-span-2">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Short Description</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Short Description</label>
                   <textarea
                     value={descInput}
                     onChange={(e) => setDescInput(e.target.value)}
                     rows={2}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl p-3.5 text-white text-sm outline-none transition resize-none"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl p-3.5 text-[#0F241C] text-sm outline-none transition resize-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5 col-span-2">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Categories Included (Comma-separated)</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Categories Included (Comma-separated)</label>
                   <input
                     type="text"
                     value={categoriesInput}
                     onChange={(e) => setCategoriesInput(e.target.value)}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition"
                     placeholder="Welcome Drinks, Starters, Main Course, Desserts"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5 col-span-2">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Key Items Sample List (Comma-separated)</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Key Items Sample List (Comma-separated)</label>
                   <input
                     type="text"
                     value={itemsInput}
                     onChange={(e) => setItemsInput(e.target.value)}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition"
                     placeholder="Paneer Tikka, Veg Dum Biryani, Kala Jamun"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Button Action Text</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Button Action Text</label>
                   <input
                     type="text"
                     value={buttonTextInput}
                     onChange={(e) => setButtonTextInput(e.target.value)}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Luxury Color Theme</label>
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Luxury Color Theme</label>
                   <select
                     value={themeInput}
                     onChange={(e) => setThemeInput(e.target.value)}
-                    className="bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-sm outline-none transition cursor-pointer"
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-sm outline-none transition cursor-pointer"
                   >
-                    <option value="silver">Premium Silver</option>
+                    <option value="silver">Premium Ivory &amp; Emerald</option>
                     <option value="gold">Exquisite Gold</option>
                     <option value="platinum">Royal Platinum</option>
                     <option value="premium">Ruby Premium</option>
@@ -1071,9 +1074,9 @@ export const MenuPackagesCard: React.FC<SectionProps & {
                       type="checkbox"
                       checked={popularInput}
                       onChange={(e) => setPopularInput(e.target.checked)}
-                      className="w-4 h-4 rounded text-black accent-[#D4AF37] cursor-pointer"
+                      className="w-4 h-4 rounded accent-[#034431] cursor-pointer"
                     />
-                    <span className="text-xs text-slate-300">Feature as "Popular" badge</span>
+                    <span className="text-xs font-semibold text-[#083A28]">Feature as "Popular" badge</span>
                   </label>
 
                   <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -1081,19 +1084,19 @@ export const MenuPackagesCard: React.FC<SectionProps & {
                       type="checkbox"
                       checked={visibleInput}
                       onChange={(e) => setVisibleInput(e.target.checked)}
-                      className="w-4 h-4 rounded text-black accent-[#D4AF37] cursor-pointer"
+                      className="w-4 h-4 rounded accent-[#034431] cursor-pointer"
                     />
-                    <span className="text-xs text-slate-300">Visible on Profile Page</span>
+                    <span className="text-xs font-semibold text-[#083A28]">Visible on Profile Page</span>
                   </label>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-4 border-t border-white/10 font-sans mt-4">
+            <div className="flex justify-between items-center px-6 py-4 bg-[#FAF3E2]/70 border-t border-[#DFC78A]/60 font-sans">
               <button
                 type="button"
                 onClick={handleDeletePackage}
-                className="bg-red-900/40 hover:bg-red-900/60 text-red-200 font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+                className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
               >
                 <Trash2 size={13} /> Delete Package
               </button>
@@ -1101,14 +1104,14 @@ export const MenuPackagesCard: React.FC<SectionProps & {
                 <button
                   type="button"
                   onClick={handleSavePackage}
-                  className="bg-[#D4AF37] hover:bg-[#b08427] text-black font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer"
+                  className="bg-gradient-to-r from-[#01291D] to-[#034431] hover:from-[#034431] hover:to-[#065239] text-[#F5C642] border border-[#DFC78A]/45 font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap shadow-sm"
                 >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditingPackage(false)}
-                  className="bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer"
+                  className="bg-white hover:bg-[#FAF3E2] text-[#083A28] border border-[#DFC78A] font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap"
                 >
                   Cancel
                 </button>
@@ -1128,7 +1131,7 @@ export const MenuPackagesCard: React.FC<SectionProps & {
               <button
                 type="button"
                 onClick={handleAddNewPackage}
-                className="bg-[#DEAA38] hover:bg-[#A27008] text-white font-sans font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider cursor-pointer transition flex items-center gap-1 shadow-xs animate-pulse"
+                className="bg-gradient-to-r from-[#01291D] to-[#034431] hover:from-[#034431] hover:to-[#065239] text-[#F5C642] border border-[#DFC78A]/50 font-sans font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider cursor-pointer transition flex items-center gap-1 shadow-xs whitespace-nowrap"
               >
                 <Plus size={10} /> Add Custom
               </button>
@@ -1145,29 +1148,6 @@ export const MenuPackagesCard: React.FC<SectionProps & {
           </div>
         </div>
 
-        {/* Guest Selector Counter */}
-        <div className="bg-[#FCFAF5] border border-amber-200/60 rounded-xl p-1.5 px-4 flex items-center gap-4 shadow-sm">
-          <button
-            onClick={() => setGuestCount((prev) => Math.max(10, prev - 10))}
-            className="w-8.5 h-8.5 rounded-full bg-stone-100/90 text-stone-700 hover:bg-stone-200 active:scale-90 transition-all flex items-center justify-center font-bold text-lg cursor-pointer border border-stone-200/40"
-          >
-            −
-          </button>
-          <div className="text-center min-w-[65px]">
-            <span className="block text-lg font-black text-slate-800 leading-none">
-              {guestCount}
-            </span>
-            <span className="text-[10.5px] font-bold text-slate-500 uppercase tracking-widest mt-1 block font-sans">
-              Guests
-            </span>
-          </div>
-          <button
-            onClick={() => setGuestCount((prev) => Math.min(3000, prev + 10))}
-            className="w-8.5 h-8.5 rounded-full bg-stone-100/90 text-stone-700 hover:bg-stone-200 active:scale-90 transition-all flex items-center justify-center font-bold text-lg cursor-pointer border border-stone-200/40"
-          >
-            +
-          </button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5 mt-2 max-w-[960px] mx-auto justify-center">
@@ -1188,11 +1168,11 @@ export const MenuPackagesCard: React.FC<SectionProps & {
             }
           > = {
             silver: {
-              background: "linear-gradient(180deg, #FFFFFF 0%, #F7F7F5 100%)",
-              borderColor: "#D9D9D6",
-              titleColor: "text-[#474745]",
-              subtitleColor: "text-[#75737d]",
-              buttonClass: "bg-[#173D32] hover:bg-[#0f2922] text-white",
+              background: "linear-gradient(180deg, #FFFDF8 0%, #FAF3E2 100%)",
+              borderColor: "#DFC78A",
+              titleColor: "text-[#083A28]",
+              subtitleColor: "text-[#5C5849]",
+              buttonClass: "bg-gradient-to-r from-[#01291D] to-[#034431] hover:brightness-110 text-[#F5C642] border border-[#DFC78A]/40",
             },
             gold: {
               background: "linear-gradient(180deg, #FFFDF6 0%, #FFF3D8 100%)",
@@ -1202,11 +1182,11 @@ export const MenuPackagesCard: React.FC<SectionProps & {
               buttonClass: "bg-gradient-to-r from-[#D4AF37] via-[#F5E6B3] to-[#AA7C11] text-[#051410] border border-[#DEAA38]/30 hover:brightness-105",
             },
             platinum: {
-              background: "linear-gradient(180deg, #FFFFFF 0%, #F5F5F3 100%)",
-              borderColor: "#C8C8C8",
-              titleColor: "text-[#334155]",
-              subtitleColor: "text-[#64748b]",
-              buttonClass: "bg-[#173D32] hover:bg-[#0f2922] text-white",
+              background: "linear-gradient(180deg, #FFFDF8 0%, #F7EFE0 100%)",
+              borderColor: "#D8BE7A",
+              titleColor: "text-[#083A28]",
+              subtitleColor: "text-[#5C5849]",
+              buttonClass: "bg-gradient-to-r from-[#01291D] to-[#034431] hover:brightness-110 text-[#F5C642] border border-[#DFC78A]/40",
             },
             premium: {
               background: "linear-gradient(180deg, #FFF9F9 0%, #FFE7E7 100%)",
@@ -1241,7 +1221,7 @@ export const MenuPackagesCard: React.FC<SectionProps & {
               key={pkg.id}
               className={cn(
                 "rounded-xl p-3 pt-3.5 pb-3 transition-all duration-300 relative flex flex-col justify-between group hover:-translate-y-0.5 hover:shadow-md max-w-[260px] mx-auto w-full min-h-[270px] border",
-                pkg.visible === false && "opacity-60 border-dashed bg-stone-100",
+                pkg.visible === false && "opacity-60 border-dashed bg-[#FAF3E2]",
                 isHighlighted ? "ring-2 ring-[#DEAA38] ring-offset-1 shadow-[0_0_16px_rgba(212,175,55,0.3)] border-[#DEAA38] scale-[1.01]" : ""
               )}
               style={{
@@ -1277,7 +1257,7 @@ export const MenuPackagesCard: React.FC<SectionProps & {
               )}
 
               {pkg.visible === false && (
-                <div className="absolute top-2 right-2.5 bg-slate-800 text-slate-100 font-extrabold text-[7px] uppercase px-1.5 py-0.5 rounded-full shadow-2xs tracking-wider z-35">
+                <div className="absolute top-2 right-2.5 bg-[#01291D] text-[#F8D76A] border border-[#D9A323]/60 font-extrabold text-[7px] uppercase px-1.5 py-0.5 rounded-full shadow-2xs tracking-wider z-35">
                   Hidden
                 </div>
               )}
@@ -1592,29 +1572,31 @@ export const BranchDetailsCard: React.FC<SectionProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-[24px] p-6 border border-[#D4AF37]/25 hover:border-[#D4AF37]/50 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between group text-left relative">
+    <div className="bg-[#FFFDF8] rounded-[24px] p-6 border border-[#DFC78A] hover:border-[#D4961B]/80 transition-all shadow-[0_8px_24px_rgba(140,105,32,0.07)] flex flex-col justify-between group text-left relative">
       {isEditingBranches && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/45 backdrop-blur-md p-4 overflow-y-auto">
-          <div className="bg-white border border-[#E7D4A4] rounded-[28px] shadow-[0_32px_80px_rgba(212,175,55,0.08),0_16px_32px_rgba(0,0,0,0.03)] w-full max-w-2xl p-10 text-[#1E1E1E] relative flex flex-col max-h-[85vh]">
-            <button
-              type="button"
-              onClick={() => setIsEditingBranches(false)}
-              className="absolute top-6 right-6 text-[#6D6D6D] hover:text-[#1E1E1E] bg-[#F7F4EE] hover:bg-[#E7D4A4]/40 p-2 rounded-full transition cursor-pointer border border-[#E7D4A4]/20 flex items-center justify-center"
-            >
-              <X size={16} />
-            </button>
-            <div className="flex flex-col border-b border-[#E7D4A4]/40 pb-4 mb-5">
-              <span className="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold font-mono">Profile Builder</span>
-              <h3 className="text-xl font-serif font-black text-[#1E1E1E] mt-1 tracking-tight uppercase">
-                Edit Branch Details
-              </h3>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#01291D]/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-[#FFFDF8] border-2 border-[#DFC78A] rounded-[28px] shadow-[0_24px_60px_rgba(1,41,29,0.28)] w-full max-w-2xl overflow-hidden text-[#0F241C] relative flex flex-col max-h-[85vh]">
+            <div className="bg-gradient-to-r from-[#01291D] to-[#034431] px-8 py-5 border-b border-[#DFC78A]/40 flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase tracking-widest text-[#E8C877] font-bold font-mono">Profile Builder</span>
+                <h3 className="text-xl font-serif font-black text-[#FFFDF8] mt-0.5 tracking-tight uppercase">
+                  Edit Branch Details
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditingBranches(false)}
+                className="text-[#E8C877] hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition cursor-pointer flex items-center justify-center"
+              >
+                <X size={16} />
+              </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-6 scrollbar-thin scrollbar-thumb-[#D4AF37]/50 scrollbar-track-transparent">
+            <div className="flex-1 overflow-y-auto space-y-4 p-8 scrollbar-thin scrollbar-thumb-[#D4AF37]/50 scrollbar-track-transparent">
               {editedList.map((branch, idx) => (
-                <div key={idx} className="bg-[#F7F4EE] border border-[#E7D4A4] rounded-2xl p-5 space-y-4 relative transition-all duration-300 hover:shadow-sm">
-                  <div className="flex justify-between items-center pb-2 border-b border-[#E7D4A4]/30">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] font-mono">
+                <div key={idx} className="bg-[#FAF3E2]/65 border border-[#DFC78A] rounded-2xl p-5 space-y-4 relative transition-all duration-300 hover:shadow-sm">
+                  <div className="flex justify-between items-center pb-2 border-b border-[#DFC78A]/40">
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#8A6510] font-mono">
                       Branch #{idx + 1}
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -1622,7 +1604,7 @@ export const BranchDetailsCard: React.FC<SectionProps> = ({
                         type="button"
                         disabled={idx === 0}
                         onClick={() => handleMoveUpBranch(idx)}
-                        className="p-1 rounded-md border border-[#E7D4A4] bg-white text-[#6D6D6D] hover:text-[#D4AF37] hover:border-[#D4AF37] disabled:opacity-30 disabled:pointer-events-none transition cursor-pointer flex items-center justify-center"
+                        className="p-1 rounded-md border border-[#DFC78A] bg-[#FFFDF8] text-[#083A28] hover:text-[#B47A00] hover:border-[#D9A323] disabled:opacity-30 disabled:pointer-events-none transition cursor-pointer flex items-center justify-center"
                         title="Move Up"
                       >
                         <ChevronUp size={14} />
@@ -1631,7 +1613,7 @@ export const BranchDetailsCard: React.FC<SectionProps> = ({
                         type="button"
                         disabled={idx === editedList.length - 1}
                         onClick={() => handleMoveDownBranch(idx)}
-                        className="p-1 rounded-md border border-[#E7D4A4] bg-white text-[#6D6D6D] hover:text-[#D4AF37] hover:border-[#D4AF37] disabled:opacity-30 disabled:pointer-events-none transition cursor-pointer flex items-center justify-center"
+                        className="p-1 rounded-md border border-[#DFC78A] bg-[#FFFDF8] text-[#083A28] hover:text-[#B47A00] hover:border-[#D9A323] disabled:opacity-30 disabled:pointer-events-none transition cursor-pointer flex items-center justify-center"
                         title="Move Down"
                       >
                         <ChevronDown size={14} />
@@ -1639,7 +1621,7 @@ export const BranchDetailsCard: React.FC<SectionProps> = ({
                       <button
                         type="button"
                         onClick={() => handleRemoveBranch(idx)}
-                        className="p-1 rounded-md border border-red-200 bg-red-50 text-red-500 hover:bg-red-100 transition cursor-pointer flex items-center justify-center"
+                        className="p-1 rounded-md border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer flex items-center justify-center"
                         title="Remove Branch"
                       >
                         <Trash2 size={14} />
@@ -1649,23 +1631,23 @@ export const BranchDetailsCard: React.FC<SectionProps> = ({
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans text-left">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] text-[#D4AF37] font-bold uppercase tracking-wider font-mono">✏ Branch Name</label>
+                      <label className="text-[10px] text-[#083A28] font-bold uppercase tracking-wider font-mono">Branch Name</label>
                       <input
                         type="text"
                         value={branch.name}
                         onChange={(e) => handleUpdateBranchField(idx, "name", e.target.value)}
                         placeholder="e.g. Hyderabad Head Office"
-                        className="w-full bg-white border border-[#E7D4A4] rounded-xl px-4 py-2 text-xs text-[#1E1E1E] focus:outline-none focus:border-[#D4AF37] transition font-medium"
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 py-2 text-xs text-[#0F241C] focus:outline-none focus:border-[#034431] transition font-medium"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] text-[#D4AF37] font-bold uppercase tracking-wider font-mono">📍 Address</label>
+                      <label className="text-[10px] text-[#083A28] font-bold uppercase tracking-wider font-mono">Address</label>
                       <input
                         type="text"
                         value={branch.address}
                         onChange={(e) => handleUpdateBranchField(idx, "address", e.target.value)}
                         placeholder="e.g. Madhapur, Hyderabad"
-                        className="w-full bg-white border border-[#E7D4A4] rounded-xl px-4 py-2 text-xs text-[#1E1E1E] focus:outline-none focus:border-[#D4AF37] transition font-medium"
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 py-2 text-xs text-[#0F241C] focus:outline-none focus:border-[#034431] transition font-medium"
                       />
                     </div>
                   </div>
@@ -1673,17 +1655,17 @@ export const BranchDetailsCard: React.FC<SectionProps> = ({
               ))}
 
               {editedList.length === 0 && (
-                <div className="text-center py-10 border-2 border-dashed border-[#E7D4A4] rounded-2xl bg-[#F7F4EE]/50 text-stone-500 italic text-sm font-sans">
+                <div className="text-center py-10 border-2 border-dashed border-[#DFC78A] rounded-2xl bg-[#FAF3E2]/40 text-[#5C5849] italic text-sm font-sans">
                   No branch offices listed. Click below to add one.
                 </div>
               )}
             </div>
 
-            <div className="flex justify-between items-center pt-4 border-t border-[#E7D4A4]/40 font-sans shrink-0">
+            <div className="flex flex-wrap justify-between items-center gap-3 px-8 py-4 bg-[#FAF3E2]/70 border-t border-[#DFC78A]/60 font-sans shrink-0">
               <button
                 type="button"
                 onClick={handleAddBranch}
-                className="bg-[#D4AF37] hover:bg-[#E5C158] text-white font-extrabold text-xs px-5 py-3 rounded-xl transition flex items-center gap-1.5 cursor-pointer uppercase tracking-wider"
+                className="bg-[#FFFDF8] hover:bg-[#FAF3E2] text-[#083A28] border border-[#DFC78A] font-extrabold text-xs px-5 py-3 rounded-xl transition flex items-center gap-1.5 cursor-pointer uppercase tracking-wider whitespace-nowrap"
               >
                 <Plus size={14} /> Add New Branch
               </button>
@@ -1691,14 +1673,14 @@ export const BranchDetailsCard: React.FC<SectionProps> = ({
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="bg-[#D4AF37] hover:bg-[#E5C158] text-white font-extrabold text-xs px-5 py-3 rounded-xl transition cursor-pointer uppercase tracking-wider"
+                  className="bg-gradient-to-r from-[#01291D] to-[#034431] hover:from-[#034431] hover:to-[#065239] text-[#F5C642] border border-[#DFC78A]/45 font-extrabold text-xs px-5 py-3 rounded-xl transition cursor-pointer uppercase tracking-wider whitespace-nowrap shadow-sm"
                 >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditingBranches(false)}
-                  className="bg-[#F7F4EE] hover:bg-[#E7D4A4]/35 text-[#1E1E1E] font-extrabold text-xs px-5 py-3 rounded-xl transition cursor-pointer border border-[#E7D4A4] uppercase tracking-wider"
+                  className="bg-white hover:bg-[#FAF3E2] text-[#083A28] font-extrabold text-xs px-5 py-3 rounded-xl transition cursor-pointer border border-[#DFC78A] uppercase tracking-wider whitespace-nowrap"
                 >
                   Cancel
                 </button>
@@ -1824,136 +1806,140 @@ export const ServiceAreasCard: React.FC<SectionProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-[24px] p-6 border border-[#D4AF37]/25 hover:border-[#D4AF37]/50 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between group text-left relative">
+    <div className="bg-[#FFFDF8] rounded-[24px] p-6 border border-[#DFC78A] hover:border-[#D4961B]/80 transition-all shadow-[0_8px_24px_rgba(140,105,32,0.07)] flex flex-col justify-between group text-left relative">
       {isEditingAreas && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#0D0D0D] border-2 border-[#D4AF37] rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] w-full max-w-lg p-6 text-white relative flex flex-col max-h-[85vh]">
-            <button
-              type="button"
-              onClick={() => setIsEditingAreas(false)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition cursor-pointer"
-            >
-              <X size={14} />
-            </button>
-            <h3 className="text-lg font-serif font-bold text-[#D4AF37] mb-4 uppercase tracking-wide">
-              Edit Service Areas
-            </h3>
-
-            {/* Serve Entire City toggle */}
-            <div className="mb-4">
-              <label className="flex items-center gap-3 cursor-pointer select-none bg-[#151515] border border-[#D4AF37]/20 hover:border-[#D4AF37]/45 rounded-xl px-4 py-3 transition">
-                <input
-                  type="checkbox"
-                  checked={isEntireHyderabad}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setLocalAreas(["All Hyderabad"]);
-                    } else {
-                      setLocalAreas([]);
-                    }
-                  }}
-                  className="w-4 h-4 text-black focus:ring-0 border-gray-300 rounded cursor-pointer accent-[#D4AF37]"
-                />
-                <span className="text-xs font-bold text-white uppercase tracking-wider">
-                  Serve Entire City ("All Hyderabad")
-                </span>
-              </label>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#01291D]/60 backdrop-blur-sm p-4">
+          <div className="bg-[#FFFDF8] border-2 border-[#DFC78A] rounded-2xl shadow-[0_24px_60px_rgba(1,41,29,0.28)] w-full max-w-lg overflow-hidden text-[#0F241C] relative flex flex-col max-h-[85vh]">
+            <div className="bg-gradient-to-r from-[#01291D] to-[#034431] px-6 py-4 border-b border-[#DFC78A]/40 flex items-center justify-between">
+              <h3 className="text-lg font-serif font-bold text-[#F5C642] uppercase tracking-wide">
+                Edit Service Areas
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsEditingAreas(false)}
+                className="text-[#E8C877] hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition cursor-pointer"
+              >
+                <X size={14} />
+              </button>
             </div>
 
-            {!isEntireHyderabad && (
-              <div className="space-y-4 flex-1 flex flex-col overflow-hidden">
-                <div className="flex gap-2">
+            <div className="p-6 flex-1 flex flex-col overflow-hidden">
+              {/* Serve Entire City toggle */}
+              <div className="mb-4">
+                <label className="flex items-center gap-3 cursor-pointer select-none bg-[#FAF3E2]/70 border border-[#DFC78A] hover:border-[#D9A323] rounded-xl px-4 py-3 transition">
                   <input
-                    type="text"
-                    value={newAreaInput}
-                    onChange={(e) => setNewAreaInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddArea();
+                    type="checkbox"
+                    checked={isEntireHyderabad}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setLocalAreas(["All Hyderabad"]);
+                      } else {
+                        setLocalAreas([]);
                       }
                     }}
-                    placeholder="e.g. Jubilee Hills"
-                    className="flex-1 bg-[#151515] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-xl px-4 h-11 text-white text-xs outline-none transition"
+                    className="w-4 h-4 rounded cursor-pointer accent-[#034431]"
                   />
-                  <button
-                    type="button"
-                    onClick={handleAddArea}
-                    className="bg-[#D4AF37] hover:bg-[#b08427] text-black font-extrabold text-xs px-4 rounded-xl transition cursor-pointer shrink-0"
-                  >
-                    + Add
-                  </button>
-                </div>
+                  <span className="text-xs font-bold text-[#083A28] uppercase tracking-wider">
+                    Serve Entire City ("All Hyderabad")
+                  </span>
+                </label>
+              </div>
 
-                <div className="flex-1 overflow-y-auto space-y-2 pr-1 py-1">
-                  {localAreas.map((area, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-[#151515] border border-white/5 rounded-xl px-4 py-2 text-xs">
-                      {editingIndex === idx ? (
-                        <div className="flex gap-2 flex-1 items-center">
-                          <input
-                            type="text"
-                            value={editingTextInput}
-                            onChange={(e) => setEditingTextInput(e.target.value)}
-                            className="bg-black border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-lg px-2 py-1 text-white text-xs outline-none flex-1"
-                          />
+              {!isEntireHyderabad && (
+                <div className="space-y-4 flex-1 flex flex-col overflow-hidden">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newAreaInput}
+                      onChange={(e) => setNewAreaInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddArea();
+                        }
+                      }}
+                      placeholder="e.g. Jubilee Hills"
+                      className="flex-1 bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-11 text-[#0F241C] text-xs outline-none transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddArea}
+                      className="bg-gradient-to-r from-[#01291D] to-[#034431] text-[#F5C642] border border-[#DFC78A]/45 font-extrabold text-xs px-4 rounded-xl transition cursor-pointer shrink-0 whitespace-nowrap"
+                    >
+                      + Add
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-1 py-1">
+                    {localAreas.map((area, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-[#FAF3E2]/55 border border-[#DFC78A]/70 rounded-xl px-4 py-2 text-xs">
+                        {editingIndex === idx ? (
+                          <div className="flex gap-2 flex-1 items-center">
+                            <input
+                              type="text"
+                              value={editingTextInput}
+                              onChange={(e) => setEditingTextInput(e.target.value)}
+                              className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-lg px-2 py-1 text-[#0F241C] text-xs outline-none flex-1"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => saveRename(idx)}
+                              className="text-[#034431] font-bold text-[11px] uppercase cursor-pointer"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[#083A28] font-semibold flex-1 cursor-pointer hover:text-[#B47A00]" onClick={() => startRename(idx)} title="Click to rename">
+                            {area} <span className="text-[10px] text-[#6B6554] font-normal ml-1">(click to edit)</span>
+                          </span>
+                        )}
+
+                        <div className="flex items-center gap-2 ml-2">
+                          {editingIndex !== idx && (
+                            <button
+                              type="button"
+                              onClick={() => startRename(idx)}
+                              className="text-[#083A28]/70 hover:text-[#083A28] p-1 cursor-pointer"
+                              title="Rename Area"
+                            >
+                              <Pencil size={11} />
+                            </button>
+                          )}
                           <button
                             type="button"
-                            onClick={() => saveRename(idx)}
-                            className="text-[#D4AF37] font-bold text-[11px] uppercase"
+                            onClick={() => handleRemoveArea(idx)}
+                            className="text-red-500 hover:text-red-600 p-1 cursor-pointer"
+                            title="Delete Area"
                           >
-                            Save
+                            <X size={12} />
                           </button>
                         </div>
-                      ) : (
-                        <span className="text-white font-medium flex-1 cursor-pointer hover:text-[#D4AF37]" onClick={() => startRename(idx)} title="Click to rename">
-                          {area} <span className="text-[10px] text-slate-500 font-normal ml-1">(click to edit)</span>
-                        </span>
-                      )}
-
-                      <div className="flex items-center gap-2 ml-2">
-                        {editingIndex !== idx && (
-                          <button
-                            type="button"
-                            onClick={() => startRename(idx)}
-                            className="text-slate-400 hover:text-white p-1"
-                            title="Rename Area"
-                          >
-                            <Pencil size={11} />
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveArea(idx)}
-                          className="text-red-400 hover:text-red-500 p-1"
-                          title="Delete Area"
-                        >
-                          <X size={12} />
-                        </button>
                       </div>
-                    </div>
-                  ))}
+                    ))}
 
-                  {localAreas.length === 0 && (
-                    <div className="text-center py-8 text-slate-500 italic">
-                      No service areas added yet.
-                    </div>
-                  )}
+                    {localAreas.length === 0 && (
+                      <div className="text-center py-8 text-[#6B6554] italic text-xs">
+                        No service areas added yet.
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            <div className="flex gap-3 pt-4 border-t border-white/10 font-sans mt-4">
+            <div className="flex gap-3 px-6 py-4 bg-[#FAF3E2]/70 border-t border-[#DFC78A]/60 font-sans">
               <button
                 type="button"
                 onClick={handleSave}
-                className="bg-[#D4AF37] hover:bg-[#b08427] text-black font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer"
+                className="bg-gradient-to-r from-[#01291D] to-[#034431] hover:from-[#034431] hover:to-[#065239] text-[#F5C642] border border-[#DFC78A]/45 font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap shadow-sm"
               >
                 Save Changes
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditingAreas(false)}
-                className="bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer"
+                className="bg-white hover:bg-[#FAF3E2] text-[#083A28] border border-[#DFC78A] font-extrabold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap"
               >
                 Cancel
               </button>
@@ -2024,7 +2010,7 @@ export const QuickInfoCard: React.FC<SectionProps> = ({
     : "Italian, Mediterranean, American";
   
   const minGuests = targetCatererObj.minGuests || "20 Guests";
-  const priceRange = targetCatererObj.priceRange || "$$$ ($35 - ₹1,500 per person)";
+  const priceRange = targetCatererObj.priceRange || "₹350 - ₹1,500 per person";
   const bookingLeadTime = targetCatererObj.bookingLeadTime || "2 - 6 Weeks";
   const responseTime = targetCatererObj.responseTime || "Within 6 Hours";
   const established = targetCatererObj.established || "2015";
@@ -2067,97 +2053,101 @@ export const QuickInfoCard: React.FC<SectionProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-[24px] p-6 border border-[#D4AF37]/25 hover:border-[#D4AF37]/65 transition-all shadow-md duration-300 flex flex-col group text-left relative">
+    <div className="bg-[#FFFDF8] rounded-[24px] p-6 border border-[#DFC78A] hover:border-[#D4961B]/80 transition-all shadow-[0_8px_24px_rgba(140,105,32,0.07)] duration-300 flex flex-col group text-left relative">
       {isEditingQuickInfo && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#0D0D0D] border-2 border-[#D4AF37] rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] w-full max-w-lg p-6 text-white relative">
-            <button
-              type="button"
-              onClick={() => setIsEditingQuickInfo(false)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition cursor-pointer"
-            >
-              <X size={14} />
-            </button>
-            <h3 className="text-lg font-serif font-bold text-[#D4AF37] mb-5 uppercase tracking-wide">
-              Edit Quick Info
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
-              <div className="flex flex-col gap-1.5 col-span-2">
-                <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Cuisine Type (Comma separated)</label>
-                <input
-                  type="text"
-                  value={specInput}
-                  onChange={(e) => setSpecInput(e.target.value)}
-                  className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 h-12 text-white text-sm outline-none transition w-full"
-                  placeholder="e.g. Italian, Indian, Chinese"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Min. Guest Count</label>
-                <input
-                  type="text"
-                  value={minGuestsInput}
-                  onChange={(e) => setMinGuestsInput(e.target.value)}
-                  className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 h-12 text-white text-sm outline-none transition w-full"
-                  placeholder="e.g. 20 Guests"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Price Range</label>
-                <input
-                  type="text"
-                  value={priceRangeInput}
-                  onChange={(e) => setPriceRangeInput(e.target.value)}
-                  className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 h-12 text-white text-sm outline-none transition w-full"
-                  placeholder="e.g. ₹350 - ₹1,500"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Booking Lead Time</label>
-                <input
-                  type="text"
-                  value={leadTimeInput}
-                  onChange={(e) => setLeadTimeInput(e.target.value)}
-                  className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 h-12 text-white text-sm outline-none transition w-full"
-                  placeholder="e.g. 2 - 6 Weeks"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Response Time</label>
-                <input
-                  type="text"
-                  value={responseTimeInput}
-                  onChange={(e) => setResponseTimeInput(e.target.value)}
-                  className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 h-12 text-white text-sm outline-none transition w-full"
-                  placeholder="e.g. Within 6 Hours"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5 col-span-2">
-                <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Established Year</label>
-                <input
-                  type="text"
-                  value={establishedInput}
-                  onChange={(e) => setEstablishedInput(e.target.value)}
-                  className="bg-[#151515] border border-[#D4AF37]/40 focus:border-[#D4AF37] rounded-xl px-4 h-12 text-white text-sm outline-none transition w-full"
-                  placeholder="e.g. 2015"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 pt-6 font-sans">
-              <button
-                type="button"
-                onClick={handleSave}
-                className="bg-[#D4AF37] hover:bg-[#b08427] text-black font-extrabold text-xs px-6 py-3 rounded-xl transition cursor-pointer"
-              >
-                Save Changes
-              </button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#01291D]/60 backdrop-blur-sm p-4">
+          <div className="bg-[#FFFDF8] border-2 border-[#DFC78A] rounded-2xl shadow-[0_24px_60px_rgba(1,41,29,0.28)] w-full max-w-lg overflow-hidden text-[#0F241C] relative">
+            <div className="bg-gradient-to-r from-[#01291D] to-[#034431] px-6 py-4 border-b border-[#DFC78A]/40 flex items-center justify-between">
+              <h3 className="text-lg font-serif font-bold text-[#F5C642] uppercase tracking-wide">
+                Edit Quick Info
+              </h3>
               <button
                 type="button"
                 onClick={() => setIsEditingQuickInfo(false)}
-                className="bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs px-6 py-3 rounded-xl transition cursor-pointer"
+                className="text-[#E8C877] hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition cursor-pointer"
               >
-                Cancel
+                <X size={14} />
               </button>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
+                <div className="flex flex-col gap-1.5 col-span-2">
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Cuisine Type (Comma separated)</label>
+                  <input
+                    type="text"
+                    value={specInput}
+                    onChange={(e) => setSpecInput(e.target.value)}
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-12 text-[#0F241C] text-sm outline-none transition w-full"
+                    placeholder="e.g. Italian, Indian, Chinese"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Min. Guest Count</label>
+                  <input
+                    type="text"
+                    value={minGuestsInput}
+                    onChange={(e) => setMinGuestsInput(e.target.value)}
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-12 text-[#0F241C] text-sm outline-none transition w-full"
+                    placeholder="e.g. 20 Guests"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Price Range</label>
+                  <input
+                    type="text"
+                    value={priceRangeInput}
+                    onChange={(e) => setPriceRangeInput(e.target.value)}
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-12 text-[#0F241C] text-sm outline-none transition w-full"
+                    placeholder="e.g. ₹350 - ₹1,500"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Booking Lead Time</label>
+                  <input
+                    type="text"
+                    value={leadTimeInput}
+                    onChange={(e) => setLeadTimeInput(e.target.value)}
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-12 text-[#0F241C] text-sm outline-none transition w-full"
+                    placeholder="e.g. 2 - 6 Weeks"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Response Time</label>
+                  <input
+                    type="text"
+                    value={responseTimeInput}
+                    onChange={(e) => setResponseTimeInput(e.target.value)}
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-12 text-[#0F241C] text-sm outline-none transition w-full"
+                    placeholder="e.g. Within 6 Hours"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 col-span-2">
+                  <label className="text-xs text-[#083A28] font-bold uppercase tracking-wider">Established Year</label>
+                  <input
+                    type="text"
+                    value={establishedInput}
+                    onChange={(e) => setEstablishedInput(e.target.value)}
+                    className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-xl px-4 h-12 text-[#0F241C] text-sm outline-none transition w-full"
+                    placeholder="e.g. 2015"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-6 font-sans">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="bg-gradient-to-r from-[#01291D] to-[#034431] hover:from-[#034431] hover:to-[#065239] text-[#F5C642] border border-[#DFC78A]/45 font-extrabold text-xs px-6 py-3 rounded-xl transition cursor-pointer whitespace-nowrap shadow-sm"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingQuickInfo(false)}
+                  className="bg-[#FAF3E2] hover:bg-[#F3E6C8] text-[#083A28] border border-[#DFC78A] font-extrabold text-xs px-6 py-3 rounded-xl transition cursor-pointer whitespace-nowrap"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2241,7 +2231,7 @@ export const QuickInfoCard: React.FC<SectionProps> = ({
         </div>
 
         {/* Location Intelligence Profile Metrics */}
-        <div className="border-t border-slate-100 pt-4 mt-4 space-y-4">
+        <div className="border-t border-[#EFE3C4] pt-4 mt-4 space-y-4">
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-full bg-amber-500/5 border border-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] shrink-0 mt-0.5">
               <span className="text-sm">📍</span>
@@ -2368,53 +2358,55 @@ export const AchievementsCard: React.FC<SectionProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-[24px] p-6 border border-[#D4AF37]/25 hover:border-[#D4AF37]/65 transition-all shadow-md duration-300 flex flex-col group text-left relative">
+    <div className="bg-[#FFFDF8] rounded-[24px] p-6 border border-[#DFC78A] hover:border-[#D4961B]/80 transition-all shadow-[0_8px_24px_rgba(140,105,32,0.07)] duration-300 flex flex-col group text-left relative">
       {isEditingAchievements && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#0D0D0D] border-2 border-[#D4AF37] rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] w-full max-w-lg p-6 text-white relative flex flex-col max-h-[85vh]">
-            <button
-              type="button"
-              onClick={() => setIsEditingAchievements(false)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition cursor-pointer"
-            >
-              <X size={14} />
-            </button>
-            <h3 className="text-lg font-serif font-bold text-[#D4AF37] mb-4 uppercase tracking-wide">
-              Edit Achievements
-            </h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#01291D]/60 backdrop-blur-sm p-4">
+          <div className="bg-[#FFFDF8] border-2 border-[#DFC78A] rounded-2xl shadow-[0_24px_60px_rgba(1,41,29,0.28)] w-full max-w-lg overflow-hidden text-[#0F241C] relative flex flex-col max-h-[85vh]">
+            <div className="bg-gradient-to-r from-[#01291D] to-[#034431] px-6 py-4 border-b border-[#DFC78A]/40 flex items-center justify-between">
+              <h3 className="text-lg font-serif font-bold text-[#F5C642] uppercase tracking-wide">
+                Edit Achievements
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsEditingAchievements(false)}
+                className="text-[#E8C877] hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4">
+            <div className="flex-1 overflow-y-auto space-y-4 p-6">
               {editedList.map((ach, idx) => (
-                <div key={idx} className="bg-[#151515] border border-[#D4AF37]/20 rounded-xl p-3 relative flex flex-col gap-2.5">
+                <div key={idx} className="bg-[#FAF3E2]/65 border border-[#DFC78A] rounded-xl p-3 relative flex flex-col gap-2.5">
                   <button
                     type="button"
                     onClick={() => handleRemoveAchievement(idx)}
-                    className="absolute top-3 right-3 text-red-400 hover:text-red-500 bg-red-500/10 p-1 rounded-lg transition cursor-pointer"
+                    className="absolute top-3 right-3 text-red-600 hover:text-red-700 bg-red-50 border border-red-200 p-1 rounded-lg transition cursor-pointer"
                     title="Remove Achievement"
                   >
                     <Trash2 size={12} />
                   </button>
-                  <span className="text-[9px] uppercase font-bold tracking-widest text-[#D4AF37]/70 font-mono">
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-[#8A6510] font-mono">
                     Achievement #{idx + 1}
                   </span>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-sans">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Value / Count</label>
+                      <label className="text-[10px] text-[#083A28] font-bold uppercase tracking-wider">Value / Count</label>
                       <input
                         type="text"
                         value={ach.value}
                         onChange={(e) => handleUpdateAchievement(idx, "value", e.target.value)}
-                        className="bg-[#0D0D0D] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-lg px-3 h-10 text-white text-xs outline-none transition"
+                        className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-lg px-3 h-10 text-[#0F241C] text-xs outline-none transition"
                         placeholder="e.g. 150+ or 15+"
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Title / Label</label>
+                      <label className="text-[10px] text-[#083A28] font-bold uppercase tracking-wider">Title / Label</label>
                       <input
                         type="text"
-                        value={ach.label}
+                        value={ach.label ?? ach.title ?? ""}
                         onChange={(e) => handleUpdateAchievement(idx, "label", e.target.value)}
-                        className="bg-[#0D0D0D] border border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-lg px-3 h-10 text-white text-xs outline-none transition"
+                        className="bg-[#FFFDF9] border border-[#DFC78A] focus:border-[#034431] rounded-lg px-3 h-10 text-[#0F241C] text-xs outline-none transition"
                         placeholder="e.g. Events Completed"
                       />
                     </div>
@@ -2423,17 +2415,17 @@ export const AchievementsCard: React.FC<SectionProps> = ({
               ))}
 
               {editedList.length === 0 && (
-                <div className="text-center py-8 text-slate-400 italic">
+                <div className="text-center py-8 text-[#6B6554] italic text-xs">
                   No achievements listed. Click below to add one.
                 </div>
               )}
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-white/10 font-sans">
+            <div className="flex flex-wrap justify-between items-center gap-3 px-6 py-4 bg-[#FAF3E2]/70 border-t border-[#DFC78A]/60 font-sans">
               <button
                 type="button"
                 onClick={handleAddAchievement}
-                className="bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-1 cursor-pointer"
+                className="bg-white hover:bg-[#FAF3E2] text-[#083A28] border border-[#DFC78A] font-extrabold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-1 cursor-pointer whitespace-nowrap"
               >
                 <Plus size={14} /> Add Achievement
               </button>
@@ -2441,14 +2433,14 @@ export const AchievementsCard: React.FC<SectionProps> = ({
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="bg-[#D4AF37] hover:bg-[#b08427] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer"
+                  className="bg-gradient-to-r from-[#01291D] to-[#034431] hover:from-[#034431] hover:to-[#065239] text-[#F5C642] border border-[#DFC78A]/45 font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap shadow-sm"
                 >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditingAchievements(false)}
-                  className="bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer"
+                  className="bg-white hover:bg-[#FAF3E2] text-[#083A28] border border-[#DFC78A] font-extrabold text-xs px-5 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap"
                 >
                   Cancel
                 </button>

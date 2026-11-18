@@ -28,7 +28,15 @@ import {
   UploadCloud,
   Check,
   ChevronLeft,
-  Star
+  Star,
+  Hourglass,
+  Flag,
+  Coins,
+  ArrowRight,
+  ClipboardList,
+  Layers,
+  Eye,
+  Search
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -144,6 +152,7 @@ export default function CatererMobileDashboard({
   handleMultipleFiles
 }: CatererMobileDashboardProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [mobileOrderSearch, setMobileOrderSearch] = useState('');
 
   // Bottom Nav items
   const bottomNavItems = [
@@ -155,52 +164,50 @@ export default function CatererMobileDashboard({
   ];
 
   return (
-    <div className="md:hidden flex flex-col min-h-screen bg-slate-50 pb-32">
-      {/* Sticky top header */}
-      <div className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-100 flex items-center justify-between px-4 z-30 shadow-sm select-none">
+    <div className="md:hidden flex flex-col min-h-screen bg-[#FAF2E1] text-[#0F241C] pb-32">
+      {/* Sticky Emerald & Gold Top Header */}
+      <div className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-r from-[#013122] via-[#044732] to-[#01281C] border-b border-[#D9A323]/45 flex items-center justify-between px-4 z-30 shadow-md select-none text-[#FDF8EC]">
         <div className="flex items-center gap-2.5">
           <button 
             onClick={() => setIsSidebarOpen(true)}
-            className="p-2 text-slate-700 hover:bg-slate-100 active:scale-95 transition-all rounded-xl"
+            className="p-2 text-[#F5C642] hover:bg-[#084330] active:scale-95 transition-all rounded-xl"
             id="mobile-hamburger-menu-btn"
           >
             <Menu size={22} />
           </button>
           
           <div className="flex items-center gap-2">
-            <div className="bg-brand-gold-500 p-1.5 rounded-xl text-white">
+            <div className="bg-gradient-to-br from-[#FAE18D] to-[#D2951B] p-1.5 rounded-xl text-[#052419] shadow-xs">
               <ChefHat size={18} />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-tight text-brand-green-900 leading-none">PlanMyChoice</span>
-              <span className="text-[7.5px] uppercase tracking-widest text-brand-gold-600 font-extrabold leading-none mt-0.5">PORTAL</span>
+              <span className="text-sm font-display font-bold tracking-tight text-[#FFFDF8] leading-none">PlanMyChoice</span>
+              <span className="text-[7.5px] uppercase tracking-widest text-[#F5C642] font-extrabold leading-none mt-0.5">CATERER PORTAL</span>
             </div>
           </div>
         </div>
         
         <div className="flex items-center gap-1.5">
-          {/* Notification bell icon */}
           <button 
             onClick={() => setActiveTab('notifications')}
-            className="relative p-2.5 text-slate-500 hover:text-brand-green-900 transition-colors rounded-xl hover:bg-slate-50"
+            className="relative p-2.5 text-[#FDF8EC]/90 hover:text-[#F5C642] transition-colors rounded-xl hover:bg-[#084330]"
             id="mobile-header-bell-btn"
           >
             <Bell size={20} />
             {unreadNotificationsCount > 0 && (
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border border-white" />
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border border-[#01281C]" />
             )}
           </button>
           
-          {/* Profile Dropdown Trigger */}
           <button 
             onClick={() => setActiveTab('profile')}
-            className="flex items-center gap-2 pl-2.5 border-l border-slate-200 active:scale-95 transition-transform"
+            className="flex items-center gap-2 pl-2.5 border-l border-[#D9A323]/30 active:scale-95 transition-transform"
             id="mobile-header-profile-btn"
           >
-            <div className="w-8 h-8 rounded-full bg-brand-gold-100 text-brand-gold-600 flex items-center justify-center font-black text-sm border border-brand-gold-200 shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FAE18D] to-[#D2951B] text-[#052419] flex items-center justify-center font-black text-sm border border-[#FCEBA8] shadow-sm">
               {user?.name?.charAt(0).toUpperCase() || 'C'}
             </div>
-            <span className="text-xs font-bold text-slate-800 max-w-[80px] truncate">
+            <span className="text-xs font-bold text-[#FFFDF8] max-w-[80px] truncate">
               {user?.name?.split(' ')[0] || 'Caterer'}
             </span>
           </button>
@@ -210,32 +217,27 @@ export default function CatererMobileDashboard({
       {/* Main content body (offset by header height) */}
       <div className="pt-16 px-4">
         {activeTab === 'dashboard' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             
-            {/* Premium Hero Card */}
-            <div className="relative mt-4 overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-950 p-6 text-white shadow-xl border border-emerald-800/20">
-              {/* Subtle background glow or texture pattern */}
-              <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full filter blur-3xl" />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-brand-gold-500/5 rounded-full filter blur-2xl" />
-              
-              <div className="flex justify-between items-center relative z-10">
-                <div className="space-y-1 max-w-[65%]">
-                  <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+            {/* Partner Brand Card */}
+            <div className="relative mt-4 overflow-hidden rounded-3xl bg-gradient-to-br from-[#023122] via-[#044732] to-[#012217] p-5 text-white shadow-lg border border-[#D9A323]/40">
+              <div className="flex justify-between items-center relative z-10 gap-3">
+                <div className="space-y-1 min-w-0 flex-1">
+                  <p className="text-[10px] font-black text-[#F5C642] uppercase tracking-[0.16em]">
                     Caterer Portal
                   </p>
-                  <h2 className="text-2xl font-display font-medium text-white tracking-wide leading-tight truncate">
+                  <h2 className="text-xl font-display font-bold text-[#FFFDF8] tracking-wide leading-tight truncate">
                     {caterer?.businessName || 'Elite Catering'}
                   </h2>
-                  <div className="pt-2">
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-brand-gold-300 bg-brand-gold-500/10 border border-brand-gold-500/30 px-3 py-1.5 rounded-full">
-                      <CheckCircle size={10} className="text-brand-gold-400" /> Approved Partner
+                  <div className="pt-1.5">
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#F5C642] bg-[#0A402F] border border-[#D9A323]/45 px-2.5 py-1 rounded-full">
+                      <CheckCircle size={10} className="text-[#F5C642]" /> Approved Partner
                     </span>
                   </div>
                 </div>
 
-                {/* Golden circular food/caterer logo */}
                 <div className="relative shrink-0">
-                  <div className="w-20 h-20 rounded-full border-2 border-brand-gold-500/40 p-1.5 bg-emerald-950 flex items-center justify-center overflow-hidden shadow-lg shadow-black/30">
+                  <div className="w-16 h-16 rounded-full border-2 border-[#D9A323]/60 p-1 bg-[#012217] flex items-center justify-center overflow-hidden shadow-md">
                     {caterer?.logo ? (
                       <img 
                         src={caterer.logo} 
@@ -244,279 +246,327 @@ export default function CatererMobileDashboard({
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="w-full h-full rounded-full bg-emerald-900 flex items-center justify-center text-brand-gold-500">
-                        <ChefHat size={32} />
+                      <div className="w-full h-full rounded-full bg-[#044732] flex items-center justify-center text-[#F5C642]">
+                        <ChefHat size={28} />
                       </div>
                     )}
                   </div>
-                  {/* Miniature decorative chef crown or accent */}
-                  <span className="absolute -top-1 -right-1 bg-brand-gold-500 text-emerald-950 rounded-full p-1 border border-emerald-950 shadow">
-                    <ChefHat size={8} />
-                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Dashboard Overview Title */}
-            <div>
-              <h1 className="text-2xl font-display font-bold text-slate-900">
-                Dashboard Overview
-              </h1>
+            {/* Dashboard Overview Heading */}
+            <div className="flex items-stretch gap-3 pt-1">
+              <div className="w-[3px] rounded-full bg-gradient-to-b from-[#E8BA42] to-[#B77A12] shrink-0" />
+              <div>
+                <h1 className="text-xl font-display font-bold text-[#0F3D2E] leading-tight">
+                  Dashboard Overview
+                </h1>
+                <p className="text-[11.5px] text-[#5C5240] font-medium mt-0.5">
+                  Track your events and grow with PlanMyChoice.
+                </p>
+              </div>
             </div>
 
-            {/* Statistics (2-column responsive grid) */}
-            <div className="grid grid-cols-2 gap-3.5">
-              
-              {/* Total Orders */}
+            {/* 6 Pastel Gradient KPI Cards */}
+            <div className="grid grid-cols-2 gap-2.5">
               <button 
-                onClick={() => { setActiveTab('orders'); }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between text-left active:scale-95 transition-all w-full"
+                type="button"
+                onClick={() => { setActiveTab('orders'); setOrderListFilter('all'); }}
+                className="bg-gradient-to-br from-[#F2FBF3] to-[#E5F6E8] border border-[#BBE2C4] p-3.5 rounded-2xl shadow-xs flex items-center gap-2.5 text-left active:scale-95 transition-all w-full"
               >
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
-                  <p className="text-2xl font-black text-slate-900 mt-1">{totalOrders}</p>
+                <div className="w-9 h-9 rounded-full bg-[#D9F3DF] border border-[#A7DCBA] text-[#15803D] flex items-center justify-center shrink-0">
+                  <Package size={16} />
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Package size={18} />
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-bold text-[#1E3B2B] truncate">Total Orders</p>
+                  <p className="text-xl font-display font-bold text-[#0F241C] tabular-nums leading-tight mt-0.5">{totalOrders}</p>
                 </div>
               </button>
 
-              {/* Pending Orders */}
               <button 
-                onClick={() => { setActiveTab('orders'); }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between text-left active:scale-95 transition-all w-full"
+                type="button"
+                onClick={() => { setActiveTab('orders'); setOrderListFilter('pending'); }}
+                className="bg-gradient-to-br from-[#FFFDF3] to-[#FEF4D6] border border-[#EAD089] p-3.5 rounded-2xl shadow-xs flex items-center gap-2.5 text-left active:scale-95 transition-all w-full"
               >
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Orders</p>
-                  <p className="text-2xl font-black text-amber-600 mt-1">{pendingOrders}</p>
+                <div className="w-9 h-9 rounded-full bg-[#FCE9B2] border border-[#E7C266] text-[#A16207] flex items-center justify-center shrink-0">
+                  <Hourglass size={16} />
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                  <Clock size={18} />
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-bold text-[#5C3D06] truncate">Pending Orders</p>
+                  <p className="text-xl font-display font-bold text-[#0F241C] tabular-nums leading-tight mt-0.5">{pendingOrders}</p>
                 </div>
               </button>
 
-              {/* Approved */}
               <button 
-                onClick={() => { setActiveTab('orders'); }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between text-left active:scale-95 transition-all w-full"
+                type="button"
+                onClick={() => { setActiveTab('orders'); setOrderListFilter('approved'); }}
+                className="bg-gradient-to-br from-[#EEFCF4] to-[#DCF8E7] border border-[#9EE2BA] p-3.5 rounded-2xl shadow-xs flex items-center gap-2.5 text-left active:scale-95 transition-all w-full"
               >
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Approved</p>
-                  <p className="text-2xl font-black text-green-600 mt-1">{approvedOrders}</p>
+                <div className="w-9 h-9 rounded-full bg-[#C8F4DA] border border-[#86DCA9] text-[#15803D] flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={16} />
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
-                  <CheckCircle size={18} />
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-bold text-[#14532D] truncate">Approved</p>
+                  <p className="text-xl font-display font-bold text-[#0F241C] tabular-nums leading-tight mt-0.5">{approvedOrders}</p>
                 </div>
               </button>
 
-              {/* Completed */}
               <button 
-                onClick={() => { setActiveTab('orders'); }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between text-left active:scale-95 transition-all w-full"
+                type="button"
+                onClick={() => { setActiveTab('orders'); setOrderListFilter('completed'); }}
+                className="bg-gradient-to-br from-[#F1F8FF] to-[#E2F0FE] border border-[#AED4FA] p-3.5 rounded-2xl shadow-xs flex items-center gap-2.5 text-left active:scale-95 transition-all w-full"
               >
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Completed</p>
-                  <p className="text-2xl font-black text-slate-800 mt-1">{completedOrders}</p>
+                <div className="w-9 h-9 rounded-full bg-[#D5E9FE] border border-[#98C8F9] text-[#1D4ED8] flex items-center justify-center shrink-0">
+                  <Flag size={16} />
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-                  <CheckCircle2 size={18} />
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-bold text-[#1E3A8A] truncate">Completed</p>
+                  <p className="text-xl font-display font-bold text-[#0F241C] tabular-nums leading-tight mt-0.5">{completedOrders}</p>
                 </div>
               </button>
 
-              {/* Rejected */}
               <button 
-                onClick={() => { setActiveTab('orders'); }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between text-left active:scale-95 transition-all w-full"
+                type="button"
+                onClick={() => { setActiveTab('orders'); setOrderListFilter('rejected'); }}
+                className="bg-gradient-to-br from-[#FFF4F5] to-[#FDE4E6] border border-[#F6B8BD] p-3.5 rounded-2xl shadow-xs flex items-center gap-2.5 text-left active:scale-95 transition-all w-full"
               >
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rejected</p>
-                  <p className="text-2xl font-black text-red-600 mt-1">{rejectedOrders}</p>
+                <div className="w-9 h-9 rounded-full bg-[#FAD1D5] border border-[#F19FA7] text-[#DC2626] flex items-center justify-center shrink-0">
+                  <XCircle size={16} />
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
-                  <XCircle size={18} />
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-bold text-[#7F1D1D] truncate">Rejected</p>
+                  <p className="text-xl font-display font-bold text-[#0F241C] tabular-nums leading-tight mt-0.5">{rejectedOrders}</p>
                 </div>
               </button>
 
-              {/* Revenue */}
               <button 
-                onClick={() => { setActiveTab('orders'); }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between text-left active:scale-95 transition-all w-full"
+                type="button"
+                onClick={() => { setActiveTab('orders'); setOrderListFilter('revenue'); }}
+                className="bg-gradient-to-br from-[#F8F3FF] to-[#EDE2FE] border border-[#CEB4FA] p-3.5 rounded-2xl shadow-xs flex items-center gap-2.5 text-left active:scale-95 transition-all w-full"
               >
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Revenue</p>
-                  <p className="text-2xl font-black text-brand-gold-600 mt-1">₹{(revenue/1000).toFixed(1)}k</p>
+                <div className="w-9 h-9 rounded-full bg-[#E5D5FE] border border-[#C19CF9] text-[#7E22CE] flex items-center justify-center shrink-0">
+                  <Coins size={16} />
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-brand-gold-50 text-brand-gold-600 flex items-center justify-center shrink-0">
-                  <Activity size={18} />
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-bold text-[#581C87] truncate">Revenue</p>
+                  <p className="text-xl font-display font-bold text-[#0F241C] tabular-nums leading-tight mt-0.5">₹{(revenue / 1000).toFixed(1)}K</p>
                 </div>
               </button>
-
             </div>
 
             {/* Upcoming Scheduled Events Card */}
-            <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
-              <div className="border-b border-slate-100 pb-4">
-                <h3 className="font-bold text-slate-900 text-base font-display">Upcoming Scheduled Events</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Filter and manage confirmed celebrations</p>
-                
-                {/* Range selector row */}
-                <div className="mt-4 bg-slate-50/80 p-1.5 rounded-2xl border border-slate-100">
-                  <div className="flex justify-between items-center gap-1 overflow-x-auto custom-sidebar-scrollbar whitespace-nowrap py-0.5">
-                    {[
-                      { id: '7', label: '7 Days' },
-                      { id: '15', label: '15 Days' },
-                      { id: '30', label: '30 Days' },
-                      { id: 'custom', label: 'Custom' }
-                    ].map((tab) => (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setEventFilter(tab.id as any)}
-                        className={cn(
-                          "flex-1 text-center py-2 px-3 text-xs font-bold rounded-xl transition-all",
-                          eventFilter === tab.id
-                            ? "bg-emerald-950 text-white shadow"
-                            : "text-slate-500 hover:text-slate-800"
-                        )}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {eventFilter === 'custom' && (
-                    <div className="flex flex-col gap-2 mt-3 p-3 bg-white rounded-xl border border-slate-100 animate-fade-in text-xs font-bold text-slate-600">
-                      <div className="flex items-center justify-between">
-                        <span>From</span>
-                        <input 
-                          type="date" 
-                          value={customStartDate} 
-                          onChange={(e) => setCustomStartDate(e.target.value)} 
-                          className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-brand-gold-500 w-[70%]" 
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>To</span>
-                        <input 
-                          type="date" 
-                          value={customEndDate} 
-                          onChange={(e) => setCustomEndDate(e.target.value)} 
-                          className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-brand-gold-500 w-[70%]" 
-                        />
-                      </div>
-                    </div>
-                  )}
+            <div className="bg-[#FFFDF8] rounded-2xl shadow-sm border border-[#E4C987] overflow-hidden">
+              <div className="bg-gradient-to-r from-[#023122] via-[#044732] to-[#022E1F] border-b-2 border-[#D9A323] px-4 py-2.5 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <CalendarDays size={15} className="text-[#F5C642]" />
+                  <h3 className="font-display font-bold text-sm text-[#FDF8EC]">Upcoming Scheduled Events</h3>
                 </div>
+                <button 
+                  type="button"
+                  onClick={() => { setActiveTab('orders'); setOrderListFilter('approved'); }}
+                  className="text-[11px] font-bold text-[#F5C642] flex items-center gap-1"
+                >
+                  <span>View All</span>
+                  <ArrowRight size={12} />
+                </button>
               </div>
 
-              {/* Event Cards or Empty view */}
-              <div className="pt-4 space-y-3.5">
-                {getFilteredUpcomingEvents().map(ord => (
-                  <div key={'upcoming-event-'+ord.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 hover:shadow hover:border-brand-green-300 transition-all flex flex-col justify-between">
-                    <div>
-                      <div className="flex gap-3 items-center mb-3">
-                        <div className="w-12 h-12 bg-emerald-950 text-white rounded-xl flex flex-col items-center justify-center border border-emerald-900 flex-shrink-0 shadow-sm">
-                          <span className="text-[8px] font-bold uppercase tracking-wider text-brand-gold-300">{new Date(ord.eventDate).toLocaleDateString('en-US', {month: 'short'})}</span>
-                          <span className="text-lg font-display font-black leading-none">{new Date(ord.eventDate).getDate()}</span>
+              <div className="p-3.5 space-y-3">
+                <div className="bg-[#FAF0D8] p-1 rounded-full border border-[#E6CA82] flex items-center gap-1 overflow-x-auto whitespace-nowrap">
+                  {[
+                    { id: '7', label: '7 Days' },
+                    { id: '15', label: '15 Days' },
+                    { id: '30', label: '30 Days' },
+                    { id: 'custom', label: 'Custom' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setEventFilter(tab.id as any)}
+                      className={cn(
+                        "flex-1 text-center py-1.5 px-2.5 text-[11px] font-bold rounded-full transition-all",
+                        eventFilter === tab.id
+                          ? "bg-gradient-to-r from-[#023A28] to-[#044C35] text-[#FFFDF8] shadow-2xs"
+                          : "text-[#493E2B]"
+                      )}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {eventFilter === 'custom' && (
+                  <div className="flex flex-col gap-2 p-2.5 bg-[#FCF8EE] rounded-xl border border-[#DFC689] text-xs font-bold text-[#493E2B]">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>From</span>
+                      <input 
+                        type="date" 
+                        value={customStartDate} 
+                        onChange={(e) => setCustomStartDate(e.target.value)} 
+                        className="bg-white border border-[#DFC689] rounded-lg px-2 py-1 text-xs outline-none w-[70%]" 
+                      />
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span>To</span>
+                      <input 
+                        type="date" 
+                        value={customEndDate} 
+                        onChange={(e) => setCustomEndDate(e.target.value)} 
+                        className="bg-white border border-[#DFC689] rounded-lg px-2 py-1 text-xs outline-none w-[70%]" 
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2.5">
+                  {getFilteredUpcomingEvents().map((ord) => (
+                    <div key={'upcoming-event-' + ord.id} className="bg-[#FFFDF9] border border-[#EAE0C8] rounded-xl p-3 flex flex-col gap-2.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#044530] to-[#01291C] border border-[#D9A323]/60 text-white flex flex-col items-center justify-center shrink-0">
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-[#F5C642]">{new Date(ord.eventDate).toLocaleDateString('en-US', { month: 'short' })}</span>
+                          <span className="text-base font-display font-extrabold leading-none">{new Date(ord.eventDate).getDate()}</span>
                         </div>
-                        <div className="truncate">
-                          <p className="font-bold text-slate-950 text-sm truncate" title={ord.customerName}>{ord.customerName}</p>
-                          <span className={cn("px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider border", getStatusColor(ord.status))}>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-[#0F241C] text-sm truncate">{ord.customerName}</p>
+                          <span className={cn("inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border mt-0.5", getStatusColor(ord.status))}>
                             {ord.status}
                           </span>
                         </div>
                       </div>
-                      
-                      <div className="space-y-1.5 text-xs text-slate-600 font-medium border-t border-slate-100 pt-2.5">
-                        <p className="flex justify-between">
-                          <span className="text-slate-400">Guests:</span> 
-                          <span className="font-bold text-slate-800">{ord.guests}</span>
+
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] border-t border-[#EFE3C4] pt-2">
+                        <div className="flex items-center gap-1 min-w-0">
+                          <User size={11} className="text-[#C48E22] shrink-0" />
+                          <span className="text-[#6B5F4B]">Guests:</span>
+                          <span className="font-bold text-[#0F241C]">{ord.guests}</span>
+                        </div>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Layers size={11} className="text-[#C48E22] shrink-0" />
+                          <span className="font-bold text-[#0F241C] truncate">{ord.packageDetails?.packageName || 'Custom'}</span>
+                        </div>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Phone size={11} className="text-[#C48E22] shrink-0" />
+                          <span className="font-semibold text-[#0F241C] truncate">{ord.phone || ord.customerPhone || 'N/A'}</span>
+                        </div>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <MapPin size={11} className="text-[#C48E22] shrink-0" />
+                          <span className="font-semibold text-[#0F241C] truncate">{ord.venue || ord.address || 'TBD'}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenOrderDetails(ord)}
+                        className="w-full py-2 rounded-full bg-[#FAF0D4] border border-[#DFB95B] text-[#0F241C] text-xs font-bold flex items-center justify-center gap-1.5"
+                      >
+                        <span>View Details</span>
+                        <ArrowRight size={13} className="text-[#9E7018]" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {getFilteredUpcomingEvents().length === 0 && (
+                    <div className="py-6 text-center text-[#6B5F4B] text-xs bg-[#FCF8EE] rounded-xl border border-dashed border-[#DFC689]">
+                      <CalendarDays size={22} className="mx-auto mb-1.5 text-[#B8841E]" />
+                      <p className="font-bold text-[#0F241C]">No scheduled events</p>
+                      <p className="text-[11px] text-[#6B5F4B] mt-0.5">No upcoming events match this timeframe.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Notifications Card */}
+            <div className="bg-[#FFFDF8] rounded-2xl border border-[#E4C987] shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-r from-[#023122] via-[#044732] to-[#022E1F] border-b-2 border-[#D9A323] px-4 py-2.5 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Bell size={15} className="text-[#F5C642]" />
+                  <h3 className="font-display font-bold text-sm text-[#FDF8EC]">Recent Notifications</h3>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setActiveTab('notifications')} 
+                  className="text-[11px] font-bold text-[#F5C642] flex items-center gap-1"
+                >
+                  <span>View All</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+
+              <div className="divide-y divide-[#EFE4C8]">
+                {(localNotifications.length > 0 ? localNotifications.slice(0, 3) : partnerOrders.slice(0, 3)).map((item: any) => {
+                  const isNotif = localNotifications.length > 0;
+                  return (
+                    <div key={item.id} className="p-3.5 flex gap-3 items-start">
+                      <div className="w-8 h-8 rounded-full bg-[#E8F2FE] border border-[#BED9FA] text-[#1D4ED8] flex shrink-0 items-center justify-center">
+                        <Bell size={14} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-[#0F241C] text-xs truncate">
+                          {isNotif ? item.title : `New order received from ${item.customerName}`}
                         </p>
-                        <p className="flex justify-between">
-                          <span className="text-slate-400">Package:</span> 
-                          <span className="font-bold text-slate-800 truncate max-w-[150px]">{ord.packageDetails?.packageName || 'Custom'}</span>
+                        <p className="text-[11px] text-[#494032] mt-0.5 line-clamp-2">
+                          {isNotif ? item.message : `Package: ${item.packageDetails?.packageName || 'Custom'} • Guests: ${item.guests}`}
                         </p>
-                        <p className="flex justify-between">
-                          <span className="text-slate-400">Phone:</span> 
-                          <span className="font-bold text-slate-800">{ord.phone || ord.customerPhone || 'N/A'}</span>
-                        </p>
-                        <p className="flex justify-between items-start gap-2">
-                          <span className="text-slate-400 shrink-0">Venue:</span> 
-                          <span className="font-bold text-slate-800 text-right truncate max-w-[150px]" title={ord.venue}>{ord.venue || 'TBD'}</span>
+                        <p className="text-[10px] text-[#7D6E52] mt-1 font-medium">
+                          {item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
                         </p>
                       </div>
                     </div>
-                    
-                    <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex justify-end">
-                      <button onClick={() => handleOpenOrderDetails(ord)} className="text-xs font-black text-brand-green-950 hover:text-brand-green-800 flex items-center gap-1 active:scale-95 transition-transform">
-                        View Details <ChevronRight size={14} />
+                  );
+                })}
+                {localNotifications.length === 0 && partnerOrders.length === 0 && (
+                  <div className="py-6 text-center text-[#6B5F4B] text-xs">No recent notifications.</div>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Orders Card */}
+            <div className="bg-[#FFFDF8] rounded-2xl border border-[#E4C987] shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-r from-[#023122] via-[#044732] to-[#022E1F] border-b-2 border-[#D9A323] px-4 py-2.5 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <ClipboardList size={15} className="text-[#F5C642]" />
+                  <h3 className="font-display font-bold text-sm text-[#FDF8EC]">Recent Orders</h3>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => { setActiveTab('orders'); setOrderListFilter('all'); }}
+                  className="text-[11px] font-bold text-[#F5C642] flex items-center gap-1"
+                >
+                  <span>View All</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+              <div className="divide-y divide-[#EFE4C8]">
+                {partnerOrders.slice(0, 3).map((ord) => (
+                  <div key={'mob-recent-' + ord.id} className="p-3.5 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-mono font-bold text-[11px] text-[#0F241C]">#{ord.id}</p>
+                      <p className="text-xs font-semibold text-[#30281E] truncate">
+                        {ord.packageDetails?.packageName || 'Custom'} • {ord.guests} guests
+                      </p>
+                      <p className="text-[10.5px] text-[#6B5F4B]">{ord.eventDate || 'TBD'}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="text-right">
+                        <p className="text-xs font-bold text-[#0F241C]">₹{Number(ord.totalAmount || ord.amount || 0).toLocaleString('en-IN')}</p>
+                        <span className={cn("inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border", getStatusColor(ord.status))}>
+                          {ord.status}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenOrderDetails(ord)}
+                        className="w-7 h-7 rounded-full bg-[#FAF0D4] border border-[#E6CA82] text-[#78530A] flex items-center justify-center"
+                      >
+                        <Eye size={13} />
                       </button>
                     </div>
                   </div>
                 ))}
-                
-                {getFilteredUpcomingEvents().length === 0 && (
-                  <div className="py-8 text-center text-slate-400 text-sm bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100 shadow-sm">
-                      <CalendarDays size={22} className="text-slate-400" />
-                    </div>
-                    <p className="font-bold text-slate-700">No scheduled events</p>
-                    <p className="text-[11px] text-slate-400 mt-1 max-w-[200px] mx-auto leading-normal">No upcoming events are scheduled within this timeframe.</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-slate-100 mt-4 pt-3 flex justify-end">
-                <button 
-                  onClick={() => setActiveTab('orders')} 
-                  className="text-xs font-extrabold text-brand-green-900 hover:text-brand-green-850 flex items-center gap-1"
-                >
-                  View All Calendar <ChevronRight size={14} />
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Notifications */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-5">
-              <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                <h3 className="font-bold text-slate-900 text-base font-display">Recent Notifications</h3>
-                <button 
-                  onClick={() => setActiveTab('notifications')} 
-                  className="text-xs font-extrabold text-brand-green-900 hover:text-brand-green-850 flex items-center gap-0.5 cursor-pointer"
-                >
-                  View All <ChevronRight size={13} />
-                </button>
-              </div>
-
-              <div className="space-y-3.5">
-                {partnerOrders.slice(0, 3).map((ord) => (
-                  <div key={ord.id} className="p-3.5 bg-slate-50/55 border border-slate-100 rounded-2xl flex gap-3 hover:bg-slate-50 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex flex-shrink-0 items-center justify-center border border-blue-100">
-                      <Bell size={16} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start gap-1">
-                        <p className="font-bold text-slate-900 text-xs truncate">
-                          New Booking Received
-                        </p>
-                        <span className="text-[9px] bg-emerald-50 text-emerald-800 font-bold px-1.5 py-0.5 rounded-full border border-emerald-100 shrink-0">
-                          New
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                        You have received a new booking request for {ord.guests} guests from {ord.customerName}.
-                      </p>
-                      <p className="text-[10px] text-slate-400 mt-2 font-semibold">
-                        {new Date(ord.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} • {new Date(ord.created_at).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                
                 {partnerOrders.length === 0 && (
-                  <div className="py-6 text-center text-slate-400 text-xs">
-                    No recent notifications.
-                  </div>
+                  <div className="py-6 text-center text-[#6B5F4B] text-xs">No recent orders found.</div>
                 )}
               </div>
             </div>
@@ -525,31 +575,39 @@ export default function CatererMobileDashboard({
         )}
 
         {/* --- ORDERS REDESIGNED FOR MOBILE --- */}
-        {activeTab === 'orders' && (
-          <div className="space-y-6">
+        {activeTab === 'orders' && (() => {
+          const mobileFilteredOrders = filteredOrderList.filter((ord) => {
+            if (!mobileOrderSearch.trim()) return true;
+            const q = mobileOrderSearch.trim().toLowerCase();
+            return [ord.id, ord.customerName, ord.customerPhone, ord.phone, ord.packageDetails?.packageName, ord.venue, ord.address]
+              .filter(Boolean)
+              .join(' ')
+              .toLowerCase()
+              .includes(q);
+          });
+
+          return (
+          <div className="space-y-4">
             
-            {/* Premium Emerald Hero Card */}
-            <div className="relative mt-4 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0F3D2E] via-[#164E3D] to-[#0A2D22] p-6 text-white shadow-xl border border-emerald-800/20">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full filter blur-3xl" />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-brand-gold-500/5 rounded-full filter blur-2xl" />
-              
-              <div className="flex justify-between items-center relative z-10">
-                <div className="space-y-1 max-w-[65%]">
-                  <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+            {/* Brand Card */}
+            <div className="relative mt-4 overflow-hidden rounded-3xl bg-gradient-to-br from-[#023122] via-[#044732] to-[#012217] p-5 text-white shadow-lg border border-[#D9A323]/40">
+              <div className="flex justify-between items-center relative z-10 gap-3">
+                <div className="space-y-1 min-w-0 flex-1">
+                  <p className="text-[10px] font-black text-[#F5C642] uppercase tracking-[0.16em]">
                     Caterer Portal
                   </p>
-                  <h2 className="text-2xl font-display font-medium text-white tracking-wide leading-tight truncate">
+                  <h2 className="text-xl font-display font-bold text-[#FFFDF8] tracking-wide leading-tight truncate">
                     {caterer?.businessName || 'Elite Catering'}
                   </h2>
-                  <div className="pt-2">
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#DEAA38] bg-[#DEAA38]/15 border border-[#DEAA38]/35 px-3 py-1.5 rounded-full">
-                      <CheckCircle size={10} className="text-[#DEAA38]" /> Approved Partner
+                  <div className="pt-1.5">
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#F5C642] bg-[#0A402F] border border-[#D9A323]/45 px-2.5 py-1 rounded-full">
+                      <CheckCircle size={10} className="text-[#F5C642]" /> Approved Partner
                     </span>
                   </div>
                 </div>
 
                 <div className="relative shrink-0">
-                  <div className="w-20 h-20 rounded-full border-2 border-[#DEAA38]/40 p-1.5 bg-emerald-950 flex items-center justify-center overflow-hidden shadow-lg shadow-black/30">
+                  <div className="w-16 h-16 rounded-full border-2 border-[#D9A323]/60 p-1 bg-[#012217] flex items-center justify-center overflow-hidden shadow-md">
                     {caterer?.logo ? (
                       <img 
                         src={caterer.logo} 
@@ -558,201 +616,290 @@ export default function CatererMobileDashboard({
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="w-full h-full rounded-full bg-emerald-900 flex items-center justify-center text-[#DEAA38]">
-                        <ChefHat size={32} />
+                      <div className="w-full h-full rounded-full bg-[#044732] flex items-center justify-center text-[#F5C642]">
+                        <ChefHat size={28} />
                       </div>
                     )}
                   </div>
-                  <span className="absolute -top-1 -right-1 bg-[#DEAA38] text-emerald-950 rounded-full p-1 border border-emerald-950 shadow">
-                    <ChefHat size={8} />
-                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Title and Subtitle */}
-            <div className="space-y-1">
-              <h1 className="text-[28px] font-display font-bold text-slate-950 leading-tight">
-                Order Management
-              </h1>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                Filter, review and confirm customer booking requests.
-              </p>
+            {/* Heading Banner */}
+            <div className="flex items-stretch gap-3 pt-1">
+              <div className="w-[3px] rounded-full bg-gradient-to-b from-[#E8BA42] to-[#B77A12] shrink-0" />
+              <div>
+                <h1 className="text-xl font-display font-bold text-[#0F3D2E] leading-tight">
+                  Order Management
+                </h1>
+                <p className="text-[11.5px] text-[#5C5240] font-medium mt-0.5">
+                  Filter, review, and confirm customer booking requests.
+                </p>
+              </div>
             </div>
 
-            {/* Order Filters (Segmented Control) */}
-            <div className="bg-[#FAF6EC] p-1.5 rounded-[1.5rem] border border-[#DEAA38]/10">
-              <div className="flex gap-1 overflow-x-auto whitespace-nowrap py-0.5 no-scrollbar">
-                {[
-                  { id: 'all', label: 'All Orders' },
-                  { id: 'pending', label: 'Pending' },
-                  { id: 'approved', label: 'Approved' },
-                  { id: 'completed', label: 'Completed' },
-                  { id: 'revenue', label: 'Revenue Base' }
-                ].map((tab) => {
-                  const isActive = orderListFilter === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setOrderListFilter(tab.id as any)}
-                      className={cn(
-                        "flex-1 text-center py-2.5 px-4 text-xs font-bold rounded-xl transition-all duration-300 cursor-pointer",
-                        isActive
-                          ? "bg-[#0F3D2E] text-white shadow-md"
-                          : "bg-white text-slate-600 hover:text-slate-900 border border-slate-100"
-                      )}
-                    >
-                      {tab.label}
-                    </button>
-                  );
-                })}
+            {/* Compact KPI Strip */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setOrderListFilter('all')}
+                className={cn(
+                  "rounded-2xl p-3 border text-left flex items-center gap-2.5 transition-all bg-gradient-to-br from-[#F2FBF3] to-[#E5F6E8] border-[#BBE2C4]",
+                  orderListFilter === 'all' && "ring-2 ring-[#D9A323]"
+                )}
+              >
+                <div className="w-8 h-8 rounded-full bg-[#D9F3DF] text-[#15803D] flex items-center justify-center shrink-0">
+                  <Package size={15} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-[#1E3B2B]">All Orders</p>
+                  <p className="text-lg font-display font-bold text-[#0F241C] leading-none mt-0.5 tabular-nums">{totalOrders}</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrderListFilter('pending')}
+                className={cn(
+                  "rounded-2xl p-3 border text-left flex items-center gap-2.5 transition-all bg-gradient-to-br from-[#FFFDF3] to-[#FEF4D6] border-[#EAD089]",
+                  orderListFilter === 'pending' && "ring-2 ring-[#D9A323]"
+                )}
+              >
+                <div className="w-8 h-8 rounded-full bg-[#FCE9B2] text-[#A16207] flex items-center justify-center shrink-0">
+                  <Hourglass size={15} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-[#5C3D06]">Pending</p>
+                  <p className="text-lg font-display font-bold text-[#0F241C] leading-none mt-0.5 tabular-nums">{pendingOrders}</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrderListFilter('approved')}
+                className={cn(
+                  "rounded-2xl p-3 border text-left flex items-center gap-2.5 transition-all bg-gradient-to-br from-[#EEFCF4] to-[#DCF8E7] border-[#9EE2BA]",
+                  orderListFilter === 'approved' && "ring-2 ring-[#D9A323]"
+                )}
+              >
+                <div className="w-8 h-8 rounded-full bg-[#C8F4DA] text-[#15803D] flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={15} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-[#14532D]">Approved</p>
+                  <p className="text-lg font-display font-bold text-[#0F241C] leading-none mt-0.5 tabular-nums">{approvedOrders}</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrderListFilter('revenue')}
+                className={cn(
+                  "rounded-2xl p-3 border text-left flex items-center gap-2.5 transition-all bg-gradient-to-br from-[#F8F3FF] to-[#EDE2FE] border-[#CEB4FA]",
+                  orderListFilter === 'revenue' && "ring-2 ring-[#D9A323]"
+                )}
+              >
+                <div className="w-8 h-8 rounded-full bg-[#E5D5FE] text-[#7E22CE] flex items-center justify-center shrink-0">
+                  <Coins size={15} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-[#581C87]">Revenue Base</p>
+                  <p className="text-lg font-display font-bold text-[#0F241C] leading-none mt-0.5 tabular-nums">₹{(revenue / 1000).toFixed(1)}K</p>
+                </div>
+              </button>
+            </div>
+
+            {/* Search & Status Tabs */}
+            <div className="space-y-2.5">
+              <div className="relative">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C48E22]" />
+                <input
+                  type="text"
+                  value={mobileOrderSearch}
+                  onChange={(e) => setMobileOrderSearch(e.target.value)}
+                  placeholder="Search Order ID, customer, phone..."
+                  className="w-full h-10 pl-9 pr-8 bg-[#FFFDF8] border border-[#E4C987] rounded-xl text-xs font-medium text-[#0F241C] placeholder:text-[#8A7B61] focus:outline-none focus:border-[#D9A323]"
+                />
+                {mobileOrderSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setMobileOrderSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#7D6E52]"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+
+              <div className="bg-[#FAF0D8] p-1 rounded-2xl border border-[#E6CA82]">
+                <div className="flex gap-1 overflow-x-auto whitespace-nowrap py-0.5 no-scrollbar">
+                  {[
+                    { id: 'all', label: 'All Orders' },
+                    { id: 'pending', label: 'Pending' },
+                    { id: 'approved', label: 'Approved' },
+                    { id: 'completed', label: 'Completed' },
+                    { id: 'revenue', label: 'Revenue Base' }
+                  ].map((tab) => {
+                    const isActive = orderListFilter === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setOrderListFilter(tab.id as any)}
+                        className={cn(
+                          "flex-1 text-center py-2 px-3.5 text-xs font-bold rounded-xl transition-all cursor-pointer",
+                          isActive
+                            ? "bg-gradient-to-r from-[#023A28] to-[#044C35] text-[#FFFDF8] shadow-xs"
+                            : "text-[#4A3B22]"
+                        )}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
             {/* Orders Cards List */}
-            <div className="space-y-4">
-              {filteredOrderList.map((ord) => (
-                <div key={ord.id} className="bg-white rounded-[20px] shadow-sm border border-slate-150 p-5 flex flex-col gap-4">
-                  
-                  {/* Row 1: Order ID & Status */}
-                  <div className="flex justify-between items-center">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Order ID</span>
-                      <span className="font-mono text-sm font-bold text-slate-700">#{ord.id.substring(0, 8).toUpperCase()}</span>
-                    </div>
-                    <span className={cn("px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border", getStatusColor(ord.status))}>
+            <div className="space-y-3.5">
+              {mobileFilteredOrders.map((ord) => (
+                <div key={ord.id} className="bg-[#FFFDF8] rounded-2xl shadow-sm border border-[#E4C987] overflow-hidden flex flex-col">
+                  {/* Dark Emerald Strip Header */}
+                  <div className="bg-gradient-to-r from-[#023122] via-[#044732] to-[#022E1F] border-b border-[#D9A323]/60 px-4 py-2 flex justify-between items-center">
+                    <span className="font-mono text-xs font-bold text-[#F5C642]">#{ord.id}</span>
+                    <span className={cn("px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider border", getStatusColor(ord.status))}>
                       {ord.status}
                     </span>
                   </div>
 
-                  {/* Row 2: Customer details & Date */}
-                  <div className="border-t border-slate-50 pt-3">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Customer</span>
-                    <h3 className="font-display font-bold text-slate-900 text-lg leading-snug mt-0.5">
-                      {ord.customerName || 'Guest User'}
-                    </h3>
-                    <p className="text-xs text-slate-400 font-semibold mt-1 flex items-center gap-1">
-                      <CalendarDays size={13} className="text-slate-400 shrink-0" />
-                      Booking: {new Date(ord.eventDate).toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'})}
-                    </p>
-                  </div>
-
-                  {/* Row 3: Specifications Grid */}
-                  <div className="grid grid-cols-3 gap-2 bg-[#FBF9F4] p-3 rounded-2xl border border-slate-100">
-                    <div className="flex flex-col">
-                      <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Package</span>
-                      <span className="text-xs font-bold text-slate-800 truncate mt-0.5" title={ord.packageDetails?.packageName}>
-                        {ord.packageDetails?.packageName || 'Customized'}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Guests</span>
-                      <span className="text-xs font-black text-slate-800 mt-0.5">
-                        {ord.guests}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Amount</span>
-                      <span className="text-xs font-black text-[#0F3D2E] mt-0.5">
-                        ₹{ord.totalEstimate?.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-2 pt-1">
-                    
-                    {/* Secondary Actions (always available for utility) */}
-                    <div className="flex gap-2">
-                      <button 
-                        type="button"
-                        onClick={() => handleOpenOrderDetails(ord)} 
-                        className="flex-1 h-12 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider transition-colors flex items-center justify-center cursor-pointer"
-                      >
-                        View Details
-                      </button>
-
-                      {(ord.customerPhone || ord.phone) && (
-                        <a 
-                          href={`tel:${ord.customerPhone || ord.phone}`}
-                          className="flex-1 h-12 bg-[#FAF6EC] hover:bg-[#F2EADA] text-[#DEAA38] font-bold rounded-xl text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 border border-[#DEAA38]/20"
-                        >
-                          <Phone size={14} /> Call Customer
-                        </a>
+                  <div className="p-4 flex flex-col gap-3">
+                    <div>
+                      <h3 className="font-display font-bold text-[#0F241C] text-base leading-snug">
+                        {ord.customerName || 'Guest User'}
+                      </h3>
+                      <p className="text-[11px] text-[#6B5F4B] font-medium mt-0.5 flex items-center gap-1">
+                        <CalendarDays size={12} className="text-[#C48E22] shrink-0" />
+                        <span>
+                          Event: {ord.eventDate ? new Date(ord.eventDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBD'}
+                        </span>
+                      </p>
+                      {(ord.venue || ord.address) && (
+                        <p className="text-[11px] text-[#6B5F4B] mt-1 flex items-start gap-1 line-clamp-1">
+                          <MapPin size={12} className="text-[#C48E22] shrink-0 mt-0.5" />
+                          <span className="truncate">{ord.venue || ord.address}</span>
+                        </p>
                       )}
                     </div>
 
-                    {/* Operational Map Action if location exists */}
-                    {(ord.venue || ord.address) && (
-                      <a 
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ord.venue || ord.address)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="h-12 bg-blue-50/50 hover:bg-blue-50 border border-blue-250 text-blue-700 font-bold rounded-xl text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"
-                      >
-                        <MapPin size={14} /> Open Maps
-                      </a>
-                    )}
+                    <div className="grid grid-cols-3 gap-2 bg-[#FCF8EE] p-2.5 rounded-xl border border-[#EFE3C4]">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] text-[#7D6E52] font-bold uppercase tracking-wider">Package</span>
+                        <span className="text-xs font-bold text-[#0F241C] truncate mt-0.5">
+                          {ord.packageDetails?.packageName || 'Custom'}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-[9px] text-[#7D6E52] font-bold uppercase tracking-wider">Guests</span>
+                        <span className="text-xs font-bold text-[#0F241C] mt-0.5 tabular-nums">
+                          {ord.guests ?? ord.guestCount ?? '—'}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[9px] text-[#7D6E52] font-bold uppercase tracking-wider">Amount</span>
+                        <span className="text-xs font-extrabold text-[#0F3D2E] mt-0.5 tabular-nums">
+                          ₹{Number(ord.totalEstimate ?? ord.totalAmount ?? ord.amount ?? 0).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    </div>
 
-                    {/* Primary Decision Action Buttons for pending/submitted orders */}
-                    {['pending', 'Submitted', 'Pending Caterer Review', 'updated_by_customer'].includes(ord.status) && (
-                      <div className="flex flex-col gap-2 border-t border-slate-100 pt-3 mt-1">
-                        <div className="flex gap-2">
-                          <button 
-                            type="button"
-                            onClick={() => {
-                              setSelectedOrder(ord);
-                              setShowRejectModal(true);
-                            }}
-                            className="flex-1 h-12 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl text-xs uppercase tracking-wider transition-colors flex items-center justify-center cursor-pointer"
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <button 
+                          type="button"
+                          onClick={() => handleOpenOrderDetails(ord)} 
+                          className="flex-1 h-10 bg-[#FAF0D4] hover:bg-[#F3DFAB] border border-[#DFB95B] text-[#0F241C] font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Eye size={14} className="text-[#9E7018]" />
+                          <span>View Details</span>
+                        </button>
+
+                        {(ord.customerPhone || ord.phone) && (
+                          <a 
+                            href={`tel:${ord.customerPhone || ord.phone}`}
+                            className="flex-1 h-10 bg-[#FCF8EE] border border-[#E4C987] text-[#78530A] font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5"
                           >
-                            Reject
-                          </button>
+                            <Phone size={13} /> Call
+                          </a>
+                        )}
+                      </div>
+
+                      {(ord.venue || ord.address) && (
+                        <a 
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ord.venue || ord.address)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="h-9 bg-[#F1F8FF] border border-[#AED4FA] text-[#1D4ED8] font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <MapPin size={13} /> Open Maps
+                        </a>
+                      )}
+
+                      {['pending', 'Submitted', 'Pending Caterer Review', 'updated_by_customer'].includes(ord.status) && (
+                        <div className="flex flex-col gap-2 border-t border-[#EFE3C4] pt-2.5 mt-0.5">
+                          <div className="flex gap-2">
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                setSelectedOrder(ord);
+                                setShowRejectModal(true);
+                              }}
+                              className="flex-1 h-10 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold rounded-xl text-xs transition-colors flex items-center justify-center cursor-pointer"
+                            >
+                              Reject
+                            </button>
+                            
+                            <button 
+                              type="button"
+                              onClick={() => handleApprove(ord.id)}
+                              className="flex-1 h-10 bg-gradient-to-r from-[#023A28] to-[#044C35] text-white font-bold rounded-xl text-xs transition-colors flex items-center justify-center cursor-pointer"
+                            >
+                              Approve
+                            </button>
+                          </div>
                           
                           <button 
                             type="button"
-                            onClick={() => handleApprove(ord.id)}
-                            className="flex-1 h-12 bg-[#0F3D2E] hover:bg-emerald-900 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-colors flex items-center justify-center cursor-pointer"
+                            onClick={() => openModifyModal(ord)}
+                            className="h-10 border border-[#D9A323] text-[#78530A] bg-[#FAF0D4]/60 font-bold rounded-xl text-xs transition-colors flex items-center justify-center cursor-pointer"
                           >
-                            Approve
+                            Edit Quotation
                           </button>
                         </div>
-                        
-                        <button 
-                          type="button"
-                          onClick={() => openModifyModal(ord)}
-                          className="h-12 border-2 border-[#DEAA38] text-[#DEAA38] bg-amber-500/5 hover:bg-amber-500/10 font-bold rounded-xl text-xs uppercase tracking-wider transition-colors flex items-center justify-center cursor-pointer"
-                        >
-                          Edit Quotation
-                        </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
 
-              {/* Empty State */}
-              {filteredOrderList.length === 0 && (
-                <div className="bg-white rounded-[20px] shadow-sm border border-slate-150 p-10 text-center py-16">
-                  <div className="w-20 h-20 bg-[#FAF6EC] rounded-full flex items-center justify-center mx-auto mb-6">
-                    <ShoppingBag size={36} className="text-[#DEAA38]" />
+              {mobileFilteredOrders.length === 0 && (
+                <div className="bg-[#FFFDF8] rounded-2xl shadow-sm border border-[#E4C987] p-8 text-center">
+                  <div className="w-14 h-14 bg-[#FAF0D4] border border-[#E4C987] rounded-full flex items-center justify-center mx-auto mb-3 text-[#B8841E]">
+                    <ShoppingBag size={24} />
                   </div>
-                  <h3 className="font-display font-bold text-slate-800 text-xl">
-                    {orderListFilter === 'approved' ? "No approved orders found" : "No orders found"}
+                  <h3 className="font-display font-bold text-[#0F241C] text-base">
+                    No {orderListFilter !== 'all' ? orderListFilter : ''} orders found
                   </h3>
-                  <p className="text-sm text-slate-400 mt-2 font-medium max-w-xs mx-auto leading-relaxed">
-                    {orderListFilter === 'approved' 
-                      ? "When you approve orders, they will appear here." 
-                      : "We couldn't find any orders matching this filter."
-                    }
+                  <p className="text-xs text-[#6B5F4B] mt-1">
+                    Try adjusting your status filter or search query.
                   </p>
                 </div>
               )}
             </div>
 
           </div>
-        )}
+          );
+        })()}
 
         {/* --- PROFILE REDESIGNED FOR MOBILE --- */}
         {activeTab === 'profile' && (
@@ -808,21 +955,21 @@ export default function CatererMobileDashboard({
 
             {/* Title and Subtitle */}
             <div className="space-y-1">
-              <h1 className="text-[28px] font-display font-bold text-slate-950 leading-tight">
+              <h1 className="text-[28px] font-display font-bold text-[#0F241C] leading-tight">
                 Profile Management
               </h1>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                Identify your registration with approved before becoming visible.
+              <p className="text-sm text-[#5C5240] leading-relaxed font-medium">
+                Identify your registration as approved before becoming visible.
               </p>
             </div>
 
             {/* Under Review State Banner */}
             {isProfilePending && (
-              <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5 flex items-start gap-3 shadow-2xs">
-                <Clock className="text-amber-500 shrink-0 mt-0.5 animate-pulse" size={20} />
+              <div className="bg-[#FEF3C7] border border-[#DFC78A] rounded-3xl p-5 flex items-start gap-3 shadow-2xs">
+                <Clock className="text-[#9A6A0F] shrink-0 mt-0.5" size={20} />
                 <div className="space-y-1">
-                  <h4 className="font-bold text-amber-900 text-sm">Update Request Pending</h4>
-                  <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                  <h4 className="font-bold text-[#5C3D06] text-sm">Update Request Pending</h4>
+                  <p className="text-xs text-[#6B4A10] leading-relaxed font-medium">
                     Your recent profile changes are currently under review by our admin team. Once approved, they will be visible to customers.
                   </p>
                 </div>
@@ -830,19 +977,19 @@ export default function CatererMobileDashboard({
             )}
 
             {/* Basic Info Fields Stack (one per row) */}
-            <div className="space-y-5 bg-white rounded-[20px] shadow-sm border border-slate-150 p-6">
+            <div className="space-y-5 bg-[#FFFDF8] rounded-[20px] shadow-sm border border-[#DFC78A] p-6">
               
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Owner Name</label>
+                <label className="text-sm font-bold text-[#0F241C]">Owner Name</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7D6E52]">
                     <User size={18} />
                   </span>
                   <input 
                     type="text" 
                     value={profileFormData.owner || ''} 
                     onChange={(e) => setProfileFormData({...profileFormData, owner: e.target.value})} 
-                    className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl pl-12 pr-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                    className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-12 pr-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                     placeholder="e.g. Mohammed Ismail"
                     required 
                   />
@@ -850,16 +997,16 @@ export default function CatererMobileDashboard({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Business Name</label>
+                <label className="text-sm font-bold text-[#0F241C]">Business Name</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7D6E52]">
                     <Building size={18} />
                   </span>
                   <input 
                     type="text" 
                     value={profileFormData.businessName || ''} 
                     onChange={(e) => setProfileFormData({...profileFormData, businessName: e.target.value})} 
-                    className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl pl-12 pr-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                    className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-12 pr-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                     placeholder="e.g. Elite Catering"
                     required 
                   />
@@ -867,16 +1014,16 @@ export default function CatererMobileDashboard({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Mobile Number</label>
+                <label className="text-sm font-bold text-[#0F241C]">Mobile Number</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7D6E52]">
                     <Phone size={18} />
                   </span>
                   <input 
                     type="tel" 
                     value={profileFormData.phone || ''} 
                     onChange={(e) => setProfileFormData({...profileFormData, phone: e.target.value})} 
-                    className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl pl-12 pr-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                    className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-12 pr-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                     placeholder="e.g. 6300255623"
                     required 
                   />
@@ -884,55 +1031,55 @@ export default function CatererMobileDashboard({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Email Address</label>
+                <label className="text-sm font-bold text-[#0F241C]">Email Address</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7D6E52]">
                     <Mail size={18} />
                   </span>
                   <input 
                     type="email" 
                     value={profileFormData.email || ''} 
                     onChange={(e) => setProfileFormData({...profileFormData, email: e.target.value})} 
-                    className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl pl-12 pr-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
-                    placeholder="e.g. atulcatering25@gmail.com"
+                    className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-12 pr-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
+                    placeholder="e.g. info@catering.com"
                     required 
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Business Description</label>
+                <label className="text-sm font-bold text-[#0F241C]">Business Description</label>
                 <textarea 
                   value={profileFormData.description || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, description: e.target.value})} 
-                  className="w-full bg-[#FAF9F5]/70 border border-slate-200 rounded-xl p-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors h-32 resize-none leading-relaxed" 
+                  className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl p-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors h-32 resize-none leading-relaxed" 
                   placeholder="Tell customers about your catering service, specialties, and vision..." 
                   required
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Full Address</label>
+                <label className="text-sm font-bold text-[#0F241C]">Full Address</label>
                 <textarea 
                   value={profileFormData.address || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, address: e.target.value})} 
-                  className="w-full bg-[#FAF9F5]/70 border border-slate-200 rounded-xl p-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors h-28 resize-none leading-relaxed" 
+                  className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl p-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors h-28 resize-none leading-relaxed" 
                   placeholder="Enter full physical business or kitchen address..."
                   required
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Base City</label>
+                <label className="text-sm font-bold text-[#0F241C]">Base City</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7D6E52]">
                     <MapPin size={18} />
                   </span>
                   <input 
                     type="text" 
                     value={profileFormData.city || ''} 
                     onChange={(e) => setProfileFormData({...profileFormData, city: e.target.value})} 
-                    className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl pl-12 pr-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                    className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-12 pr-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                     placeholder="e.g. Hyderabad"
                     required 
                   />
@@ -942,82 +1089,82 @@ export default function CatererMobileDashboard({
             </div>
 
             {/* Professional & Operational Details Section */}
-            <div className="space-y-5 bg-white rounded-[20px] shadow-sm border border-slate-150 p-6">
-              <h3 className="font-display font-bold text-slate-900 text-lg border-b border-slate-100 pb-3">
-                Professional & Operational Details
+            <div className="space-y-5 bg-[#FFFDF8] rounded-[20px] shadow-sm border border-[#DFC78A] p-6">
+              <h3 className="font-display font-bold text-[#0F241C] text-lg border-b border-[#EFE3C4] pb-3">
+                Professional &amp; Operational Details
               </h3>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Brand Name</label>
+                <label className="text-sm font-bold text-[#0F241C]">Brand Name</label>
                 <input 
                   type="text" 
                   value={profileFormData.brandName || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, brandName: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
-                  placeholder="e.g. Q4 Royal Caterers Premium" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
+                  placeholder="e.g. Royal Caterers Premium" 
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Tagline</label>
+                <label className="text-sm font-bold text-[#0F241C]">Tagline</label>
                 <input 
                   type="text" 
                   value={profileFormData.tagline || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, tagline: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                   placeholder="e.g. Crafting Memorable Celebrations with Exceptional Taste" 
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">WhatsApp Mobile Connection</label>
+                <label className="text-sm font-bold text-[#0F241C]">WhatsApp Mobile Connection</label>
                 <input 
                   type="tel" 
                   value={profileFormData.whatsappNumber || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, whatsappNumber: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                   placeholder="e.g. +91 98765 43210" 
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Years of Experience</label>
+                <label className="text-sm font-bold text-[#0F241C]">Years of Experience</label>
                 <input 
                   type="number" 
                   value={profileFormData.experience || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, experience: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                   placeholder="e.g. 20" 
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Events Completed</label>
+                <label className="text-sm font-bold text-[#0F241C]">Events Completed</label>
                 <input 
                   type="number" 
                   value={profileFormData.eventsCompleted || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, eventsCompleted: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                   placeholder="e.g. 260" 
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">Number of Branches</label>
+                <label className="text-sm font-bold text-[#0F241C]">Number of Branches</label>
                 <input 
                   type="number" 
                   value={profileFormData.branches || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, branches: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium text-[#0F241C] focus:border-[#D4961B] focus:bg-[#FFFDF8] outline-none transition-colors" 
                   placeholder="e.g. 2" 
                 />
               </div>
 
               <div className="flex flex-col gap-3">
-                <label className="text-sm font-bold text-slate-700">Service Areas</label>
+                <label className="text-sm font-bold text-[#0F241C]">Service Areas</label>
                 
                 {/* Serve Entire Hyderabad checkbox */}
-                <label className="flex items-center gap-2.5 cursor-pointer select-none bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-slate-50">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none bg-[#FAF3E2]/65 border border-[#DFC78A] rounded-xl px-4 py-3.5 transition hover:bg-[#FAF0D4]">
                   <input
                     type="checkbox"
                     checked={(() => {
@@ -1033,9 +1180,9 @@ export default function CatererMobileDashboard({
                         setProfileFormData({ ...profileFormData, serviceAreas: [] });
                       }
                     }}
-                    className="w-5 h-5 text-[#0F3D2E] focus:ring-[#0F3D2E] border-slate-300 rounded cursor-pointer accent-[#0F3D2E]"
+                    className="w-5 h-5 text-[#01291D] focus:ring-[#01291D] border-[#DFC78A] rounded cursor-pointer accent-[#01291D]"
                   />
-                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-[#0F241C] uppercase tracking-wider">
                     Serve Entire Hyderabad
                   </span>
                 </label>
@@ -1049,7 +1196,7 @@ export default function CatererMobileDashboard({
                   <div className="flex flex-col gap-3">
                     <div className="flex gap-2 relative">
                       <div className="relative flex-1">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7D6E52]">
                           <MapPin size={18} />
                         </span>
                         <input
@@ -1072,7 +1219,7 @@ export default function CatererMobileDashboard({
                             }
                           }}
                           placeholder="Enter area name, e.g. Jubilee Hills..."
-                          className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl pl-11 pr-4 text-sm font-medium focus:border-[#DEAA38] outline-none"
+                          className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl pl-11 pr-4 text-sm font-medium text-[#0F241C] focus:border-[#D4961B] outline-none"
                         />
                       </div>
                       <button
@@ -1089,7 +1236,7 @@ export default function CatererMobileDashboard({
                           }
                           setDashboardNewAreaText("");
                         }}
-                        className="bg-[#0F3D2E] hover:bg-emerald-900 text-white text-xs font-black px-5 rounded-xl transition h-14 shrink-0 uppercase tracking-wider cursor-pointer"
+                        className="bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 hover:brightness-110 text-[#FFFDF8] text-xs font-black px-5 rounded-xl transition h-14 shrink-0 uppercase tracking-wider cursor-pointer"
                       >
                         + Add Area
                       </button>
@@ -1103,9 +1250,9 @@ export default function CatererMobileDashboard({
                       })().map((area: string, idx: number) => (
                         <span
                           key={idx}
-                          className="inline-flex items-center gap-1.5 bg-[#FAF6EC] border border-[#DEAA38]/20 text-slate-800 px-3 py-1.5 rounded-full text-xs font-semibold select-none"
+                          className="inline-flex items-center gap-1.5 bg-[#FAF0D4] border border-[#DFC78A] text-[#0F241C] px-3 py-1.5 rounded-full text-xs font-semibold select-none"
                         >
-                          <span className="uppercase text-[10px] font-bold text-amber-900 tracking-wider">
+                          <span className="uppercase text-[10px] font-bold text-[#78530A] tracking-wider">
                             {area}
                           </span>
                           <button
@@ -1116,7 +1263,7 @@ export default function CatererMobileDashboard({
                               const filtered = arr.filter((a: string) => a !== area);
                               setProfileFormData({ ...profileFormData, serviceAreas: filtered });
                             }}
-                            className="text-amber-850 hover:text-red-600 transition-colors focus:outline-none cursor-pointer"
+                            className="text-[#78530A] hover:text-rose-600 transition-colors focus:outline-none cursor-pointer"
                           >
                             <X size={12} strokeWidth={2.5} />
                           </button>
@@ -1127,7 +1274,7 @@ export default function CatererMobileDashboard({
                         const arr = Array.isArray(raw) ? raw : (typeof raw === "string" ? (raw.startsWith("[") ? JSON.parse(raw) : raw.split(",").map(s => s.trim()).filter(Boolean)) : []);
                         return arr.length === 0;
                       })() && (
-                        <p className="text-xs text-slate-400 italic">No specific service areas added yet. Type an area above and click Add Area.</p>
+                        <p className="text-xs text-[#6B5F4B] italic">No specific service areas added yet. Type an area above and click Add Area.</p>
                       )}
                     </div>
                   </div>
@@ -1136,24 +1283,24 @@ export default function CatererMobileDashboard({
             </div>
 
             {/* Branding & Identity Section */}
-            <div className="space-y-6 bg-white rounded-[20px] shadow-sm border border-slate-150 p-6">
-              <h3 className="font-display font-bold text-slate-900 text-lg border-b border-slate-100 pb-3">
-                Branding & Identity
+            <div className="space-y-6 bg-[#FFFDF8] rounded-[20px] shadow-sm border border-[#DFC78A] p-6">
+              <h3 className="font-display font-bold text-[#0F241C] text-lg border-b border-[#EFE3C4] pb-3">
+                Branding &amp; Identity
               </h3>
 
               {/* Logo Upload Box */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700">Caterer Logo Upload (500x500)</label>
-                <div className="border-2 border-dashed border-[#DEAA38]/40 rounded-3xl p-5 bg-[#FAF9F5]/30 flex flex-col items-center justify-center min-h-[180px] relative overflow-hidden transition-all">
+                <label className="text-sm font-bold text-[#0F241C]">Caterer Logo Upload (500x500)</label>
+                <div className="border-2 border-dashed border-[#DFC78A] rounded-3xl p-5 bg-[#FAF3E2]/45 flex flex-col items-center justify-center min-h-[180px] relative overflow-hidden transition-all">
                   {profileFormData.logo ? (
                     <div className="relative w-full h-[140px] flex flex-col items-center justify-center">
                       <img 
                         src={profileFormData.logo} 
                         alt="Logo Preview" 
-                        className="max-h-full max-w-[120px] object-contain rounded-full shadow border-2 border-white"
+                        className="max-h-full max-w-[120px] object-contain rounded-full shadow border-2 border-[#FFFDF8]"
                         referrerPolicy="no-referrer"
                       />
-                      <label className="mt-3 cursor-pointer bg-[#DEAA38] text-slate-950 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-amber-500 shadow-sm transition-all select-none uppercase tracking-wider">
+                      <label className="mt-3 cursor-pointer bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] border border-[#B57B0C]/35 text-[#042419] text-xs font-black px-4 py-2.5 rounded-xl hover:brightness-105 shadow-sm transition-all select-none uppercase tracking-wider">
                         Change Logo
                         <input 
                           type="file" 
@@ -1176,11 +1323,11 @@ export default function CatererMobileDashboard({
                     </div>
                   ) : (
                     <div className="text-center flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full bg-[#FAF6EC] text-amber-700 flex items-center justify-center mb-2">
-                        <UploadCloud size={22} className="text-[#DEAA38]" />
+                      <div className="w-12 h-12 rounded-full bg-[#FAF0D4] border border-[#DFC78A] text-[#9A6A0F] flex items-center justify-center mb-2">
+                        <UploadCloud size={22} className="text-[#9A6A0F]" />
                       </div>
-                      <p className="text-xs font-bold text-slate-500">No logo uploaded yet</p>
-                      <label className="mt-2 cursor-pointer bg-[#DEAA38] text-slate-950 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-amber-500 transition-all select-none uppercase tracking-wider">
+                      <p className="text-xs font-bold text-[#5C5240]">No logo uploaded yet</p>
+                      <label className="mt-2 cursor-pointer bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] border border-[#B57B0C]/35 text-[#042419] text-xs font-black px-4 py-2.5 rounded-xl hover:brightness-105 transition-all select-none uppercase tracking-wider">
                         Upload Logo
                         <input 
                           type="file" 
@@ -1205,19 +1352,19 @@ export default function CatererMobileDashboard({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Or Select From Gallery / Paste URL</label>
+                  <label className="block text-[10px] text-[#7D6E52] font-bold uppercase tracking-wider">Or Select From Gallery / Paste URL</label>
                   <div className="flex gap-2">
                     <input 
                       type="text" 
                       placeholder="e.g. https://host.com/logo.jpg" 
                       value={profileFormData.logo && profileFormData.logo.startsWith('data:') ? '' : (profileFormData.logo || '')} 
                       onChange={(e) => setProfileFormData({...profileFormData, logo: e.target.value})} 
-                      className="flex-1 h-12 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-xs font-medium outline-none" 
+                      className="flex-1 h-12 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-xs font-medium text-[#0F241C] outline-none focus:border-[#D4961B]" 
                     />
                     <button 
                       type="button"
                       onClick={() => setProfileFormData({...profileFormData, logo: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=500'})}
-                      className="bg-[#FAF6EC] border border-[#DEAA38]/30 text-amber-900 font-bold px-4 rounded-xl text-xs uppercase cursor-pointer"
+                      className="bg-[#FAF0D4] border border-[#DFC78A] text-[#78530A] font-bold px-4 rounded-xl text-xs uppercase cursor-pointer"
                     >
                       Gallery
                     </button>
@@ -1227,17 +1374,17 @@ export default function CatererMobileDashboard({
 
               {/* Cover Banner Upload Box */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700">Cover Banner Upload (1600x600)</label>
-                <div className="border-2 border-dashed border-[#DEAA38]/40 rounded-3xl p-5 bg-[#FAF9F5]/30 flex flex-col items-center justify-center min-h-[180px] relative overflow-hidden transition-all">
+                <label className="text-sm font-bold text-[#0F241C]">Cover Banner Upload (1600x600)</label>
+                <div className="border-2 border-dashed border-[#DFC78A] rounded-3xl p-5 bg-[#FAF3E2]/45 flex flex-col items-center justify-center min-h-[180px] relative overflow-hidden transition-all">
                   {profileFormData.coverBanner ? (
                     <div className="relative w-full h-[140px] flex flex-col items-center justify-center">
                       <img 
                         src={profileFormData.coverBanner} 
                         alt="Banner Preview" 
-                        className="max-h-full w-full object-cover rounded-xl shadow border border-slate-100"
+                        className="max-h-full w-full object-cover rounded-xl shadow border border-[#DFC78A]"
                         referrerPolicy="no-referrer"
                       />
-                      <label className="mt-3 cursor-pointer bg-[#DEAA38] text-slate-950 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-amber-500 shadow-sm transition-all select-none uppercase tracking-wider">
+                      <label className="mt-3 cursor-pointer bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] border border-[#B57B0C]/35 text-[#042419] text-xs font-black px-4 py-2.5 rounded-xl hover:brightness-105 shadow-sm transition-all select-none uppercase tracking-wider">
                         Change Banner
                         <input 
                           type="file" 
@@ -1260,11 +1407,11 @@ export default function CatererMobileDashboard({
                     </div>
                   ) : (
                     <div className="text-center flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full bg-[#FAF6EC] text-amber-700 flex items-center justify-center mb-2">
-                        <UploadCloud size={22} className="text-[#DEAA38]" />
+                      <div className="w-12 h-12 rounded-full bg-[#FAF0D4] border border-[#DFC78A] text-[#9A6A0F] flex items-center justify-center mb-2">
+                        <UploadCloud size={22} className="text-[#9A6A0F]" />
                       </div>
-                      <p className="text-xs font-bold text-slate-500">No cover banner uploaded yet</p>
-                      <label className="mt-2 cursor-pointer bg-[#DEAA38] text-slate-950 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-amber-500 transition-all select-none uppercase tracking-wider">
+                      <p className="text-xs font-bold text-[#5C5240]">No cover banner uploaded yet</p>
+                      <label className="mt-2 cursor-pointer bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] border border-[#B57B0C]/35 text-[#042419] text-xs font-black px-4 py-2.5 rounded-xl hover:brightness-105 transition-all select-none uppercase tracking-wider">
                         Upload Banner
                         <input 
                           type="file" 
@@ -1289,19 +1436,19 @@ export default function CatererMobileDashboard({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Or Select From Gallery / Paste URL</label>
+                  <label className="block text-[10px] text-[#7D6E52] font-bold uppercase tracking-wider">Or Select From Gallery / Paste URL</label>
                   <div className="flex gap-2">
                     <input 
                       type="text" 
                       placeholder="e.g. https://host.com/banner.jpg" 
                       value={profileFormData.coverBanner && profileFormData.coverBanner.startsWith('data:') ? '' : (profileFormData.coverBanner || '')} 
                       onChange={(e) => setProfileFormData({...profileFormData, coverBanner: e.target.value})} 
-                      className="flex-1 h-12 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-xs font-medium outline-none" 
+                      className="flex-1 h-12 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-xs font-medium text-[#0F241C] outline-none focus:border-[#D4961B]" 
                     />
                     <button 
                       type="button"
                       onClick={() => setProfileFormData({...profileFormData, coverBanner: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1000'})}
-                      className="bg-[#FAF6EC] border border-[#DEAA38]/30 text-amber-900 font-bold px-4 rounded-xl text-xs uppercase cursor-pointer"
+                      className="bg-[#FAF0D4] border border-[#DFC78A] text-[#78530A] font-bold px-4 rounded-xl text-xs uppercase cursor-pointer"
                     >
                       Gallery
                     </button>
@@ -1312,19 +1459,19 @@ export default function CatererMobileDashboard({
             </div>
 
             {/* Gallery Photos Section */}
-            <div className="space-y-6 bg-white rounded-[20px] shadow-sm border border-slate-150 p-6">
-              <h3 className="font-display font-bold text-slate-900 text-lg border-b border-slate-100 pb-3">
+            <div className="space-y-6 bg-[#FFFDF8] rounded-[20px] shadow-sm border border-[#DFC78A] p-6">
+              <h3 className="font-display font-bold text-[#0F241C] text-lg border-b border-[#EFE3C4] pb-3">
                 Gallery Photos
               </h3>
-              <p className="text-xs text-slate-500 -mt-2">
+              <p className="text-xs text-[#5C5240] -mt-2">
                 Manage the images shown on your Explore Caterers listing.
               </p>
 
               {/* Mobile 2-column grid */}
               <div className="grid grid-cols-2 gap-4">
                 {(profileFormData.galleryPhotos || []).map((imgUrl: string, idx: number) => (
-                  <div key={idx} className="bg-slate-50 rounded-2xl border border-slate-200 p-2.5 shadow-sm relative flex flex-col justify-between">
-                    <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 border border-slate-200/50 mb-2 flex items-center justify-center">
+                  <div key={idx} className="bg-[#FAF3E2]/55 rounded-2xl border border-[#DFC78A] p-2.5 shadow-sm relative flex flex-col justify-between">
+                    <div className="relative aspect-video rounded-xl overflow-hidden bg-[#FAF3E2] border border-[#DFC78A]/70 mb-2 flex items-center justify-center">
                       <img 
                         src={imgUrl} 
                         alt={`Gallery ${idx + 1}`} 
@@ -1332,7 +1479,7 @@ export default function CatererMobileDashboard({
                         referrerPolicy="no-referrer"
                       />
                       {idx === 0 && (
-                        <span className="absolute top-1 left-1 bg-brand-gold-500 text-slate-900 text-[8px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow uppercase tracking-wider">
+                        <span className="absolute top-1 left-1 bg-gradient-to-r from-[#FCE07E] to-[#D99B16] text-[#042419] text-[8px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow uppercase tracking-wider">
                           <Star size={8} fill="currentColor" /> Primary
                         </span>
                       )}
@@ -1343,7 +1490,7 @@ export default function CatererMobileDashboard({
                         <button 
                           type="button" 
                           onClick={() => handleMakePrimary(idx)}
-                          className="w-full py-1 bg-brand-gold-50 hover:bg-brand-gold-100 text-[#DEAA38] font-bold rounded-lg text-[10px] transition-colors flex items-center justify-center gap-0.5 border border-brand-gold-100 uppercase tracking-wide"
+                          className="w-full py-1 bg-[#FAF0D4] hover:bg-[#F3DFAB] text-[#78530A] font-bold rounded-lg text-[10px] transition-colors flex items-center justify-center gap-0.5 border border-[#DFC78A] uppercase tracking-wide cursor-pointer"
                         >
                           <Star size={10} /> Primary
                         </button>
@@ -1354,7 +1501,7 @@ export default function CatererMobileDashboard({
                           type="button"
                           disabled={idx === 0}
                           onClick={() => handleMovePhoto(idx, 'left')}
-                          className="flex-1 py-1 bg-white hover:bg-slate-100 disabled:opacity-30 border border-slate-200 text-slate-600 rounded-lg flex items-center justify-center"
+                          className="flex-1 py-1 bg-[#FFFDF8] hover:bg-[#FAF0D4] disabled:opacity-30 border border-[#DFC78A] text-[#0F241C] rounded-lg flex items-center justify-center cursor-pointer"
                           title="Move Left"
                         >
                           <ChevronLeft size={14} />
@@ -1363,7 +1510,7 @@ export default function CatererMobileDashboard({
                           type="button"
                           disabled={idx === (profileFormData.galleryPhotos || []).length - 1}
                           onClick={() => handleMovePhoto(idx, 'right')}
-                          className="flex-1 py-1 bg-white hover:bg-slate-100 disabled:opacity-30 border border-slate-200 text-slate-600 rounded-lg flex items-center justify-center"
+                          className="flex-1 py-1 bg-[#FFFDF8] hover:bg-[#FAF0D4] disabled:opacity-30 border border-[#DFC78A] text-[#0F241C] rounded-lg flex items-center justify-center cursor-pointer"
                           title="Move Right"
                         >
                           <ChevronRight size={14} />
@@ -1371,7 +1518,7 @@ export default function CatererMobileDashboard({
                       </div>
 
                       <div className="flex gap-1.5">
-                        <label className="flex-1 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center uppercase tracking-wide">
+                        <label className="flex-1 py-1 bg-[#FFFDF8] hover:bg-[#FAF0D4] border border-[#DFC78A] text-[#0F241C] font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center uppercase tracking-wide">
                           Replace
                           <input 
                             type="file" 
@@ -1388,7 +1535,7 @@ export default function CatererMobileDashboard({
                         <button 
                           type="button" 
                           onClick={() => handleDeletePhoto(idx)}
-                          className="py-1 px-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 font-bold rounded-lg text-[10px] transition-colors"
+                          className="py-1 px-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 font-bold rounded-lg text-[10px] transition-colors cursor-pointer"
                         >
                           <Trash2 size={12} />
                         </button>
@@ -1399,13 +1546,13 @@ export default function CatererMobileDashboard({
               </div>
 
               {/* Upload Button */}
-              <div className="border border-dashed border-[#DEAA38]/40 rounded-3xl p-5 bg-[#FAF9F5]/30 flex flex-col items-center justify-center min-h-[140px] text-center">
-                <div className="w-10 h-10 rounded-full bg-[#FAF6EC] text-amber-700 flex items-center justify-center mb-2 shadow-sm">
-                  <UploadCloud size={20} className="text-[#DEAA38]" />
+              <div className="border-2 border-dashed border-[#DFC78A] rounded-3xl p-5 bg-[#FAF3E2]/45 flex flex-col items-center justify-center min-h-[140px] text-center">
+                <div className="w-10 h-10 rounded-full bg-[#FAF0D4] border border-[#DFC78A] text-[#9A6A0F] flex items-center justify-center mb-2 shadow-sm">
+                  <UploadCloud size={20} />
                 </div>
-                <p className="text-xs font-bold text-slate-700 mb-0.5">Upload new images</p>
-                <p className="text-[10px] text-slate-400 mb-3">Supports JPG, PNG, WEBP</p>
-                <label className="cursor-pointer bg-[#DEAA38] text-slate-950 text-[10px] font-black px-4 py-2.5 rounded-xl hover:bg-amber-500 shadow-sm transition-all select-none uppercase tracking-wider">
+                <p className="text-xs font-bold text-[#0F241C] mb-0.5">Upload new images</p>
+                <p className="text-[10px] text-[#6B5F4B] mb-3">Supports JPG, PNG, WEBP</p>
+                <label className="cursor-pointer bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] border border-[#B57B0C]/35 text-[#042419] text-[10px] font-black px-4 py-2.5 rounded-xl hover:brightness-105 shadow-sm transition-all select-none uppercase tracking-wider">
                   Upload Photos
                   <input 
                     type="file" 
@@ -1423,40 +1570,40 @@ export default function CatererMobileDashboard({
             </div>
 
             {/* Legal Details Section */}
-            <div className="space-y-5 bg-white rounded-[20px] shadow-sm border border-slate-150 p-6">
-              <h3 className="font-display font-bold text-slate-900 text-lg border-b border-slate-100 pb-3">
+            <div className="space-y-5 bg-[#FFFDF8] rounded-[20px] shadow-sm border border-[#DFC78A] p-6">
+              <h3 className="font-display font-bold text-[#0F241C] text-lg border-b border-[#EFE3C4] pb-3">
                 Legal Details
               </h3>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">FSSAI Number</label>
+                <label className="text-sm font-bold text-[#0F241C]">FSSAI Number</label>
                 <input 
                   type="text" 
                   value={profileFormData.fssaiNumber || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, fssaiNumber: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors uppercase" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium focus:border-[#D4961B] outline-none transition-colors uppercase text-[#0F241C]" 
                   placeholder="14-digit FSSAI registration" 
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">GSTIN</label>
+                <label className="text-sm font-bold text-[#0F241C]">GSTIN</label>
                 <input 
                   type="text" 
                   value={profileFormData.gstNumber || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, gstNumber: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors uppercase" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium focus:border-[#D4961B] outline-none transition-colors uppercase text-[#0F241C]" 
                   placeholder="15-character GSTIN code" 
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-slate-700">PAN Number</label>
+                <label className="text-sm font-bold text-[#0F241C]">PAN Number</label>
                 <input 
                   type="text" 
                   value={profileFormData.panNumber || ''} 
                   onChange={(e) => setProfileFormData({...profileFormData, panNumber: e.target.value})} 
-                  className="w-full h-14 bg-[#FAF9F5]/70 border border-slate-200 rounded-xl px-4 text-base font-medium focus:border-[#DEAA38] focus:bg-white outline-none transition-colors uppercase" 
+                  className="w-full h-14 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-4 text-base font-medium focus:border-[#D4961B] outline-none transition-colors uppercase text-[#0F241C]" 
                   placeholder="10-character business PAN" 
                 />
               </div>
@@ -1466,7 +1613,7 @@ export default function CatererMobileDashboard({
             <div className="pt-4 pb-12">
               <button 
                 type="submit" 
-                className="w-full h-14 bg-[#0F3D2E] hover:bg-emerald-900 text-white text-base font-black rounded-xl shadow-lg transition-all uppercase tracking-wider flex items-center justify-center cursor-pointer"
+                className="w-full h-14 bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 hover:brightness-110 text-[#FFFDF8] text-base font-black rounded-xl shadow-lg transition-all uppercase tracking-wider flex items-center justify-center cursor-pointer"
               >
                 Submit Profile for Review
               </button>
@@ -1478,19 +1625,19 @@ export default function CatererMobileDashboard({
         {/* --- NOTIFICATIONS ON MOBILE --- */}
         {activeTab === 'notifications' && (
           <div className="space-y-6 pt-4">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-2">
+            <div className="flex justify-between items-center border-b border-[#EFE3C4] pb-4 mb-2">
               <div>
-                <h1 className="text-2xl font-display font-bold text-slate-950">
+                <h1 className="text-2xl font-display font-bold text-[#0F241C]">
                   Notifications
                 </h1>
-                <p className="text-xs text-slate-500 font-semibold">
+                <p className="text-xs text-[#5C5240] font-semibold">
                   Status changes, system updates, and requests.
                 </p>
               </div>
               {localNotifications.length > 0 && (
                 <button 
                   onClick={handleClearAllNotifications} 
-                  className="px-3.5 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="px-3.5 py-2 bg-rose-50 text-rose-700 border border-rose-200 font-bold rounded-xl text-xs transition-colors cursor-pointer"
                 >
                   Clear All
                 </button>
@@ -1499,19 +1646,19 @@ export default function CatererMobileDashboard({
 
             <div className="space-y-3">
               {localNotifications.map((n) => (
-                <div key={n.id} className={cn("p-4 rounded-2xl border transition-all flex justify-between items-start gap-2.5", n.read ? "bg-white border-slate-150" : "bg-[#FAF6EC] border-[#DEAA38]/30 shadow-2xs")}>
+                <div key={n.id} className={cn("p-4 rounded-2xl border transition-all flex justify-between items-start gap-2.5", n.read ? "bg-[#FFFDF8] border-[#DFC78A]/70" : "bg-[#FAF0D4]/65 border-[#D4961B]/60 shadow-2xs")}>
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className={cn("w-2 h-2 rounded-full shrink-0", n.read ? "bg-slate-300" : "bg-[#DEAA38]")} />
-                      <h4 className="font-bold text-slate-800 text-sm truncate">{n.title}</h4>
+                      <span className={cn("w-2 h-2 rounded-full shrink-0", n.read ? "bg-[#DFC78A]" : "bg-[#D4961B]")} />
+                      <h4 className="font-bold text-[#0F241C] text-sm truncate">{n.title}</h4>
                     </div>
-                    <p className="text-xs text-slate-600 pl-4 leading-relaxed font-medium">{n.message}</p>
-                    {n.orderId && <p className="text-[10px] text-slate-400 font-mono pl-4">Order: #{n.orderId.substring(0, 8)}</p>}
+                    <p className="text-xs text-[#494032] pl-4 leading-relaxed font-medium">{n.message}</p>
+                    {n.orderId && <p className="text-[10px] text-[#7D6E52] font-mono pl-4">Order: #{n.orderId.substring(0, 8)}</p>}
                   </div>
                   {!n.read && (
                     <button 
                       onClick={() => handleMarkNotificationRead(n.id)} 
-                      className="px-2.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-all shrink-0 cursor-pointer"
+                      className="px-2.5 py-1.5 bg-[#FFFDF8] hover:bg-[#FAF0D4] border border-[#DFC78A] text-[#0F241C] rounded-lg text-[10px] font-bold transition-all shrink-0 cursor-pointer"
                     >
                       Mark Read
                     </button>
@@ -1520,12 +1667,12 @@ export default function CatererMobileDashboard({
               ))}
               
               {localNotifications.length === 0 && (
-                <div className="bg-white rounded-2xl border border-slate-150 p-10 text-center py-12">
-                  <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                    <Bell size={24} className="text-slate-400" />
+                <div className="bg-[#FFFDF8] rounded-2xl border border-[#DFC78A] p-10 text-center py-12">
+                  <div className="w-14 h-14 bg-[#FAF0D4] border border-[#DFC78A] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Bell size={24} className="text-[#9A6A0F]" />
                   </div>
-                  <p className="font-bold text-slate-700">All caught up!</p>
-                  <p className="text-xs text-slate-400 mt-1">You have no new notifications.</p>
+                  <p className="font-bold text-[#0F241C]">All caught up!</p>
+                  <p className="text-xs text-[#6B5F4B] mt-1">You have no new notifications.</p>
                 </div>
               )}
             </div>
@@ -1536,10 +1683,10 @@ export default function CatererMobileDashboard({
         {activeTab === 'payments' && (
           <div className="space-y-6 pt-4">
             <div>
-              <h1 className="text-2xl font-display font-bold text-slate-950">
+              <h1 className="text-2xl font-display font-bold text-[#0F241C]">
                 Payment History
               </h1>
-              <p className="text-xs text-slate-500 font-semibold">
+              <p className="text-xs text-[#5C5240] font-semibold">
                 Manage your transaction payouts and fees.
               </p>
             </div>
@@ -1549,34 +1696,34 @@ export default function CatererMobileDashboard({
                 const gross = (ord.pricePerPlate || 0) * (ord.guests || 0);
                 const netAmount = gross * 0.9;
                 return (
-                  <div key={'pay-'+ord.id} className="bg-white rounded-2xl shadow-2xs border border-slate-150 p-4 space-y-3">
+                  <div key={'pay-'+ord.id} className="bg-[#FFFDF8] rounded-2xl shadow-2xs border border-[#DFC78A] p-4 space-y-3">
                     <div className="flex justify-between items-center">
                       <div className="flex flex-col">
-                        <span className="text-[8px] text-slate-400 font-bold uppercase">Order ID</span>
-                        <span className="font-mono text-xs font-bold text-slate-700">#{ord.id.substring(0, 8).toUpperCase()}</span>
+                        <span className="text-[8px] text-[#7D6E52] font-bold uppercase">Order ID</span>
+                        <span className="font-mono text-xs font-bold text-[#0F241C]">#{ord.id.substring(0, 8).toUpperCase()}</span>
                       </div>
-                      <span className="bg-green-50 text-green-700 border border-green-150 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                      <span className="bg-[#DCF8E6] text-[#116E39] border border-[#9EE2BA] px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">
                         Paid
                       </span>
                     </div>
 
-                    <div className="border-t border-slate-50 pt-2 text-xs font-medium space-y-1 text-slate-650">
-                      <p className="flex justify-between"><span className="text-slate-400">Customer:</span> <span className="font-bold text-slate-800">{ord.customerName}</span></p>
-                      <p className="flex justify-between"><span className="text-slate-400">Gross Amount:</span> <span className="font-bold text-slate-800">₹{gross.toLocaleString()}</span></p>
-                      <p className="flex justify-between"><span className="text-slate-400">Platform Fee (10%):</span> <span className="font-semibold text-rose-600">-₹{(gross*0.1).toFixed(0)}</span></p>
-                      <p className="flex justify-between border-t border-dashed border-slate-100 pt-2 mt-1 text-sm font-bold"><span className="text-[#0F3D2E]">Net Payout:</span> <span className="text-[#0F3D2E]">₹{netAmount.toLocaleString()}</span></p>
+                    <div className="border-t border-[#EFE3C4] pt-2 text-xs font-medium space-y-1 text-[#494032]">
+                      <p className="flex justify-between"><span className="text-[#6B5F4B]">Customer:</span> <span className="font-bold text-[#0F241C]">{ord.customerName}</span></p>
+                      <p className="flex justify-between"><span className="text-[#6B5F4B]">Gross Amount:</span> <span className="font-bold text-[#0F241C] tabular-nums">₹{gross.toLocaleString()}</span></p>
+                      <p className="flex justify-between"><span className="text-[#6B5F4B]">Platform Fee (10%):</span> <span className="font-semibold text-rose-600 tabular-nums">-₹{(gross*0.1).toFixed(0)}</span></p>
+                      <p className="flex justify-between border-t border-dashed border-[#DFC78A] pt-2 mt-1 text-sm font-bold"><span className="text-[#064E3B]">Net Payout:</span> <span className="text-[#064E3B] tabular-nums">₹{netAmount.toLocaleString()}</span></p>
                     </div>
                   </div>
                 );
               })}
 
               {partnerOrders.filter(o => ['Approved', 'Completed'].includes(o.status)).length === 0 && (
-                <div className="bg-white rounded-2xl border border-slate-150 p-10 text-center py-12">
-                  <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                    <CreditCard size={24} className="text-slate-400" />
+                <div className="bg-[#FFFDF8] rounded-2xl border border-[#DFC78A] p-10 text-center py-12">
+                  <div className="w-14 h-14 bg-[#FAF0D4] border border-[#DFC78A] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CreditCard size={24} className="text-[#9A6A0F]" />
                   </div>
-                  <p className="font-bold text-slate-700">No transactions</p>
-                  <p className="text-xs text-slate-400 mt-1">Confirmed payouts will be listed here.</p>
+                  <p className="font-bold text-[#0F241C]">No transactions</p>
+                  <p className="text-xs text-[#6B5F4B] mt-1">Confirmed payouts will be listed here.</p>
                 </div>
               )}
             </div>
@@ -1587,7 +1734,7 @@ export default function CatererMobileDashboard({
 
       {/* Bottom Navigation Bar (Mobile Only) */}
       <div className="fixed bottom-4 left-4 right-4 z-50 select-none">
-        <div className="bg-[#111111] rounded-[2rem] p-2 px-3 flex justify-between items-center shadow-2xl border border-white/5">
+        <div className="bg-gradient-to-r from-[#01291D] via-[#023A28] to-[#01291D] rounded-[2rem] p-2 px-3 flex justify-between items-center shadow-2xl border border-[#DFC78A]/45">
           {bottomNavItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -1595,17 +1742,17 @@ export default function CatererMobileDashboard({
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={cn(
-                  "relative flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-2xl transition-all duration-300",
+                  "relative flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-2xl transition-all duration-300 cursor-pointer",
                   isActive 
-                    ? "bg-[#DEAA38] text-slate-950 font-black shadow-lg" 
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-gradient-to-r from-[#FAE18D] to-[#D99B16] text-[#042419] font-black shadow-lg" 
+                    : "text-[#E8DFC5] hover:text-[#FFFDF8]"
                 )}
                 id={`mobile-bottom-nav-${item.id}`}
               >
                 <div className="relative">
                   <item.icon size={18} className={isActive ? "scale-110" : ""} />
                   {item.badge && (
-                    <span className="absolute -top-1.5 -right-2 bg-[#DEAA38] text-slate-950 text-[8px] font-black rounded-full w-4 h-4 flex items-center justify-center border border-[#111111]">
+                    <span className="absolute -top-1.5 -right-2 bg-[#F5C642] text-[#042419] text-[8px] font-black rounded-full w-4 h-4 flex items-center justify-center border border-[#01291D]">
                       {item.badge}
                     </span>
                   )}
@@ -1638,28 +1785,28 @@ export default function CatererMobileDashboard({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed top-0 bottom-0 left-0 w-72 bg-slate-950 text-white z-50 flex flex-col p-6 shadow-2xl"
+              className="fixed top-0 bottom-0 left-0 w-72 bg-gradient-to-b from-[#013122] via-[#01281C] to-[#011A12] border-r border-[#D9A323]/30 text-[#F6EFE0] z-50 flex flex-col p-6 shadow-2xl"
             >
-              <div className="flex justify-between items-center pb-6 border-b border-slate-900">
+              <div className="flex justify-between items-center pb-5 border-b border-[#D9A323]/20">
                 <div className="flex items-center gap-2">
-                  <div className="bg-brand-gold-500 p-1.5 rounded-xl text-white">
+                  <div className="bg-gradient-to-br from-[#FAE18D] to-[#D2951B] p-1.5 rounded-xl text-[#052419]">
                     <ChefHat size={18} />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold tracking-tight text-white leading-none">PlanMyChoice</span>
-                    <span className="text-[7.5px] uppercase tracking-widest text-brand-gold-500 font-black leading-none mt-0.5">PORTAL</span>
+                    <span className="text-sm font-display font-bold tracking-tight text-[#FFFDF8] leading-none">PlanMyChoice</span>
+                    <span className="text-[7.5px] uppercase tracking-widest text-[#F5C642] font-black leading-none mt-0.5">CATERER PORTAL</span>
                   </div>
                 </div>
                 <button 
                   onClick={() => setIsSidebarOpen(false)}
-                  className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-900 active:scale-95 transition-transform"
+                  className="p-1 text-[#F5C642]/80 hover:text-white rounded-lg hover:bg-[#084330] active:scale-95 transition-transform"
                 >
                   <X size={20} />
                 </button>
               </div>
 
               {/* Navigation items list */}
-              <div className="flex-1 overflow-y-auto py-6 space-y-1.5 custom-sidebar-scrollbar">
+              <div className="flex-1 overflow-y-auto py-5 space-y-1.5 custom-sidebar-scrollbar">
                 {navItems.map((item) => {
                   const isActive = activeTab === item.id;
                   return (
@@ -1672,18 +1819,18 @@ export default function CatererMobileDashboard({
                       className={cn(
                         "w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-sm",
                         isActive 
-                          ? "bg-brand-gold-500 text-slate-950 shadow-lg shadow-brand-gold-500/10" 
-                          : "hover:bg-slate-900 text-slate-300 hover:text-white"
+                          ? "bg-gradient-to-r from-[#FAE18D] via-[#E8B839] to-[#D2951B] text-[#052419] shadow-lg" 
+                          : "hover:bg-[#084330]/80 text-[#F6EFE0]/90 hover:text-[#FCE38A]"
                       )}
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon size={16} />
+                        <item.icon size={16} className={isActive ? "text-[#052419]" : "text-[#E5BA4C]"} />
                         <span>{item.label}</span>
                       </div>
                       {item.badge && (
                         <span className={cn(
                           "text-[9px] font-black px-2 py-0.5 rounded-full",
-                          isActive ? "bg-slate-950 text-brand-gold-500" : "bg-brand-gold-500 text-slate-950"
+                          isActive ? "bg-[#052419] text-[#FAE18D]" : "bg-[#F4C44E] text-[#052419]"
                         )}>
                           {item.badge}
                         </span>
@@ -1694,7 +1841,7 @@ export default function CatererMobileDashboard({
               </div>
 
               {/* Log out option inside mobile drawer */}
-              <div className="pt-6 border-t border-slate-900">
+              <div className="pt-6 border-t border-[#D9A323]/25">
                 <button 
                   onClick={() => {
                     setIsSidebarOpen(false);

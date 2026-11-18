@@ -7,6 +7,7 @@ import {
   Minus,
   ArrowLeft,
   Check,
+  ChevronLeft,
   ChevronRight,
   ChefHat,
   Package,
@@ -30,6 +31,22 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronUp,
+  Calendar,
+  Clock,
+  FileText,
+  Phone,
+  Mail,
+  ClipboardList,
+  Tag,
+  Pencil,
+  Building2,
+  CheckCircle2,
+  Crown,
+  Layers,
+  Leaf,
+  UtensilsCrossed,
+  Calculator,
+  Info,
 } from "lucide-react";
 import { DEMO_CATERERS } from "../data";
 import { toast } from "../components/Toast";
@@ -349,6 +366,44 @@ const isItemNonVeg = (itemName: string, categoryName: string = ""): boolean => {
       !name.includes("hara bhara"))
   );
 };
+
+const isCategoryNonVeg = (categoryName: string = "", items: string[] = []): boolean => {
+  const cat = categoryName.toLowerCase().trim();
+  if (
+    cat.includes("non-veg") ||
+    cat.includes("non veg") ||
+    cat.includes("nonveg") ||
+    cat.includes("chicken") ||
+    cat.includes("mutton") ||
+    cat.includes("fish") ||
+    cat.includes("prawn") ||
+    cat.includes("seafood") ||
+    cat.includes("meat") ||
+    cat.includes("egg") ||
+    cat.includes("keema")
+  ) {
+    return true;
+  }
+  if (cat.includes("veg")) {
+    return false;
+  }
+  if (items.length > 0 && items.every((item) => isItemNonVeg(item, categoryName))) {
+    return true;
+  }
+  return false;
+};
+
+const VegLeafIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22L6.66 19.7C7.14 19.87 7.64 20 8 20C19 20 22 3 22 3C21 5 14 5.25 9 6.25C4 7.25 2 11.5 2 13.5C2 15.5 3.75 17.25 3.75 17.25C7 8 17 8 17 8Z" />
+  </svg>
+);
+
+const NonVegDrumstickIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <path d="M15.4 3.6c-2.6 0-4.9 1.6-5.8 4-.7 1.8-.4 3.8.5 5.4L5.5 17.6a1.9 1.9 0 0 1-1.9-.4 1.5 1.5 0 0 0-2.1 2.1c.5.5 1.2.7 1.9.6-.1.7.1 1.4.6 1.9a1.5 1.5 0 0 0 2.1-2.1 1.9 1.9 0 0 1-.4-1.9l4.6-4.6c1.6.9 3.6 1.2 5.4.5 2.4-.9 4-3.2 4-5.8 0-2.4-1.9-4.3-4.3-4.3Z" />
+  </svg>
+);
 
 const getItemPrice = (itemName: string, categoryName: string = ""): number => {
   const lower = itemName.toLowerCase().trim();
@@ -1463,6 +1518,7 @@ export default function OrderFlow() {
   const [highlightIncomplete, setHighlightIncomplete] = useState(false);
   const [validationTriggered, setValidationTriggered] = useState(false);
   const categoryTabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+  const categoryScrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (activeCategory && categoryTabRefs.current[activeCategory]) {
@@ -1631,51 +1687,168 @@ export default function OrderFlow() {
 
   if (!caterer)
     return (
-      <div className="min-h-screen pt-32 pb-24 text-center">Loading...</div>
+      <div className="min-h-screen pt-32 pb-24 bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] flex flex-col items-center justify-center text-[#083A28] font-medium font-poppins">
+        <div className="animate-spin rounded-full h-10 w-10 border-[3px] border-[#DFC78A] border-t-[#024731] mb-4" />
+        Loading caterer details...
+      </div>
     );
+
+  const activeCategoryData = selectedPackage?.categories?.find(
+    (c: any) => c.categoryName === activeCategory,
+  );
+  const isActiveCatNonVeg = isCategoryNonVeg(
+    activeCategory,
+    activeCategoryData?.items || [],
+  );
+  const activeCategoryIndex = Math.max(0, menuCategories.indexOf(activeCategory));
 
   return (
     <div
       className={cn(
-        "min-h-screen flex flex-col font-poppins transition-colors duration-300 bg-[#FAF8F3] pt-14 sm:pt-[58px]"
+        "min-h-screen flex flex-col font-poppins transition-colors duration-300 pt-14 sm:pt-[58px] relative",
+        viewMode === "custom" || viewMode === "checkout" || viewMode === "package_detail"
+          ? "bg-[#FBF7EF] overflow-x-clip"
+          : "bg-[#FAF8F3]"
       )}
     >
+      {/* Subtle Botanical Leaf & Luxury Corner Accents for Menu Selection */}
+      {viewMode === "custom" && (
+        <>
+          <div className="pointer-events-none select-none fixed top-[58px] right-0 w-72 h-44 overflow-hidden z-10 opacity-90 hidden sm:block">
+            <svg viewBox="0 0 320 180" fill="none" className="w-full h-full">
+              <path
+                d="M110,-10 C185,48 250,76 330,86 L330,-10 Z"
+                fill={isActiveCatNonVeg ? "url(#pmcCornerBurgundyTop)" : "url(#pmcCornerEmeraldTop)"}
+              />
+              <path
+                d="M110,-10 C185,48 250,76 330,86"
+                stroke="url(#pmcCornerGoldTop)"
+                strokeWidth="3"
+                fill="none"
+              />
+              <defs>
+                <linearGradient id="pmcCornerEmeraldTop" x1="110" y1="-10" x2="330" y2="86" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#004B35" />
+                  <stop offset="100%" stopColor="#00281D" />
+                </linearGradient>
+                <linearGradient id="pmcCornerBurgundyTop" x1="110" y1="-10" x2="330" y2="86" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#8B1E16" />
+                  <stop offset="100%" stopColor="#5E110B" />
+                </linearGradient>
+                <linearGradient id="pmcCornerGoldTop" x1="110" y1="-10" x2="330" y2="86" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#F8D76A" />
+                  <stop offset="50%" stopColor="#D9A323" />
+                  <stop offset="100%" stopColor="#DFA91E" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div className="pointer-events-none select-none fixed bottom-0 left-0 w-64 h-44 overflow-hidden z-0 opacity-20 hidden lg:block">
+            <svg viewBox="0 0 240 160" fill="none" className={cn("w-full h-full", isActiveCatNonVeg ? "text-[#8B1E16]" : "text-[#004B35]")}>
+              <path d="M12 155 C35 110 72 82 124 72 C95 108 65 138 12 155 Z" stroke="currentColor" strokeWidth="1.4" fill="currentColor" fillOpacity="0.18" />
+              <path d="M8 120 C22 86 50 62 84 52 C68 82 40 105 8 120 Z" stroke="currentColor" strokeWidth="1.2" fill="currentColor" fillOpacity="0.12" />
+              <path d="M58 158 C88 128 130 112 174 114 C138 138 98 154 58 158 Z" stroke="currentColor" strokeWidth="1.2" fill="currentColor" fillOpacity="0.12" />
+            </svg>
+          </div>
+        </>
+      )}
+
+      {/* Subtle Botanical Gold Corner Flourishes for Package Detail & Checkout Views */}
+      {(viewMode === "checkout" || viewMode === "package_detail") && (
+        <>
+          <div className="pointer-events-none select-none fixed top-[58px] left-0 w-32 h-36 overflow-hidden z-0 opacity-55 hidden lg:block">
+            <svg viewBox="0 0 130 140" fill="none" className="w-full h-full text-[#C8941A]">
+              <path d="M4 4 C14 48 16 88 8 130" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.65" />
+              <path d="M10 38 C28 24 46 22 58 28 C44 40 28 44 10 38 Z" fill="currentColor" fillOpacity="0.22" stroke="currentColor" strokeWidth="1" />
+              <path d="M12 72 C34 58 54 58 68 68 C48 80 30 82 12 72 Z" fill="currentColor" fillOpacity="0.18" stroke="currentColor" strokeWidth="1" />
+              <path d="M8 102 C22 92 38 94 48 104 C34 112 20 112 8 102 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1" />
+            </svg>
+          </div>
+          <div className="pointer-events-none select-none fixed top-[58px] right-0 w-36 h-40 overflow-hidden z-0 opacity-55 hidden lg:block">
+            <svg viewBox="0 0 140 150" fill="none" className="w-full h-full text-[#C8941A]">
+              <path d="M132 6 C116 54 112 96 122 140" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.65" />
+              <path d="M124 38 C104 22 82 22 68 30 C84 44 104 46 124 38 Z" fill="currentColor" fillOpacity="0.22" stroke="currentColor" strokeWidth="1" />
+              <path d="M118 76 C94 60 72 62 56 72 C78 86 98 86 118 76 Z" fill="currentColor" fillOpacity="0.18" stroke="currentColor" strokeWidth="1" />
+              <path d="M120 108 C102 98 84 100 72 110 C88 118 104 118 120 108 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1" />
+            </svg>
+          </div>
+          {viewMode === "package_detail" && (
+            <div className="pointer-events-none select-none fixed bottom-0 left-0 w-36 h-36 overflow-hidden z-0 opacity-50 hidden lg:block">
+              <svg viewBox="0 0 150 150" fill="none" className="w-full h-full text-[#C8941A]">
+                <path d="M4 146 C36 108 62 78 98 56" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.6" />
+                <path d="M36 110 C38 86 28 66 12 56 C14 80 22 96 36 110 Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1" />
+                <path d="M60 88 C78 82 94 90 104 106 C84 106 70 100 60 88 Z" fill="currentColor" fillOpacity="0.18" stroke="currentColor" strokeWidth="1" />
+                <path d="M78 68 C80 48 68 32 52 24 C56 44 64 58 78 68 Z" fill="currentColor" fillOpacity="0.16" stroke="currentColor" strokeWidth="1" />
+              </svg>
+            </div>
+          )}
+          <div className="pointer-events-none select-none fixed bottom-0 right-0 w-40 h-40 overflow-hidden z-0 opacity-50 hidden lg:block">
+            <svg viewBox="0 0 160 160" fill="none" className="w-full h-full text-[#C8941A]">
+              <path d="M156 156 C122 116 96 86 58 64" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.6" />
+              <path d="M122 118 C118 94 128 74 144 62 C142 86 134 104 122 118 Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1" />
+              <path d="M98 94 C78 88 64 96 54 112 C74 112 88 106 98 94 Z" fill="currentColor" fillOpacity="0.18" stroke="currentColor" strokeWidth="1" />
+              <path d="M78 74 C76 54 88 38 104 30 C100 50 92 64 78 74 Z" fill="currentColor" fillOpacity="0.16" stroke="currentColor" strokeWidth="1" />
+            </svg>
+          </div>
+        </>
+      )}
+
       {/* Build Header */}
       {viewMode === "custom" ? (
-        <div className="bg-[#FAF7F2] border-b border-[#D6B15E]/30 sticky top-[56px] sm:top-[58px] z-20 select-none shadow-xs">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 sm:py-2 flex items-center justify-between gap-3">
+        <div className="bg-[#FBF7EF]/95 backdrop-blur-sm border-b border-[#E8C77A]/50 sticky top-[56px] sm:top-[58px] z-20 select-none shadow-[0_4px_18px_rgba(0,46,34,0.05)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-3">
             {/* Left Controls & Title Branding */}
-            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
               {/* Back button */}
               <button
                 type="button"
                 onClick={() => setViewMode("package_detail")}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FFFEFA] border border-[#D6B15E]/50 hover:border-[#D6B15E] text-[#0B2D23] rounded-full font-bold text-[11px] shadow-2xs hover:shadow-xs transition-all cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FFFDF8] border border-[#E8C77A] hover:border-[#D9A323] text-[#173D30] rounded-full font-semibold text-xs shadow-2xs hover:shadow-[0_2px_10px_rgba(217,163,35,0.2)] transition-all cursor-pointer shrink-0 whitespace-nowrap"
               >
-                <ArrowLeft size={12} className="text-[#0B2D23]" />
+                <ArrowLeft size={13} className="text-[#004B35]" />
                 <span>Back</span>
               </button>
 
               {/* Brand Title */}
-              <div className="flex items-center gap-2 min-w-0">
+              <div className="flex items-center gap-2 min-w-0 border-l border-[#E8C77A]/50 pl-3 sm:pl-4">
                 <div className="flex flex-col text-left min-w-0">
-                  <h1 className="font-serif font-bold text-sm sm:text-base lg:text-lg tracking-tight text-[#0B2D23] uppercase leading-tight truncate">
+                  <h1
+                    className="font-serif font-bold text-base sm:text-lg lg:text-[21px] tracking-tight text-[#002E22] uppercase leading-tight truncate"
+                    style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                  >
                     {caterer.name || "ELITE CATERING"}
                   </h1>
-                  <span className="text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#B8860B] font-sans leading-none mt-0.5 truncate">
-                    {caterer.tagline || caterer.location || "Curated Catering Menu"}
+                  <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] text-[#B8860B] font-sans leading-none mt-1 truncate">
+                    <MapPin size={11} className="text-[#D9A323] shrink-0" />
+                    <span className="truncate">
+                      {caterer.tagline || caterer.location || "Curated Catering Menu"}
+                    </span>
                   </span>
                 </div>
               </div>
             </div>
 
+            {/* Center Decorative Dining Cloche Divider */}
+            <div className="hidden md:flex items-center justify-center flex-1 max-w-[260px] mx-auto px-2 opacity-90">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#D9A323]/60 to-[#D9A323]" />
+              <div className="mx-3 text-[#C8941A] flex items-center justify-center">
+                <svg width="24" height="18" viewBox="0 0 28 20" fill="none" aria-hidden="true">
+                  <circle cx="14" cy="3.5" r="1.8" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M5 14C5 9.02944 9.02944 5 14 5C18.9706 5 23 9.02944 23 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d="M2.5 16.5H25.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d="M4 14H24" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent via-[#D9A323]/60 to-[#D9A323]" />
+            </div>
+
             {/* Right Guests Selector with Editable Numeric Input */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <div className="flex items-center bg-[#FFFEFA] border border-[#D6B15E]/50 rounded-lg overflow-hidden shadow-2xs">
+            <div className="flex items-center gap-2 shrink-0 sm:pr-4">
+              <div className="flex items-center bg-[#FFFDF8] border border-[#E8C77A] rounded-xl overflow-hidden shadow-2xs">
                 <button
                   type="button"
                   onClick={decrementGuests}
-                  className="w-6.5 sm:w-7 h-6.5 sm:h-7 flex items-center justify-center text-[#0B2D23] hover:bg-[#FAF6EE] border-r border-[#D6B15E]/40 transition-colors font-bold text-xs cursor-pointer"
+                  className="w-7 sm:w-8 h-7 sm:h-8 flex items-center justify-center text-[#173D30] hover:bg-[#FAF1D6]/70 border-r border-[#E8C77A]/60 transition-colors font-bold text-sm cursor-pointer"
                   title="Decrease Guests"
                 >
                   −
@@ -1695,206 +1868,350 @@ export default function OrderFlow() {
                       e.currentTarget.blur();
                     }
                   }}
-                  className="w-10 sm:w-12 h-6.5 sm:h-7 text-center font-bold text-xs text-[#0B2D23] bg-[#FFFEFA] outline-none focus:bg-[#FFFDF7] focus:ring-1 focus:ring-[#D6B15E]/50"
+                  className="w-11 sm:w-14 h-7 sm:h-8 text-center font-bold text-xs sm:text-sm text-[#002E22] bg-[#FFFDF8] outline-none focus:bg-[#FFF9EC] tabular-nums"
                   title="Click to type guest count directly"
                 />
                 <button
                   type="button"
                   onClick={incrementGuests}
-                  className="w-6.5 sm:w-7 h-6.5 sm:h-7 flex items-center justify-center text-[#0B2D23] hover:bg-[#FAF6EE] border-l border-[#D6B15E]/40 transition-colors font-bold text-xs cursor-pointer"
+                  className="w-7 sm:w-8 h-7 sm:h-8 flex items-center justify-center text-[#173D30] hover:bg-[#FAF1D6]/70 border-l border-[#E8C77A]/60 transition-colors font-bold text-sm cursor-pointer"
                   title="Increase Guests"
                 >
                   +
                 </button>
               </div>
-              <span className="font-bold text-[11px] text-[#0B2D23] hidden xs:inline">
+              <span className="font-semibold text-xs text-[#173D30] hidden xs:inline">
                 Guests
               </span>
             </div>
           </div>
 
-          {/* Horizontal Category Tabs Row */}
-          <div className="border-t border-[#D6B15E]/30 bg-[#FFFEFA]/95 backdrop-blur-xs">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-1.5">
-              <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar scroll-smooth py-0.5">
-                {menuCategories.map((cat: string) => {
-                  const catData = selectedPackage?.categories?.find(
-                    (c: any) => c.categoryName === cat,
-                  );
-                  const catItems = catData?.items || [];
-                  const selectedCount = catItems.filter(
-                    (i: string) => selectedItems[i],
-                  ).length;
-                  const match = catData?.selectionRule?.match(/\d+/);
-                  const catLimit = match ? parseInt(match[0], 10) : 0;
-                  const isDone = selectedCount >= catLimit;
-                  const isActive = activeCategory === cat;
-                  const isHighlighted = highlightIncomplete && !isDone;
+          {/* Horizontal Category Tabs Row with Scroll Arrows & Track */}
+          <div className="border-t border-[#E8C77A]/35 bg-[#FBF7EF]/95">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2 pb-1.5">
+              <div className="flex items-center gap-2">
+                {/* Left Scroll Arrow */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    categoryScrollContainerRef.current?.scrollBy({
+                      left: -260,
+                      behavior: "smooth",
+                    })
+                  }
+                  aria-label="Scroll categories left"
+                  className="w-7 h-7 rounded-full bg-[#FFFDF8] border border-[#E8C77A] hover:border-[#D9A323] hover:bg-[#FFF9EC] text-[#173D30] flex items-center justify-center shadow-2xs transition-all cursor-pointer shrink-0"
+                >
+                  <ChevronLeft size={14} />
+                </button>
 
-                  return (
-                    <button
-                      key={cat}
-                      ref={(el) => {
-                        categoryTabRefs.current[cat] = el;
-                      }}
-                      type="button"
-                      onClick={() => setActiveCategory(cat)}
-                      className={cn(
-                        "px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer flex items-center gap-1 border select-none shrink-0",
-                        isActive
-                          ? "bg-[#0B2D23] text-white border-[#D6B15E]/80 shadow-2xs"
-                          : "bg-[#FFFEFA] text-[#0B2D23] hover:text-[#061D16] hover:bg-[#FAF6EE] border-[#D6B15E]/50 hover:border-[#D6B15E] shadow-2xs",
-                        isHighlighted && "border-red-500 bg-red-50 text-red-700 animate-pulse",
-                      )}
-                    >
-                      <span>{cat}</span>
-                      {catLimit > 0 ? (
+                {/* Scrollable Category Pills */}
+                <div
+                  ref={categoryScrollContainerRef}
+                  className="flex-1 flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5"
+                >
+                  {menuCategories.map((cat: string) => {
+                    const catData = selectedPackage?.categories?.find(
+                      (c: any) => c.categoryName === cat,
+                    );
+                    const catItems = catData?.items || [];
+                    const selectedCount = catItems.filter(
+                      (i: string) => selectedItems[i],
+                    ).length;
+                    const match = catData?.selectionRule?.match(/\d+/);
+                    const catLimit = match ? parseInt(match[0], 10) : 0;
+                    const hasSelectedItems = selectedCount > 0;
+                    const isCompleted =
+                      hasSelectedItems && (catLimit === 0 || selectedCount >= catLimit);
+                    const isActive = activeCategory === cat;
+                    const isCatNonVeg = isCategoryNonVeg(cat, catItems);
+                    const isHighlighted =
+                      highlightIncomplete && catLimit > 0 && selectedCount < catLimit;
+                    const badgeLabel =
+                      catLimit > 1 && hasSelectedItems && !isCompleted
+                        ? `${selectedCount}/${catLimit}`
+                        : `${selectedCount}`;
+
+                    return (
+                      <button
+                        key={cat}
+                        ref={(el) => {
+                          categoryTabRefs.current[cat] = el;
+                        }}
+                        type="button"
+                        onClick={() => setActiveCategory(cat)}
+                        className={cn(
+                          "relative px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap transition-all duration-200 cursor-pointer flex items-center gap-1.5 border select-none shrink-0",
+                          isActive
+                            ? isCatNonVeg
+                              ? "bg-gradient-to-r from-[#8B1E16] to-[#6B140E] text-[#FFFDF8] border-[#D9A323] font-bold shadow-[0_4px_14px_rgba(139,30,22,0.34)] ring-1 ring-[#F8D76A]/45 -translate-y-[1px]"
+                              : "bg-gradient-to-r from-[#004B35] to-[#003526] text-[#FFFDF8] border-[#D9A323] font-bold shadow-[0_4px_14px_rgba(217,163,35,0.34)] ring-1 ring-[#F8D76A]/45 -translate-y-[1px]"
+                            : isCompleted
+                              ? "bg-[#EAF7EC] hover:bg-[#DFF3E3] text-[#004B35] font-semibold border-[#74C69D] hover:border-[#40916C] shadow-[0_2px_6px_rgba(21,128,61,0.08)]"
+                              : "bg-[#FFFDF8] hover:bg-[#FFF8E8] text-[#004B35] font-semibold border-[#E8C77A] hover:border-[#D9A323] shadow-[0_2px_6px_rgba(217,163,35,0.08)]",
+                          isHighlighted &&
+                            !isActive &&
+                            "border-red-500 bg-red-50 text-red-700",
+                        )}
+                      >
+                        {/* Leading Icon: Independent Green Checkmark if completed, plus Dietary Icon */}
+                        {isCompleted && (
+                          <span
+                            className={cn(
+                              "inline-flex items-center justify-center shrink-0",
+                              isActive ? "text-[#4ADE80]" : "text-[#15803D]",
+                            )}
+                            title="Completed"
+                          >
+                            <Check size={13} strokeWidth={3} />
+                          </span>
+                        )}
+
+                        {(!isCompleted || isActive) && (
+                          isCatNonVeg ? (
+                            <NonVegDrumstickIcon
+                              className={cn(
+                                "w-3.5 h-3.5 shrink-0",
+                                isActive ? "text-[#FCA5A5]" : "text-[#A63A2E]",
+                              )}
+                            />
+                          ) : (
+                            <VegLeafIcon
+                              className={cn(
+                                "w-3.5 h-3.5 shrink-0",
+                                isActive ? "text-[#4ADE80]" : "text-[#C58E17]",
+                              )}
+                            />
+                          )
+                        )}
+
+                        <span>{cat}</span>
+
+                        {/* Circular Count Badge */}
                         <span
                           className={cn(
-                            "text-[9.5px] px-1 py-0.2 rounded-full font-bold",
+                            "min-w-[20px] h-5 px-1.5 rounded-full text-[10.5px] font-bold inline-flex items-center justify-center tabular-nums transition-colors",
                             isActive
-                              ? isDone
-                                ? "bg-[#D6B15E]/30 text-[#FDF3D6] border border-[#D6B15E]/40"
-                                : "bg-white/15 text-white/90"
-                              : isDone
-                                ? "bg-[#E8F5EE] text-[#0B2D23] border border-[#A3D9BA]/60"
-                                : "bg-[#FAF6EE] text-[#7A6A4E] border border-[#D6B15E]/30",
+                              ? isCatNonVeg
+                                ? "bg-[#F4C430] text-[#4A0D09]"
+                                : "bg-[#F4C430] text-[#002E22]"
+                              : isCompleted
+                                ? "bg-[#15803D] text-white"
+                                : "bg-[#FBF0CC] text-[#9A6B11] border border-[#E8C77A]",
                           )}
                         >
-                          {selectedCount}/{catLimit}
+                          {badgeLabel}
                         </span>
-                      ) : selectedCount > 0 ? (
-                        <span
-                          className={cn(
-                            "text-[9.5px] px-1 py-0.2 rounded-full font-bold",
-                            isActive
-                              ? "bg-white/15 text-white"
-                              : "bg-[#FAF6EE] text-[#7A6A4E] border border-[#D6B15E]/30",
-                          )}
-                        >
-                          {selectedCount}
-                        </span>
-                      ) : null}
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Right Scroll Arrow */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    categoryScrollContainerRef.current?.scrollBy({
+                      left: 260,
+                      behavior: "smooth",
+                    })
+                  }
+                  aria-label="Scroll categories right"
+                  className="w-7 h-7 rounded-full bg-[#FFFDF8] border border-[#E8C77A] hover:border-[#D9A323] hover:bg-[#FFF9EC] text-[#173D30] flex items-center justify-center shadow-2xs transition-all cursor-pointer shrink-0"
+                >
+                  <ChevronRight size={14} />
+                </button>
               </div>
+
+              {/* Subtle Category Progress / Indicator Bar */}
+              {menuCategories.length > 0 && (
+                <div className="mt-1.5 flex items-center gap-2 px-1">
+                  <span
+                    className={cn(
+                      "text-[9px] leading-none select-none",
+                      isActiveCatNonVeg ? "text-[#8B1E16]/70" : "text-[#004B35]/70",
+                    )}
+                    aria-hidden="true"
+                  >
+                    ◀
+                  </span>
+                  <div className="flex-1 h-[3px] rounded-full bg-[#E8DFC8] overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-300",
+                        isActiveCatNonVeg
+                          ? "bg-gradient-to-r from-[#8B1E16] to-[#B03A2E]"
+                          : "bg-gradient-to-r from-[#004B35] to-[#15803D]",
+                      )}
+                      style={{
+                        width: `${Math.max(
+                          8,
+                          Math.round(
+                            ((activeCategoryIndex + 1) / (menuCategories.length || 1)) * 100,
+                          ),
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                  <span
+                    className={cn(
+                      "text-[9px] leading-none select-none",
+                      isActiveCatNonVeg ? "text-[#8B1E16]/70" : "text-[#004B35]/70",
+                    )}
+                    aria-hidden="true"
+                  >
+                    ▶
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
       ) : viewMode === "package_detail" ? (
-        <div className="bg-transparent py-2 sm:py-2.5 z-20 relative select-none">
-          <div className="max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-1.5 sm:gap-2">
+        <div className="bg-transparent pt-3 pb-2 sm:pt-4 sm:pb-2.5 z-20 relative select-none">
+          <div className="max-w-[1260px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-2.5">
             {/* Breadcrumbs */}
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px] sm:text-xs font-medium text-stone-500 font-sans tracking-wide">
-              <Link to="/" className="hover:text-[#BB9C4A] transition-colors font-bold text-stone-600">Home</Link>
-              <ChevronRight size={11} className="text-stone-400 shrink-0" />
-              <Link to="/explore" className="hover:text-[#BB9C4A] transition-colors font-bold text-stone-600">Explore Caterers</Link>
-              <ChevronRight size={11} className="text-stone-400 shrink-0" />
-              <Link to={`/caterer/${id}`} className="hover:text-[#BB9C4A] transition-colors font-bold text-stone-600 truncate max-w-[140px] sm:max-w-[220px]">{caterer?.name}</Link>
-              <ChevronRight size={11} className="text-stone-400 shrink-0" />
-              <span className="text-[#BB9C4A] font-extrabold truncate max-w-[160px] sm:max-w-[240px]">{selectedPackage?.packageName || selectedPackage?.name || "Gold Package"}</span>
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-[#354B43] font-sans tracking-wide">
+              <Link to="/" className="hover:text-[#8E6211] transition-colors font-semibold text-[#173D30]">Home</Link>
+              <ChevronRight size={12} className="text-[#8E6211]/70 shrink-0" />
+              <Link to="/explore" className="hover:text-[#8E6211] transition-colors font-semibold text-[#173D30]">Explore Caterers</Link>
+              <ChevronRight size={12} className="text-[#8E6211]/70 shrink-0" />
+              <Link to={`/caterer/${id}`} className="hover:text-[#8E6211] transition-colors font-semibold text-[#173D30] truncate max-w-[160px] sm:max-w-[240px]">{caterer?.name}</Link>
+              <ChevronRight size={12} className="text-[#8E6211]/70 shrink-0" />
+              <span className="text-[#B8860B] font-bold truncate max-w-[180px] sm:max-w-[260px]">{selectedPackage?.packageName || selectedPackage?.name || "Classic"}</span>
             </div>
 
-            <div className="flex items-center justify-start gap-2.5 sm:gap-3">
-              {/* Elegant Back Arrow button */}
+            <div className="flex items-center justify-start gap-3 sm:gap-3.5">
+              {/* Circular Gold Back Arrow Button */}
               <button
+                type="button"
                 onClick={() => {
                   navigate(`/caterer/${id}`, { state: { fromOrder: true, selectedPackageId: selectedPackage?.id, guests: guests } });
                 }}
-                className="w-7.5 h-7.5 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-[#D5A859]/15 text-[#C2BB8B] active:scale-95 transition-all bg-white/80 border border-[#DECC9C]/60 hover:border-[#BB9C4A] cursor-pointer shrink-0 shadow-2xs"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-[#FFFDF8] to-[#F6E6B7] hover:from-white hover:to-[#FCEEBF] border border-[#D9A323] text-[#173D30] active:scale-95 transition-all cursor-pointer shrink-0 shadow-[0_3px_10px_rgba(217,163,35,0.16)]"
                 title="Back to Caterer"
+                aria-label="Back to Caterer"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#BB9C4A"
-                  strokeWidth="2.5"
-                  className="transition-transform hover:-translate-x-0.5"
-                >
-                  <line x1="19" y1="12" x2="5" y2="12"></line>
-                  <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
+                <ArrowLeft size={17} strokeWidth={2.2} className="text-[#173D30]" />
               </button>
 
-              {/* Brand Title with elegant styling and balanced scale */}
-              <div className="flex flex-col text-left">
-                <h1 className="font-display font-bold text-xl sm:text-2xl lg:text-[26px] tracking-tight text-[#0B1F17] uppercase leading-tight">
-                  {selectedPackage?.packageName || "Veg Silver"}
-                </h1>
-                <span className="text-[9.5px] sm:text-[10.5px] font-sans font-semibold text-[#B8860B] uppercase tracking-[0.16em] mt-0.5">
+              {/* Serif Package Heading with Botanical Gold Wheat Sprig */}
+              <div className="flex flex-col text-left min-w-0">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h1
+                    className="font-serif font-extrabold text-2xl sm:text-[30px] tracking-tight text-[#0B1F17] uppercase leading-none"
+                    style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                  >
+                    {selectedPackage?.packageName || "Classic"}
+                  </h1>
+                  <svg viewBox="0 0 64 28" fill="none" className="w-12 sm:w-14 h-6 text-[#D9A323] shrink-0" aria-hidden="true">
+                    <path d="M4 24 C20 18 38 11 58 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                    <path d="M22 17 C20 10 25 5 32 4 C31 11 27 15 22 17 Z" fill="currentColor" fillOpacity="0.85" />
+                    <path d="M35 12 C34 5 39 2 46 2 C44 8 40 11 35 12 Z" fill="currentColor" fillOpacity="0.85" />
+                    <path d="M26 16 C33 17 39 21 41 26 C34 25 29 21 26 16 Z" fill="currentColor" fillOpacity="0.72" />
+                    <path d="M40 11 C46 12 52 15 54 20 C47 19 43 16 40 11 Z" fill="currentColor" fillOpacity="0.72" />
+                  </svg>
+                </div>
+                <span className="text-[10.5px] sm:text-xs font-sans font-bold text-[#354B43] uppercase tracking-[0.18em] mt-1 truncate">
                   {caterer.name} • {caterer.location}
                 </span>
               </div>
             </div>
           </div>
         </div>
-      ) : (
-        <div className="bg-white border-b border-stone-200/50 py-4.5 shadow-sm z-10 relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {viewMode === "checkout" ? (
-                <button
-                  onClick={() => setViewMode("custom")}
-                  className="hover:bg-stone-50 border border-stone-200 p-2 rounded-full transition-colors flex items-center justify-center shrink-0 cursor-pointer"
-                >
-                  <ArrowLeft size={18} className="text-stone-800" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setViewMode("package_detail")}
-                  className="hover:bg-stone-50 border border-stone-200 p-2 rounded-full transition-colors flex items-center justify-center shrink-0 cursor-pointer"
-                >
-                  <ArrowLeft size={18} className="text-stone-800" />
-                </button>
-              )}
-              <div className="text-left">
+      ) : viewMode === "checkout" ? (
+        <div className="bg-[#FBF7EF]/95 py-4 sm:py-5 z-10 relative">
+          <div className="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 relative z-10">
+            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+              <button
+                type="button"
+                onClick={() => setViewMode("custom")}
+                aria-label="Back to Menu Selection"
+                className="w-10 h-10 bg-white hover:bg-[#FFF9E8] border border-[#E8C77A] hover:border-[#D9A323] rounded-full transition-all flex items-center justify-center shrink-0 cursor-pointer shadow-[0_3px_10px_rgba(0,46,34,0.06)] active:scale-95"
+              >
+                <ArrowLeft size={17} className="text-[#8E6211]" />
+              </button>
+
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFFDF8] to-[#FBF3DB] border border-[#D9A323]/75 flex items-center justify-center shrink-0 shadow-[0_3px_10px_rgba(217,163,35,0.12)]">
+                <Calendar size={19} className="text-[#C8941A]" />
+              </div>
+
+              <div className="text-left min-w-0">
                 <h1
-                  className={cn(
-                    "font-display font-bold text-xl sm:text-2xl leading-tight text-stone-900 tracking-tight",
-                    viewMode === "checkout" && "font-serif text-[22px] sm:text-[28px] text-[#0F3D2E] font-extrabold tracking-tight"
-                  )}
+                  className="font-serif text-[22px] sm:text-[30px] text-[#0B1F17] font-extrabold tracking-tight leading-tight truncate"
+                  style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
                 >
-                  {viewMode === "checkout"
-                    ? "Book Your Event"
-                    : selectedPackage?.packageName || selectedPackage?.name || "Build Your Menu"}
+                  Book Your Event
                 </h1>
-                <p className="text-xs sm:text-sm text-stone-500 font-medium">
+                <p className="text-xs sm:text-[13.5px] text-[#354B43] font-semibold mt-0.5 truncate max-w-full">
                   {caterer.name} • {caterer.location}
                 </p>
               </div>
             </div>
 
-            {viewMode === "checkout" ? (
-              <div className="flex items-center gap-1.5 text-stone-600 font-sans text-xs border border-stone-200 px-3.5 py-2 rounded-full bg-stone-50/50 shrink-0 font-bold tracking-wide">
-                <ShieldCheck size={16} className="text-[#0F3D2E]" />
-                <span className="hidden xs:inline text-stone-700">Secure Booking</span>
-                <span className="xs:hidden text-stone-700">Secure</span>
+            {/* Decorative Gold Horizontal Diamond Separator */}
+            <div className="hidden md:flex items-center justify-center flex-1 max-w-[290px] mx-auto px-2 select-none" aria-hidden="true">
+              <div className="h-[1.5px] flex-1 bg-gradient-to-r from-transparent via-[#D9A323]/65 to-[#D9A323]" />
+              <div className="mx-2.5 flex items-center gap-1 text-[#C8941A]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D9A323]/70" />
+                <span className="w-2.5 h-2.5 rotate-45 border-[1.5px] border-[#C8941A] bg-[#FBF7EF] flex items-center justify-center">
+                  <span className="w-1 h-1 bg-[#D9A323]" />
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D9A323]/70" />
               </div>
-            ) : (
-              viewMode !== "package_detail" && (
-                <div className="flex items-center gap-4 hidden sm:flex">
-                  <div className="bg-slate-100 rounded-lg p-1.5 flex items-center">
-                    <button
-                      onClick={decrementGuests}
-                      className="w-8 h-8 flex items-center justify-center bg-white rounded-md shadow-sm text-brand-green-900 border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <div className="px-4 font-bold text-brand-green-900 w-28 text-center">
-                      {guests} Guests
-                    </div>
-                    <button
-                      onClick={incrementGuests}
-                      className="w-8 h-8 flex items-center justify-center bg-white rounded-md shadow-sm text-brand-green-900 border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                    >
-                      <Plus size={16} />
-                    </button>
+              <div className="h-[1.5px] flex-1 bg-gradient-to-l from-transparent via-[#D9A323]/65 to-[#D9A323]" />
+            </div>
+
+            <div className="inline-flex items-center gap-2 text-[#173D30] font-sans text-xs border border-[#E8C77A]/80 px-4 py-2 rounded-full bg-white shadow-[0_3px_12px_rgba(0,46,34,0.06)] shrink-0 font-bold tracking-wide">
+              <ShieldCheck size={16} className="text-[#0B1F17] shrink-0" />
+              <span className="hidden xs:inline">Secure Booking</span>
+              <span className="xs:hidden">Secure</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-[#FFFDF8] border-b border-[#DFC78A] py-4.5 shadow-sm z-10 relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setViewMode("package_detail")}
+                className="hover:bg-[#FAF3E2] border border-[#DFC78A] p-2 rounded-full transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+              >
+                <ArrowLeft size={18} className="text-[#083A28]" />
+              </button>
+              <div className="text-left">
+                <h1
+                  className="font-display font-bold text-xl sm:text-2xl leading-tight text-[#083A28] tracking-tight"
+                  style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                >
+                  {selectedPackage?.packageName || selectedPackage?.name || "Build Your Menu"}
+                </h1>
+                <p className="text-xs sm:text-sm text-[#5D665F] font-medium">
+                  {caterer.name} • {caterer.location}
+                </p>
+              </div>
+            </div>
+
+            {viewMode !== "package_detail" && (
+              <div className="flex items-center gap-4 hidden sm:flex">
+                <div className="bg-[#FAF3E2] border border-[#DFC78A] rounded-lg p-1.5 flex items-center">
+                  <button
+                    onClick={decrementGuests}
+                    className="w-8 h-8 flex items-center justify-center bg-[#FFFDF8] rounded-md shadow-sm text-[#083A28] border border-[#DFC78A] hover:bg-[#FAF0D4] cursor-pointer"
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <div className="px-4 font-bold text-[#083A28] w-28 text-center">
+                    {guests} Guests
                   </div>
+                  <button
+                    onClick={incrementGuests}
+                    className="w-8 h-8 flex items-center justify-center bg-[#FFFDF8] rounded-md shadow-sm text-[#083A28] border border-[#DFC78A] hover:bg-[#FAF0D4] cursor-pointer"
+                  >
+                    <Plus size={16} />
+                  </button>
                 </div>
-              )
+              </div>
             )}
           </div>
         </div>
@@ -2158,157 +2475,230 @@ export default function OrderFlow() {
       )}
 
       {viewMode === "package_detail" && selectedPackage && (
-        <div className="flex-1 w-full max-w-5xl xl:max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pb-5 pt-0.5 relative box-border">
-          {/* Outer Luxury 2-layer Bezel Frame */}
-          <div className="bg-[#FAF5EA] rounded-xl md:rounded-2xl p-1 md:p-1.5 shadow-[0_10px_30px_rgba(21,21,21,0.06)] border border-[#DECC9C] md:border-[#BB9C4A] relative overflow-hidden w-full max-w-full box-border">
-            <div className="bg-[#FFFDF9] rounded-lg md:rounded-xl border border-slate-200 md:border-[#DECC9C] overflow-hidden flex flex-col relative w-full max-w-full box-border">
-              {/* Premium Emerald Green Header with Leaf motif */}
-              <div className="bg-gradient-to-br from-[#021B1A] via-[#032D29] to-[#0A3A34] text-white px-3.5 py-2.5 sm:px-5 sm:py-3.5 relative overflow-hidden select-none border-b border-[#BB9C4A]/40">
-                {/* Detailed decorative leaf watermark on the right */}
+        <div className="flex-1 w-full max-w-[1260px] mx-auto px-4 sm:px-6 lg:px-8 pb-10 pt-2 relative z-10 box-border">
+          {/* Outer Luxury Double-Framed Ivory & Gold Container */}
+          <div className="bg-[#FFFDF8] rounded-2xl p-2 sm:p-3 shadow-[0_14px_40px_rgba(0,46,34,0.09)] border-[1.5px] border-[#D9A323]/75 relative w-full max-w-full box-border">
+            <div className="rounded-xl flex flex-col relative w-full max-w-full box-border">
+              {/* Rich Dark Emerald Gradient Header Panel with Gold Accents & Catering Cloche Motif */}
+              <div className="bg-gradient-to-r from-[#00513A] via-[#003B2A] to-[#00261B] text-white px-4 py-3.5 sm:px-6 sm:py-4.5 rounded-xl relative overflow-hidden select-none border-[1.5px] border-[#D9A323]/80 shadow-[0_6px_18px_rgba(0,46,34,0.16)]">
+                {/* Subtle Gold Corner Filigree Curves matching Screenshot 2 */}
                 <svg
-                  viewBox="0 0 100 100"
-                  className="absolute -right-2 bottom-0 top-0 w-28 sm:w-40 h-full text-[#032D29] opacity-45 pointer-events-none select-none"
+                  viewBox="0 0 80 80"
                   fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
+                  className="pointer-events-none select-none absolute left-0 bottom-0 w-16 h-16 text-[#D9A323] opacity-75"
+                  aria-hidden="true"
                 >
-                  <path d="M15 85 C 30 65, 45 40, 80 15 C 75 35, 60 75, 15 85 Z" />
-                  <path d="M15 85 L 80 15" strokeDasharray="2 2" />
-                  <path d="M35 65 Q 45 55 57 57" strokeWidth="0.8" />
-                  <path d="M45 53 Q 55 43 67 45" strokeWidth="0.8" />
-                  <path d="M55 41 Q 65 31 77 33" strokeWidth="0.8" />
-                  <path d="M22 75 Q 30 67 40 70" strokeWidth="0.8" />
+                  <path d="M0 80 L0 36 C12 58 28 70 52 80 Z" fill="currentColor" fillOpacity="0.45" />
+                  <path d="M0 36 C12 58 28 70 52 80" stroke="#F8D76A" strokeWidth="1.5" />
+                </svg>
+                <svg
+                  viewBox="0 0 80 80"
+                  fill="none"
+                  className="pointer-events-none select-none absolute right-0 bottom-0 w-16 h-16 text-[#D9A323] opacity-75"
+                  aria-hidden="true"
+                >
+                  <path d="M80 80 L80 36 C68 58 52 70 28 80 Z" fill="currentColor" fillOpacity="0.45" />
+                  <path d="M80 36 C68 58 52 70 28 80" stroke="#F8D76A" strokeWidth="1.5" />
                 </svg>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 relative z-10">
-                  <div className="flex items-center gap-2.5 sm:gap-3.5">
-                    {/* Elegant circular brand gold crest logo */}
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-full border border-transparent bg-gradient-to-br from-[#F4E2B6] via-[#D4AF37] to-[#886C1D] flex items-center justify-center shadow-xs shrink-0 p-[1.5px] relative z-10 transition-transform hover:scale-105 duration-300">
-                      <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-                        <svg
-                          viewBox="0 0 100 100"
-                          className="w-5 sm:w-6 h-5 sm:h-6 text-[#0F3D2E] fill-none"
-                          stroke="currentColor"
-                          strokeWidth="5.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M50 82 L50 22" />
-                          <path
-                            d="M50 45 C40 35, 42 20, 50 15 C58 20, 60 35, 50 45 Z"
-                            fill="#0F3D2E"
-                            fillOpacity="0.08"
-                          />
-                          <path
-                            d="M50 62 C28 58, 22 42, 34 34 C42 45, 48 53, 50 57"
-                            strokeWidth="5"
-                          />
-                          <path
-                            d="M50 62 C72 58, 78 42, 66 34 C58 45, 52 53, 50 57"
-                            strokeWidth="5"
-                          />
-                        </svg>
-                      </div>
+                {/* Faint Catering Cloche & Steam Watermark */}
+                <svg
+                  viewBox="0 0 120 80"
+                  fill="none"
+                  className="pointer-events-none select-none absolute left-1/2 -translate-x-1/4 top-1/2 -translate-y-1/2 w-36 h-24 text-[#D9A323] opacity-20 hidden sm:block"
+                  aria-hidden="true"
+                >
+                  <circle cx="52" cy="18" r="4" stroke="currentColor" strokeWidth="2.2" />
+                  <path d="M22 52 C22 35.4 35.4 22 52 22 C68.6 22 82 35.4 82 52" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+                  <path d="M12 58 H92" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+                  <path d="M16 52 H88" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M90 36 C96 30 92 22 98 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M100 40 C106 34 102 26 108 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 relative z-10">
+                  <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                    {/* Metallic Gold Medallion with Catering Cloche Icon */}
+                    <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-gradient-to-br from-[#FCE79C] via-[#E2AE2F] to-[#B68112] border-2 border-[#FFF4CE]/85 flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.28)] shrink-0">
+                      <svg viewBox="0 0 36 28" fill="none" className="w-6.5 h-5.5 sm:w-7.5 sm:h-6 text-[#003B2A]" aria-hidden="true">
+                        <circle cx="18" cy="5.5" r="2" stroke="currentColor" strokeWidth="2" />
+                        <path d="M6 19.5C6 12.8726 11.3726 7.5 18 7.5C24.6274 7.5 30 12.8726 30 19.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                        <path d="M3 22.5H33" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+                        <path d="M5 19.5H31" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                      </svg>
                     </div>
 
                     <div className="text-left flex-1 min-w-0">
-                      <h2 className="text-sm sm:text-base lg:text-lg font-display font-bold text-[#F4E2B6] tracking-wider uppercase leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] truncate">
+                      <h2
+                        className="text-xl sm:text-2xl lg:text-[26px] font-serif font-bold text-white tracking-wide uppercase leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] truncate"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                      >
                         {selectedPackage.packageName}
                       </h2>
                       <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                        <span className="text-[9.5px] sm:text-[10px] text-[#E0D4BA] font-medium tracking-wide">
+                        <span className="text-xs sm:text-[13.5px] text-[#E6EFEA] font-medium tracking-wide truncate">
                           {caterer.name} • {caterer.location}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
-                    {renderVegNonVegBadge(selectedPackage.packageType || "Veg")}
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-[#D4AF37]/30 text-[8.5px] sm:text-[9px] font-bold text-[#F4E2B6] font-sans">
-                      <Users size={11} className="text-[#D4AF37]" />
-                      Min {getPackageMinGuests(selectedPackage)}+
+                  {/* Right Side VEG/NON-VEG & Minimum Guest Badges */}
+                  <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center shrink-0">
+                    {(() => {
+                      const lower = (selectedPackage.packageType || "Veg").toLowerCase();
+                      let isVeg = true;
+                      let isNonVeg = false;
+                      if (lower.includes("non-veg") || lower.includes("non veg") || lower.includes("nonveg")) {
+                        if (lower.includes("both") || lower.includes("allow") || lower.includes("+") || lower.includes("&")) {
+                          isVeg = true;
+                          isNonVeg = true;
+                        } else {
+                          isVeg = false;
+                          isNonVeg = true;
+                        }
+                      } else if (lower.includes("both") || lower.includes("+") || lower.includes("&") || lower.includes("mixed")) {
+                        isVeg = true;
+                        isNonVeg = true;
+                      } else if (lower.includes("veg")) {
+                        isVeg = true;
+                        isNonVeg = false;
+                      } else {
+                        isVeg = true;
+                        isNonVeg = true;
+                      }
+
+                      return (
+                        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#FFFDF8] border border-[#E8C77A] shadow-sm select-none">
+                          {isVeg && (
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#173D30] tracking-wide uppercase">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#16A34A] inline-block shrink-0" />
+                              <span>VEG</span>
+                            </span>
+                          )}
+                          {isNonVeg && (
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#173D30] tracking-wide uppercase">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626] inline-block shrink-0" />
+                              <span>NON-VEG</span>
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
+
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#00281D]/85 border border-[#D9A323]/85 text-xs font-bold text-[#FFFDF8] font-sans shadow-sm">
+                      <Users size={13} className="text-[#F8D76A] shrink-0" />
+                      <span className="tabular-nums">Min {getPackageMinGuests(selectedPackage)}+</span>
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-3.5 sm:p-5 bg-[#FFFDF9]">
+              <div className="pt-4 sm:pt-5 px-1 sm:px-2 pb-1.5 bg-[#FFFDF8]">
                 {/* 2-Column Responsive Layout on Desktop, 1-Column on Mobile */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:gap-4.5 items-start">
-                  
-                  {/* LEFT COLUMN: Package Information & Pricing Tiers */}
-                  <div className="lg:col-span-6 flex flex-col gap-3">
-                    {/* Package Price Box */}
-                    <div className="relative bg-gradient-to-br from-[#FFFDF9] to-[#FAF5EA] rounded-xl border border-[#DECC9C] p-3 sm:p-3.5 hover:border-[#D4AF37]/50 transition-all duration-300 overflow-hidden shadow-2xs flex flex-col items-center justify-center text-center">
-                      {/* Corner bevel/flourish details */}
-                      <div className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t border-l border-[#BB9C4A]/40 rounded-tl-[2px]"></div>
-                      <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t border-r border-[#BB9C4A]/40 rounded-tr-[2px]"></div>
-                      <div className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b border-l border-[#BB9C4A]/40 rounded-bl-[2px]"></div>
-                      <div className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b border-r border-[#BB9C4A]/40 rounded-br-[2px]"></div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-                      <div className="flex items-center justify-center gap-2 mb-1.5 relative z-10 w-full px-2">
-                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#DECC9C] to-[#C29D38] opacity-60"></div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <span className="text-[#C29D38] text-[7.5px] select-none">⚜️</span>
-                          <span className="text-[9.5px] sm:text-[10px] font-sans font-bold tracking-[1.5px] text-[#8C6D1F] uppercase text-center">
-                            PACKAGE PRICE
-                          </span>
-                          <span className="text-[#C29D38] text-[7.5px] select-none">⚜️</span>
-                        </div>
-                        <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent via-[#DECC9C] to-[#C29D38] opacity-60"></div>
+                  {/* LEFT COLUMN: Package Price Card & Pricing Tiers */}
+                  <div className="lg:col-span-6 flex flex-col gap-5">
+                    {/* Package Price Card */}
+                    <div className="relative bg-gradient-to-b from-[#FFFDF8] via-[#FCF6E5] to-[#F8EBD0]/65 rounded-2xl border border-[#D9A323]/75 px-4 py-5 sm:px-6 sm:py-6 hover:border-[#D9A323] transition-all duration-300 overflow-hidden shadow-[0_6px_22px_rgba(217,163,35,0.10)] flex flex-col items-center justify-center text-center">
+                      {/* Subtle Botanical Corner Accents */}
+                      <svg aria-hidden="true" viewBox="0 0 110 90" fill="none" className="pointer-events-none select-none absolute top-0 left-0 w-24 h-20 text-[#C8941A] opacity-20">
+                        <path d="M6 4 C20 26 42 44 74 54" stroke="currentColor" strokeWidth="1.2" />
+                        <path d="M22 22 C34 12 50 12 62 18 C48 28 34 30 22 22 Z" fill="currentColor" fillOpacity="0.45" />
+                        <path d="M42 40 C54 32 68 34 78 42 C64 50 50 50 42 40 Z" fill="currentColor" fillOpacity="0.35" />
+                      </svg>
+                      <svg aria-hidden="true" viewBox="0 0 110 90" fill="none" className="pointer-events-none select-none absolute top-0 right-0 w-24 h-20 text-[#C8941A] opacity-20">
+                        <path d="M104 4 C90 26 68 44 36 54" stroke="currentColor" strokeWidth="1.2" />
+                        <path d="M88 22 C76 12 60 12 48 18 C62 28 76 30 88 22 Z" fill="currentColor" fillOpacity="0.45" />
+                        <path d="M68 40 C56 32 42 34 32 42 C46 50 60 50 68 40 Z" fill="currentColor" fillOpacity="0.35" />
+                      </svg>
+
+                      {/* Heading with Gold Crown */}
+                      <div className="flex items-center justify-center gap-2 mb-2 relative z-10">
+                        <Crown size={15} className="text-[#C8941A] fill-[#D9A323] shrink-0" />
+                        <span className="text-[11px] sm:text-xs font-sans font-extrabold tracking-[0.22em] text-[#0B1F17] uppercase">
+                          PACKAGE PRICE
+                        </span>
                       </div>
 
-                      <div className="relative z-10 flex flex-col items-center justify-center text-center my-0.5">
+                      {/* Hero Gold Price Flanked by Symmetric Botanical Wreaths */}
+                      <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-5 my-0.5">
+                        {/* Left Gold Wreath */}
+                        <svg viewBox="0 0 40 58" fill="none" className="w-8 sm:w-9 h-12 sm:h-14 text-[#D9A323] shrink-0" aria-hidden="true">
+                          <path d="M28 52 C14 42 10 24 20 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                          <path d="M15 41 C9 37 6 31 8 25 C14 29 16 35 15 41 Z" fill="currentColor" fillOpacity="0.82" />
+                          <path d="M13 28 C8 23 7 16 11 11 C15 16 16 22 13 28 Z" fill="currentColor" fillOpacity="0.82" />
+                          <path d="M20 45 C17 48 14 52 15 56 C20 53 22 49 20 45 Z" fill="currentColor" fillOpacity="0.72" />
+                          <path d="M16 17 C14 11 16 6 21 3 C22 9 20 13 16 17 Z" fill="currentColor" fillOpacity="0.82" />
+                        </svg>
+
                         <span
-                          className="font-bold text-2xl sm:text-3xl lg:text-[34px] leading-tight select-all text-transparent bg-clip-text"
+                          className="font-serif font-extrabold text-[40px] sm:text-[48px] leading-none select-all tabular-nums"
                           style={{
-                            fontFamily: '"Cinzel", "Libre Baskerville", "Georgia", serif',
-                            letterSpacing: "-0.5px",
-                            background: "linear-gradient(180deg, #D4AF37 0%, #C9A227 50%, #B8860B 100%)",
+                            fontFamily: '"Playfair Display", Georgia, serif',
+                            background: "linear-gradient(180deg, #E2A923 0%, #C68914 55%, #A66E08 100%)",
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
-                            filter: "drop-shadow(0px 1px 1px rgba(0,0,0,0.06))",
+                            filter: "drop-shadow(0px 1px 1px rgba(130, 88, 12, 0.14))",
                           }}
                         >
                           ₹{currentPerPlatePrice}
                         </span>
-                        <span className="text-[10px] sm:text-[10.5px] font-sans font-bold text-[#5C5750] uppercase tracking-[0.16em] mt-0.5">
-                          Per Plate
+
+                        {/* Right Gold Wreath */}
+                        <svg viewBox="0 0 40 58" fill="none" className="w-8 sm:w-9 h-12 sm:h-14 text-[#D9A323] shrink-0 -scale-x-100" aria-hidden="true">
+                          <path d="M28 52 C14 42 10 24 20 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                          <path d="M15 41 C9 37 6 31 8 25 C14 29 16 35 15 41 Z" fill="currentColor" fillOpacity="0.82" />
+                          <path d="M13 28 C8 23 7 16 11 11 C15 16 16 22 13 28 Z" fill="currentColor" fillOpacity="0.82" />
+                          <path d="M20 45 C17 48 14 52 15 56 C20 53 22 49 20 45 Z" fill="currentColor" fillOpacity="0.72" />
+                          <path d="M16 17 C14 11 16 6 21 3 C22 9 20 13 16 17 Z" fill="currentColor" fillOpacity="0.82" />
+                        </svg>
+                      </div>
+
+                      {/* Gold Ribbon Banner for PER PLATE */}
+                      <div className="relative z-10 mt-2 inline-flex items-center justify-center px-6 py-1 bg-gradient-to-r from-[#E2AD30] via-[#F7D877] to-[#DBA222] rounded-sm shadow-[0_2px_8px_rgba(184,134,11,0.22)]">
+                        <span className="text-[11px] font-sans font-extrabold text-[#173D30] uppercase tracking-[0.22em] leading-none">
+                          PER PLATE
                         </span>
                       </div>
 
-                      {/* Package Description / Feature highlights */}
-                      <p className="text-[10.5px] sm:text-[11px] text-stone-500 italic mt-1.5 text-center max-w-md line-clamp-2">
+                      {/* Package Description Quote */}
+                      <p className="relative z-10 text-xs sm:text-[13px] text-[#354B43] italic mt-3.5 text-center max-w-md leading-relaxed line-clamp-2">
                         "{selectedPackage.description || "Curated premium catering spread with chef-crafted delicacies tailored for your event."}"
                       </p>
 
+                      {/* Food Categories & Customizable Pills */}
                       {selectedPackage.categories && selectedPackage.categories.length > 0 && (
-                        <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2 pt-2 border-t border-[#DECC9C]/50 w-full">
-                          <span className="inline-flex items-center gap-1 text-[9px] sm:text-[9.5px] font-bold text-[#0F3D2E] bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded-full">
-                            <Sparkles size={10} className="text-[#D4AF37]" />
-                            {selectedPackage.categories.length} Food Categories
+                        <div className="relative z-10 flex flex-wrap items-center justify-center gap-2.5 mt-4">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B1F17] bg-white border border-[#E8C77A] px-3.5 py-1.5 rounded-full shadow-[0_2px_6px_rgba(0,46,34,0.05)]">
+                            <Leaf size={13} className="text-[#108A48] fill-[#108A48]/15 shrink-0" />
+                            <span>{selectedPackage.categories.length} Food Categories</span>
                           </span>
-                          <span className="inline-flex items-center gap-1 text-[9px] sm:text-[9.5px] font-bold text-stone-600 bg-stone-100 border border-stone-200 px-1.5 py-0.5 rounded-full">
-                            <Utensils size={10} className="text-stone-500" />
-                            Fully Customizable
+                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B1F17] bg-white border border-[#E8C77A] px-3.5 py-1.5 rounded-full shadow-[0_2px_6px_rgba(0,46,34,0.05)]">
+                            <Star size={13} className="text-[#C8941A] fill-[#D9A323] shrink-0" />
+                            <span>Fully Customizable</span>
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* Pricing Slabs (Interactive Tiers) */}
+                    {/* Pricing Slabs (Interactive Tiers Grid) */}
                     {selectedPackage.pricingSlabs && selectedPackage.pricingSlabs.length > 0 && (
-                      <div className="bg-white/90 border border-[#DECC9C] rounded-xl p-2.5 sm:p-3 shadow-2xs">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] font-sans font-bold text-[#8A6715] uppercase tracking-wider">
-                            Pricing Tiers
-                          </span>
-                          <span className="text-[9px] text-stone-500">
+                      <div className="pt-0.5">
+                        <div className="flex items-center justify-between gap-2 mb-3">
+                          <div className="flex items-center gap-2">
+                            <Layers size={16} className="text-[#C8941A] shrink-0" />
+                            <span className="text-xs sm:text-[13px] font-sans font-extrabold text-[#0B1F17] uppercase tracking-[0.08em]">
+                              PRICING TIERS
+                            </span>
+                          </div>
+                          <span className="text-[11px] sm:text-xs font-medium text-[#354B43]">
                             Click tier to update guest count
                           </span>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
                           {(() => {
                             const sortedSlabs = [...selectedPackage.pricingSlabs].sort(
                               (a: any, b: any) => a.minGuests - b.minGuests
@@ -2341,31 +2731,43 @@ export default function OrderFlow() {
                                     setGuestInputVal(String(slab.minGuests));
                                   }}
                                   className={cn(
-                                    "flex flex-col justify-center items-start px-2.5 py-1.5 sm:py-2 rounded-lg border transition-all duration-200 text-left cursor-pointer",
+                                    "relative flex flex-col justify-center items-start px-3.5 py-3 rounded-xl border transition-all duration-200 text-left cursor-pointer",
                                     isActive
-                                      ? "border-[#D4AF37] bg-gradient-to-br from-[#FFFDF9] to-[#FCFAF5] shadow-2xs ring-1 ring-[#D4AF37]/50"
-                                      : "border-[#DECC9C]/50 bg-[#FAF8F5] hover:border-[#DECC9C] hover:bg-white"
+                                      ? "bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] border-[#D9A323] ring-1 ring-[#F8D76A]/55 shadow-[0_8px_18px_rgba(0,75,53,0.22)] text-white"
+                                      : "bg-[#FFFDF8] hover:bg-[#FFF9E8] border-[#E8C77A]/85 hover:border-[#D9A323] shadow-[0_2px_8px_rgba(217,163,35,0.06)] text-[#0B1F17]"
                                   )}
                                 >
+                                  {isActive && (
+                                    <span className="absolute -top-2 -right-2 w-5.5 h-5.5 rounded-full bg-gradient-to-br from-[#F8D76A] to-[#C8941A] border border-[#FFFDF8] flex items-center justify-center shadow-sm">
+                                      <Check size={12} strokeWidth={3} className="text-[#002E22]" />
+                                    </span>
+                                  )}
                                   <span
                                     className={cn(
-                                      "text-[8.5px] font-bold uppercase tracking-wider font-sans",
-                                      isActive ? "text-[#8A6715]" : "text-stone-500"
+                                      "text-[10.5px] font-bold uppercase tracking-wider font-sans tabular-nums",
+                                      isActive ? "text-[#F8D76A]" : "text-[#354B43]"
                                     )}
                                   >
-                                    {slab.minGuests} {slab.maxGuests ? `- ${slab.maxGuests}` : "+"} Guests
+                                    {slab.minGuests} {slab.maxGuests ? `- ${slab.maxGuests}` : "+"} GUESTS
                                   </span>
-                                  <span
-                                    className={cn(
-                                      "text-xs sm:text-sm font-bold font-display mt-0.5",
-                                      isActive ? "text-[#0F3D2E]" : "text-stone-800"
-                                    )}
-                                  >
-                                    ₹{slab.price}{" "}
-                                    <span className="text-[9px] font-sans font-medium text-stone-400">
+                                  <div className="mt-1 flex items-baseline gap-1 tabular-nums">
+                                    <span
+                                      className={cn(
+                                        "text-lg sm:text-[19px] font-extrabold font-sans leading-none",
+                                        isActive ? "text-white" : "text-[#0B1F17]"
+                                      )}
+                                    >
+                                      ₹{slab.price}
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "text-xs font-medium",
+                                        isActive ? "text-[#DCEAE4]" : "text-[#5B6D65]"
+                                      )}
+                                    >
                                       / plate
                                     </span>
-                                  </span>
+                                  </div>
                                 </button>
                               );
                             });
@@ -2376,25 +2778,27 @@ export default function OrderFlow() {
                   </div>
 
                   {/* RIGHT COLUMN: Guest Count Controls, Estimate Summary & Continue Button */}
-                  <div className="lg:col-span-6 flex flex-col gap-3">
-                    {/* Enter Guest Count Controls */}
-                    <div className="bg-white/95 border border-[#DECC9C] rounded-xl p-2.5 sm:p-3 shadow-2xs">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-[10px] sm:text-[10.5px] font-sans font-bold text-[#123326] uppercase tracking-[1.5px]">
-                          ENTER GUEST COUNT
+                  <div className="lg:col-span-6 flex flex-col gap-4">
+                    {/* Enter Guest Count Card */}
+                    <div className="bg-[#FFFDF8] border border-[#E8C77A] rounded-2xl p-4 sm:p-4.5 shadow-[0_4px_14px_rgba(0,46,34,0.04)]">
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <label className="flex items-center gap-2 text-xs sm:text-[13px] font-sans font-extrabold text-[#0B1F17] uppercase tracking-[0.06em]">
+                          <Users size={16} className="text-[#C8941A] shrink-0" />
+                          <span>ENTER GUEST COUNT</span>
                         </label>
-                        <span className="text-[9.5px] font-medium text-stone-500">
+                        <span className="text-xs font-medium text-[#354B43] tabular-nums">
                           Min: {getPackageMinGuests(selectedPackage)} guests
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <button
                           type="button"
                           onClick={decrementGuests}
-                          className="w-8.5 h-8.5 sm:w-9 sm:h-9 flex items-center justify-center bg-gradient-to-b from-[#FCFAF5] to-[#EFE7D5] hover:from-white hover:to-[#FCFAF5] active:scale-95 text-[#123326] rounded-lg border border-[#DECC9C] hover:border-[#C29D38] transition-all cursor-pointer shadow-2xs text-base font-bold shrink-0"
+                          className="w-11 h-11 flex items-center justify-center bg-gradient-to-b from-[#FFFDF8] to-[#F7E8C2] hover:from-white hover:to-[#FCEEBF] active:scale-95 text-[#0B1F17] rounded-xl border border-[#D9A323]/85 hover:border-[#B8860B] transition-all cursor-pointer shadow-2xs shrink-0"
                           title="Decrease 10 guests"
+                          aria-label="Decrease guests"
                         >
-                          <Minus size={14} strokeWidth={2.5} />
+                          <Minus size={17} strokeWidth={2.5} />
                         </button>
 
                         <input
@@ -2437,114 +2841,95 @@ export default function OrderFlow() {
                               setGuestInputVal(String(parsed));
                             }
                           }}
-                          className="flex-1 w-full h-8.5 sm:h-9 text-center font-sans font-bold text-base sm:text-lg text-[#123326] bg-[#FAF8F5] focus:bg-white border border-[#DECC9C] hover:border-[#C29D38] focus:border-[#C29D38] rounded-lg outline-none transition-all shadow-inner select-all"
+                          className="flex-1 w-full h-11 text-center font-sans font-extrabold text-xl text-[#0B1F17] bg-[#FBF7EE] focus:bg-white border border-[#E8C77A] hover:border-[#D9A323] focus:border-[#004B35] rounded-xl outline-none transition-all shadow-inner select-all tabular-nums"
                         />
 
                         <button
                           type="button"
                           onClick={incrementGuests}
-                          className="w-8.5 h-8.5 sm:w-9 sm:h-9 flex items-center justify-center bg-gradient-to-b from-[#FCFAF5] to-[#EFE7D5] hover:from-white hover:to-[#FCFAF5] active:scale-95 text-[#123326] rounded-lg border border-[#DECC9C] hover:border-[#C29D38] transition-all cursor-pointer shadow-2xs text-base font-bold shrink-0"
+                          className="w-11 h-11 flex items-center justify-center bg-gradient-to-b from-[#FFFDF8] to-[#F7E8C2] hover:from-white hover:to-[#FCEEBF] active:scale-95 text-[#0B1F17] rounded-xl border border-[#D9A323]/85 hover:border-[#B8860B] transition-all cursor-pointer shadow-2xs shrink-0"
                           title="Increase 10 guests"
+                          aria-label="Increase guests"
                         >
-                          <Plus size={14} strokeWidth={2.5} />
+                          <Plus size={17} strokeWidth={2.5} />
                         </button>
                       </div>
                     </div>
 
-                    {/* Gold Detail Estimate Summary Card */}
-                    <div className="bg-[#FCFAF7] border border-[#DECC9C] rounded-xl p-3 sm:p-3.5 shadow-2xs relative overflow-hidden text-left w-full box-border">
-                      <div className="absolute top-0 right-0 w-28 h-28 bg-[#D4AF37]/5 rounded-full blur-xl pointer-events-none"></div>
-
-                      <div className="flex items-center gap-1.5 mb-2.5 pb-2 border-b border-[#E5D2A6]">
-                        <div className="w-5.5 h-5.5 rounded-full border border-[#DECC9C] bg-[#FCFAF5] text-[#8C6D1F] flex items-center justify-center shadow-2xs shrink-0">
-                          <svg
-                            className="w-3 h-3 text-[#8A6715]"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                            <line x1="9" y1="9" x2="15" y2="9" />
-                            <line x1="9" y1="13" x2="15" y2="13" />
-                            <line x1="9" y1="17" x2="15" y2="17" />
-                          </svg>
+                    {/* Estimate Summary Card */}
+                    <div className="bg-[#FFFDF8] border border-[#E8C77A] rounded-2xl p-4 sm:p-5 shadow-[0_4px_16px_rgba(0,46,34,0.05)] relative overflow-hidden text-left w-full box-border">
+                      <div className="flex items-center gap-2.5 mb-3.5 pb-2.5 border-b border-[#D9A323]/65">
+                        <div className="w-6.5 h-6.5 rounded-md border border-[#D9A323]/75 bg-[#FBF2D8] text-[#B8860B] flex items-center justify-center shadow-2xs shrink-0">
+                          <Calculator size={14} strokeWidth={2.2} />
                         </div>
-                        <h4 className="font-sans font-bold text-[10.5px] sm:text-[11px] tracking-[1.5px] text-[#123326] uppercase">
+                        <h4 className="font-sans font-extrabold text-sm sm:text-[15px] tracking-[0.06em] text-[#0B1F17] uppercase leading-none">
                           ESTIMATE SUMMARY
                         </h4>
                       </div>
 
-                      <div className="space-y-1.5 text-[10.5px] sm:text-[11px]">
-                        <div className="flex justify-between items-center text-left">
-                          <span className="text-[#5C5750] font-semibold uppercase tracking-[0.5px] font-sans">
+                      <div className="space-y-2.5 text-xs sm:text-[13px]">
+                        <div className="flex justify-between items-center text-left gap-3">
+                          <span className="text-[#354B43] font-semibold uppercase tracking-[0.04em] font-sans">
                             CATERING PACKAGE
                           </span>
-                          <span className="font-sans font-bold text-[#123326] uppercase tracking-tight truncate max-w-[180px]">
+                          <span className="font-sans font-extrabold text-[#004B35] uppercase tracking-tight truncate max-w-[200px]">
                             {selectedPackage.packageName}
                           </span>
                         </div>
 
-                        <div className="w-full border-t border-dashed border-[#DECC9C]/60"></div>
+                        <div className="w-full h-px bg-[#E8C77A]/40" />
 
-                        <div className="flex justify-between items-center text-left">
-                          <span className="text-[#5C5750] font-semibold uppercase tracking-[0.5px] font-sans">
+                        <div className="flex justify-between items-center text-left gap-3">
+                          <span className="text-[#354B43] font-semibold uppercase tracking-[0.04em] font-sans">
                             PRICE PER PLATE
                           </span>
-                          <span className="font-sans font-bold text-[#123326]">
+                          <span className="font-sans font-extrabold text-[#004B35] tabular-nums">
                             ₹{currentPerPlatePrice}
                           </span>
                         </div>
 
-                        <div className="w-full border-t border-dashed border-[#DECC9C]/60"></div>
+                        <div className="w-full h-px bg-[#E8C77A]/40" />
 
-                        <div className="flex justify-between items-center text-left">
-                          <span className="text-[#5C5750] font-semibold uppercase tracking-[0.5px] font-sans">
+                        <div className="flex justify-between items-center text-left gap-3">
+                          <span className="text-[#354B43] font-semibold uppercase tracking-[0.04em] font-sans">
                             EXPECTED GUEST COUNT
                           </span>
-                          <span className="font-sans font-bold text-[#123326]">
+                          <span className="font-sans font-extrabold text-[#004B35] tabular-nums">
                             {guests} Guests
                           </span>
                         </div>
 
-                        {/* Estimated Total Highlight Banner */}
-                        <div className="pt-0.5">
-                          <div className="bg-gradient-to-r from-[#F6F0DF] to-[#EFE5CD] border border-[#DECC9C] rounded-lg p-2.5 sm:p-3 flex justify-between items-center shadow-2xs">
+                        {/* Estimated Total Soft Gold Highlight Panel */}
+                        <div className="pt-1.5">
+                          <div className="bg-gradient-to-r from-[#FCE69B] via-[#F7D779] to-[#F1C95D] border border-[#D9A323]/90 rounded-xl px-4 py-3.5 flex justify-between items-center gap-3 shadow-[0_4px_14px_rgba(217,163,35,0.16)]">
                             <div className="flex flex-col text-left">
-                              <span className="text-[9px] font-sans font-bold text-[#B8860B] uppercase tracking-[1.5px]">
+                              <span className="text-xs sm:text-[13px] font-sans font-extrabold text-[#0B1F17] uppercase tracking-[0.06em]">
                                 ESTIMATED TOTAL
                               </span>
-                              <span className="text-[8.5px] text-[#5C5750] font-medium tracking-tight">
+                              <span className="text-[11px] text-[#354B43] font-medium mt-0.5">
                                 Inclusive of all taxes
                               </span>
                             </div>
-                            <span
-                              className="font-bold text-xl sm:text-2xl lg:text-[26px] leading-none"
-                              style={{
-                                fontFamily: '"Cinzel", "Libre Baskerville", "Georgia", serif',
-                                letterSpacing: "-0.5px",
-                                background: "linear-gradient(180deg, #D4AF37 0%, #C9A227 50%, #B8860B 100%)",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                                filter: "drop-shadow(0px 1px 1px rgba(0,0,0,0.06))",
-                              }}
-                            >
-                              ₹{(currentPerPlatePrice * guests).toLocaleString("en-IN")}
-                            </span>
+                            <div className="pl-4 border-l border-[#D9A323]/45 shrink-0">
+                              <span
+                                className="font-serif font-extrabold text-2xl sm:text-[30px] text-[#0B1F17] leading-none tabular-nums"
+                                style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                              >
+                                ₹{(currentPerPlatePrice * guests).toLocaleString("en-IN")}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Disclaimer Policy */}
-                    <div className="flex items-center gap-1.5 text-[10px] text-[#7A7369] font-medium text-left px-1">
-                      <span className="text-xs text-[#C29D38] font-bold shrink-0">ⓘ</span>
+                    <div className="flex items-center gap-2 text-xs text-[#354B43] font-medium text-left px-1">
+                      <Info size={15} className="text-[#C8941A] shrink-0" />
                       <span>Taxes and additional charges may apply as per venue policy.</span>
                     </div>
 
-                    {/* Call To Action Button (Premium Emerald / Gold outline) */}
+                    {/* Call To Action Button (Full-width Dark Emerald / Gold border) */}
                     <button
                       type="button"
                       onClick={() => {
@@ -2558,12 +2943,13 @@ export default function OrderFlow() {
                         }
                         setViewMode("custom");
                       }}
-                      className="w-full bg-gradient-to-br from-[#021B1A] via-[#032D29] to-[#0A3A34] text-[#FDE5A9] font-sans font-bold text-xs uppercase tracking-[2px] py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md border border-[#BB9C4A] hover:border-[#F4E2B6] hover:scale-[1.005] active:scale-[0.99] transition-all outline-none flex items-center justify-center gap-1.5 cursor-pointer group"
+                      className="w-full bg-gradient-to-r from-[#00513A] via-[#003B2A] to-[#00261B] hover:brightness-110 text-white font-sans font-extrabold text-sm uppercase tracking-[0.14em] py-3.5 px-6 min-h-[52px] rounded-xl shadow-[0_8px_20px_rgba(0,75,53,0.28)] hover:shadow-[0_10px_24px_rgba(0,75,53,0.34)] border-[1.5px] border-[#D9A323] hover:border-[#F8D76A] hover:scale-[1.005] active:scale-[0.99] transition-all outline-none flex items-center justify-center gap-2.5 cursor-pointer group"
                     >
+                      <UtensilsCrossed size={17} className="text-[#F8D76A] shrink-0" />
                       <span>CONTINUE WITH MENU</span>
-                      <ChevronRight
-                        size={14}
-                        className="transition-transform group-hover:translate-x-1 text-[#FDE5A9] stroke-[3]"
+                      <ArrowRight
+                        size={17}
+                        className="transition-transform group-hover:translate-x-1 text-[#F8D76A] stroke-[2.5] shrink-0"
                       />
                     </button>
                   </div>
@@ -2577,22 +2963,61 @@ export default function OrderFlow() {
 
       {viewMode === "custom" && selectedPackage && (
         <>
-          <div className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-5 pb-10 sm:pb-14">
+          <div className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-6 pb-20 lg:pb-14 relative z-10">
             <div className="flex flex-col lg:flex-row gap-5 lg:gap-6 items-start">
               {/* LEFT COLUMN: Main Menu Selection Area */}
               <div id="active-category-content" className="flex-1 min-w-0 w-full">
-                <div className="bg-[#FFFEFA] rounded-2xl border border-[#D6B15E]/40 shadow-xs p-4 sm:p-5 lg:p-6">
+                <div className="relative overflow-hidden bg-[#FFFDF8] rounded-2xl border border-[#E8C77A]/85 shadow-[0_8px_28px_rgba(23,61,48,0.06)] p-4 sm:p-6">
+                  {/* Subtle Botanical Leaf Corner Artwork */}
+                  <svg
+                    viewBox="0 0 180 120"
+                    fill="none"
+                    aria-hidden="true"
+                    className={cn(
+                      "pointer-events-none select-none absolute -top-2 -left-2 w-40 h-28 opacity-15",
+                      isActiveCatNonVeg ? "text-[#8B1E16]" : "text-[#004B35]",
+                    )}
+                  >
+                    <path d="M12 10 C32 45 55 72 92 84 C65 55 40 28 12 10 Z" stroke="currentColor" strokeWidth="1.2" fill="currentColor" fillOpacity="0.2" />
+                    <path d="M54 4 C66 32 82 52 110 62 C88 38 72 18 54 4 Z" stroke="currentColor" strokeWidth="1.1" fill="currentColor" fillOpacity="0.15" />
+                    <path d="M2 50 C25 70 50 86 78 92 C52 72 28 58 2 50 Z" stroke="currentColor" strokeWidth="1.1" fill="currentColor" fillOpacity="0.15" />
+                  </svg>
+                  <svg
+                    viewBox="0 0 180 120"
+                    fill="none"
+                    aria-hidden="true"
+                    className={cn(
+                      "pointer-events-none select-none absolute -top-2 -right-2 w-40 h-28 opacity-15 scale-x-[-1]",
+                      isActiveCatNonVeg ? "text-[#8B1E16]" : "text-[#004B35]",
+                    )}
+                  >
+                    <path d="M12 10 C32 45 55 72 92 84 C65 55 40 28 12 10 Z" stroke="currentColor" strokeWidth="1.2" fill="currentColor" fillOpacity="0.2" />
+                    <path d="M54 4 C66 32 82 52 110 62 C88 38 72 18 54 4 Z" stroke="currentColor" strokeWidth="1.1" fill="currentColor" fillOpacity="0.15" />
+                    <path d="M2 50 C25 70 50 86 78 92 C52 72 28 58 2 50 Z" stroke="currentColor" strokeWidth="1.1" fill="currentColor" fillOpacity="0.15" />
+                  </svg>
+
                   {/* Category Header & Controls */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-[#D6B15E]/30">
+                  <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 pb-4 border-b border-[#E8C77A]/45">
                     <div>
-                      <h2
-                        className="font-serif font-bold text-xl sm:text-2xl lg:text-[24px] text-[#0B2D23] leading-tight tracking-tight"
-                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
-                      >
-                        {activeCategory}
-                      </h2>
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-[3px] h-7 rounded-full bg-gradient-to-b from-[#F8D76A] to-[#D9A323] shrink-0" />
+                        {isActiveCatNonVeg ? (
+                          <NonVegDrumstickIcon className="w-6 h-6 text-[#8B1E16] shrink-0" />
+                        ) : (
+                          <VegLeafIcon className="w-6 h-6 text-[#15803D] shrink-0" />
+                        )}
+                        <h2
+                          className={cn(
+                            "font-serif font-bold text-xl sm:text-2xl lg:text-[26px] leading-tight tracking-tight",
+                            isActiveCatNonVeg ? "text-[#4A0D09]" : "text-[#004B35]",
+                          )}
+                          style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                        >
+                          {activeCategory}
+                        </h2>
+                      </div>
                       <div className="flex items-center gap-2.5 mt-2 flex-wrap">
-                        <span className="text-xs font-semibold text-[#8B6E4A] uppercase tracking-wider font-sans">
+                        <span className="text-[11px] font-semibold text-[#4C665B] uppercase tracking-[0.22em] font-sans">
                           {getSelectionRuleLabel(
                             selectedPackage.categories?.find(
                               (c: any) => c.categoryName === activeCategory,
@@ -2601,7 +3026,7 @@ export default function OrderFlow() {
                         </span>
                         {limitPerCategory > 0 && (
                           <>
-                            <span className="text-[#D6B15E]/60">•</span>
+                            <span className="text-[#D9A323]">•</span>
                             {(() => {
                               const catData = selectedPackage.categories?.find(
                                 (c: any) => c.categoryName === activeCategory,
@@ -2612,12 +3037,12 @@ export default function OrderFlow() {
                               ).length;
                               const isFull = selectedCount >= limitPerCategory;
                               return isFull ? (
-                                <span className="inline-flex items-center gap-1.5 bg-[#E8F5EE] text-[#0B2D23] font-bold px-2.5 py-0.5 rounded-full text-xs border border-[#A3D9BA]/70">
-                                  <Check size={12} strokeWidth={3} />
+                                <span className="inline-flex items-center gap-1.5 bg-[#DCFCE7] text-[#14532D] font-bold px-3 py-0.5 rounded-full text-xs border border-[#86EFAC]">
+                                  <Check size={12} strokeWidth={3} className="text-[#15803D]" />
                                   Completed ({selectedCount}/{limitPerCategory})
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1.5 bg-[#FFFDF7] text-[#8B6E32] font-bold px-2.5 py-0.5 rounded-full text-xs border border-[#D6B15E]/50">
+                                <span className="inline-flex items-center gap-1.5 bg-[#FFF9EC] text-[#8B6A14] font-bold px-3 py-0.5 rounded-full text-xs border border-[#E8C77A]">
                                   Requires {limitPerCategory} ({selectedCount} selected)
                                 </span>
                               );
@@ -2628,23 +3053,23 @@ export default function OrderFlow() {
                     </div>
 
                     {/* Search Bar for filtering items within category */}
-                    <div className="relative w-full sm:w-[240px] shrink-0">
+                    <div className="relative w-full sm:w-[250px] shrink-0">
                       <Search
                         size={15}
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#D6B15E]"
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#173D30]"
                       />
                       <input
                         type="text"
                         placeholder="Search dishes..."
                         value={categorySearchQuery}
                         onChange={(e) => setCategorySearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-8 py-2 bg-[#FFFEFA] border border-[#D6B15E]/50 rounded-full text-xs sm:text-sm font-medium text-[#0B2D23] placeholder:text-stone-400 outline-none focus:border-[#D6B15E] focus:ring-1 focus:ring-[#D6B15E]/50 transition-all shadow-2xs"
+                        className="w-full pl-9 pr-8 py-2 bg-[#FFFDF8] border border-[#E8C77A] rounded-full text-xs sm:text-sm font-medium text-[#173D30] placeholder:text-[#6B7E75] outline-none focus:border-[#D9A323] focus:ring-2 focus:ring-[#D9A323]/20 transition-all shadow-2xs"
                       />
                       {categorySearchQuery && (
                         <button
                           type="button"
                           onClick={() => setCategorySearchQuery("")}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#0B2D23] cursor-pointer"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7E75] hover:text-[#002E22] cursor-pointer"
                         >
                           <X size={14} />
                         </button>
@@ -2654,7 +3079,7 @@ export default function OrderFlow() {
 
                   {/* Category Completion Alert message */}
                   {highlightIncomplete && !isCategoryComplete(activeCategory) && (
-                    <div className="mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-center gap-2 text-xs font-semibold animate-pulse">
+                    <div className="relative z-10 mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-center gap-2 text-xs font-semibold">
                       <span>⚠️</span>
                       <span>
                         Please select {getCategoryRemainingCount(activeCategory)} more item{getCategoryRemainingCount(activeCategory) > 1 ? "s" : ""} from {activeCategory}.
@@ -2662,8 +3087,8 @@ export default function OrderFlow() {
                     </div>
                   )}
 
-                  {/* Menu Items Grid: Cards with thin gold borders and warm cream bg */}
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-3">
+                  {/* Menu Items Grid: Emerald (Veg) & Burgundy (Non-Veg) Selected Cards + Ivory Unselected Cards */}
+                  <div className="relative z-10 mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-3.5">
                     {(() => {
                       const allCatItems =
                         selectedPackage.categories?.find(
@@ -2680,14 +3105,14 @@ export default function OrderFlow() {
 
                       if (filteredItems.length === 0) {
                         return (
-                          <div className="col-span-full py-8 text-center text-stone-400">
+                          <div className="col-span-full py-8 text-center text-[#6B7E75]">
                             <p className="text-xs sm:text-sm font-medium">
                               No dishes found matching "{categorySearchQuery}"
                             </p>
                             <button
                               type="button"
                               onClick={() => setCategorySearchQuery("")}
-                              className="mt-1.5 text-xs font-bold text-[#D6B15E] hover:underline cursor-pointer"
+                              className="mt-1.5 text-xs font-bold text-[#B8860B] hover:underline cursor-pointer"
                             >
                               Clear search
                             </button>
@@ -2721,25 +3146,47 @@ export default function OrderFlow() {
                               }
                             }}
                             className={cn(
-                              "relative bg-[#FFFEFA] rounded-lg p-2.5 sm:p-3 border transition-all duration-200 flex flex-col justify-between min-h-[80px] sm:min-h-[88px] select-none",
+                              "relative rounded-xl p-3 sm:p-3.5 border transition-all duration-200 flex flex-col justify-between min-h-[108px] sm:min-h-[116px] select-none",
                               isSelected
-                                ? "border-[#D6B15E] ring-1 ring-[#D6B15E]/40 bg-[#FFFDF7] shadow-[0_2px_12px_rgba(214,177,94,0.15)]"
+                                ? isNonVeg
+                                  ? "bg-gradient-to-br from-[#8B1E16] via-[#7A1912] to-[#5E110B] border-[#D9A323] ring-1 ring-[#F8D76A]/45 shadow-[0_8px_22px_rgba(139,30,22,0.28)] cursor-pointer"
+                                  : "bg-gradient-to-br from-[#004B35] via-[#003F2E] to-[#00281D] border-[#D9A323] ring-1 ring-[#F8D76A]/45 shadow-[0_8px_22px_rgba(0,75,53,0.26)] cursor-pointer"
                                 : isDisabled
-                                  ? "border-[#D6B15E]/20 bg-[#FAF9F5] opacity-55 cursor-not-allowed shadow-none"
-                                  : "border-[#D6B15E]/50 hover:border-[#D6B15E] shadow-[0_2px_8px_rgba(214,177,94,0.06)] hover:shadow-[0_3px_12px_rgba(214,177,94,0.12)] cursor-pointer",
+                                  ? "bg-[#FFFDF8] border-[#E8C77A]/75 shadow-[0_2px_8px_rgba(217,163,35,0.06)] cursor-not-allowed"
+                                  : "bg-[#FFFDF8] border-[#E8C77A] hover:border-[#D9A323] shadow-[0_2px_10px_rgba(217,163,35,0.08)] hover:shadow-[0_6px_16px_rgba(217,163,35,0.16)] cursor-pointer",
                             )}
                           >
                             {/* Top Row: Dietary Indicator (Veg / Non-Veg) & Status Badge */}
-                            <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                            <div className="flex items-center justify-between gap-1.5 mb-1">
                               <div>
                                 {isNonVeg ? (
-                                  <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-rose-700 font-sans">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                                  <span
+                                    className={cn(
+                                      "inline-flex items-center gap-1.5 text-[11px] font-bold font-sans",
+                                      isSelected ? "text-[#FFE4E1]" : "text-[#8B1E16]",
+                                    )}
+                                  >
+                                    <NonVegDrumstickIcon
+                                      className={cn(
+                                        "w-3.5 h-3.5",
+                                        isSelected ? "text-[#FCA5A5]" : "text-[#8B1E16]",
+                                      )}
+                                    />
                                     Non-Veg
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-[#0B2D23] font-sans">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                  <span
+                                    className={cn(
+                                      "inline-flex items-center gap-1.5 text-[11px] font-bold font-sans",
+                                      isSelected ? "text-[#E6F4EE]" : "text-[#004B35]",
+                                    )}
+                                  >
+                                    <VegLeafIcon
+                                      className={cn(
+                                        "w-3.5 h-3.5",
+                                        isSelected ? "text-[#4ADE80]" : "text-[#15803D]",
+                                      )}
+                                    />
                                     Veg
                                   </span>
                                 )}
@@ -2747,42 +3194,66 @@ export default function OrderFlow() {
 
                               <div>
                                 {isPremium ? (
-                                  <span className="text-[8.5px] font-bold uppercase tracking-wider text-[#8B6E32] bg-[#FFFDF7] border border-[#D6B15E]/50 px-1 py-0.2 rounded">
+                                  <span
+                                    className={cn(
+                                      "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                                      isSelected
+                                        ? "bg-gradient-to-r from-[#F8D76A] to-[#DFA91E] border-[#F8D76A] text-[#002E22]"
+                                        : "bg-[#FAF1D6] border-[#D9A323]/60 text-[#8B6A14]",
+                                    )}
+                                  >
                                     Premium
                                   </span>
                                 ) : (
-                                  <span className="text-[8.5px] font-semibold text-stone-500 uppercase tracking-wider">
+                                  <span
+                                    className={cn(
+                                      "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                                      isSelected
+                                        ? "bg-gradient-to-r from-[#F8D76A] to-[#DFA91E] border-[#F8D76A] text-[#002E22]"
+                                        : "bg-[#FAF1D6]/90 border-[#E8C77A]/80 text-[#8B6A14]",
+                                    )}
+                                  >
                                     Included
                                   </span>
                                 )}
                               </div>
                             </div>
 
-                            {/* Middle: Dish Name */}
-                            <div className="my-0.5">
+                            {/* Middle: Dish Name (Clean modern sans typography) */}
+                            <div className="my-1">
                               <h3
-                                className="font-serif font-bold text-[13px] sm:text-sm text-[#0B2D23] leading-snug line-clamp-1"
-                                style={{
-                                  fontFamily: '"Playfair Display", Georgia, serif',
-                                }}
+                                title={itemName}
+                                className={cn(
+                                  "font-sans font-bold text-[15px] leading-snug line-clamp-1",
+                                  isSelected
+                                    ? "text-white"
+                                    : isNonVeg
+                                      ? "text-[#3A0C09]"
+                                      : "text-[#003F2E]",
+                                )}
                               >
                                 {itemName}
                               </h3>
                             </div>
 
                             {/* Bottom Row: Control button */}
-                            <div className="mt-1 pt-1 border-t border-[#D6B15E]/20 flex items-center justify-between">
-                              <span className="text-[10px] font-medium text-stone-500">
+                            <div
+                              className={cn(
+                                "mt-1.5 pt-2 border-t flex items-center justify-between gap-2",
+                                isSelected ? "border-[#D9A323]/30" : "border-[#E8C77A]/35",
+                              )}
+                            >
+                              <span className="text-[11px] font-medium font-sans">
                                 {isSelected ? (
-                                  <span className="text-[#0B2D23] font-bold">
+                                  <span className={isNonVeg ? "text-[#FDE4E1] font-semibold" : "text-[#D5E6DF] font-semibold"}>
                                     In your menu
                                   </span>
                                 ) : isDisabled ? (
-                                  <span className="text-stone-400">
+                                  <span className="text-[#6B7E75]">
                                     Limit reached
                                   </span>
                                 ) : (
-                                  <span>Tap to add</span>
+                                  <span className="text-[#5C7268]">Tap to add</span>
                                 )}
                               </span>
 
@@ -2793,9 +3264,12 @@ export default function OrderFlow() {
                                     e.stopPropagation();
                                     toggleItem(itemName, activeCategory);
                                   }}
-                                  className="px-2 py-0.5 bg-[#0B2D23] hover:bg-[#061D16] text-[#FDF8EE] border border-[#D6B15E]/70 rounded text-[10px] font-bold transition-colors cursor-pointer shadow-2xs flex items-center gap-1"
+                                  className={cn(
+                                    "px-3 py-1 bg-gradient-to-r from-[#F8D76A] via-[#F4C430] to-[#DFA91E] hover:brightness-105 rounded-full text-[11px] font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1 shrink-0 font-sans whitespace-nowrap",
+                                    isNonVeg ? "text-[#4A0D09]" : "text-[#002E22]",
+                                  )}
                                 >
-                                  <Check size={10} strokeWidth={3} />
+                                  <Check size={11} strokeWidth={3} />
                                   <span>Selected</span>
                                 </button>
                               ) : (
@@ -2809,13 +3283,17 @@ export default function OrderFlow() {
                                     }
                                   }}
                                   className={cn(
-                                    "px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 select-none",
-                                    isDisabled
-                                      ? "bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed"
-                                      : "bg-[#FFFEFA] hover:bg-[#FAF6EE] text-[#0B2D23] border border-[#D6B15E]/60 hover:border-[#D6B15E] cursor-pointer shadow-2xs",
+                                    "px-3 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 select-none shrink-0 border font-sans whitespace-nowrap",
+                                    isNonVeg
+                                      ? isDisabled
+                                        ? "bg-[#FFFDF8] text-[#8B1E16]/55 border-[#8B1E16]/35 cursor-not-allowed"
+                                        : "bg-[#FFFDF8] hover:bg-[#FDF2F1] text-[#8B1E16] border-[#8B1E16] hover:shadow-2xs cursor-pointer"
+                                      : isDisabled
+                                        ? "bg-[#FFFDF8] text-[#004B35]/55 border-[#15803D]/35 cursor-not-allowed"
+                                        : "bg-[#FFFDF8] hover:bg-[#EAF7EC] text-[#004B35] border-[#15803D] hover:shadow-2xs cursor-pointer",
                                   )}
                                 >
-                                  <Plus size={10} strokeWidth={2.5} />
+                                  <Plus size={11} strokeWidth={2.5} />
                                   <span>Add</span>
                                 </button>
                               )}
@@ -2829,26 +3307,33 @@ export default function OrderFlow() {
               </div>
 
               {/* RIGHT COLUMN: Order Summary Panel (Desktop Sticky) */}
-              <div className="hidden lg:block lg:w-[290px] xl:w-[315px] shrink-0">
-                <div className="bg-[#FFFEFA] rounded-xl border border-[#D6B15E]/50 shadow-[0_4px_16px_rgba(214,177,94,0.06)] sticky top-[108px] max-h-[calc(100vh-125px)] flex flex-col overflow-hidden">
-                  {/* Panel Header */}
-                  <div className="p-3 pb-2.5 border-b border-[#D6B15E]/30 bg-[#FAF7F2]">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-[8.5px] font-bold uppercase tracking-[0.18em] text-[#B8860B] font-sans">
+              <div className="hidden lg:block lg:w-[310px] xl:w-[335px] shrink-0">
+                <div className="bg-[#FFFDF8] rounded-2xl border border-[#D9A323]/75 shadow-[0_12px_32px_rgba(0,46,34,0.10)] sticky top-[134px] max-h-[calc(100vh-150px)] flex flex-col overflow-hidden">
+                  {/* Panel Emerald Header */}
+                  <div className="relative p-4 pb-3.5 bg-gradient-to-br from-[#004B35] via-[#003B2A] to-[#00261B] text-white border-b border-[#D9A323]/55 overflow-hidden shrink-0">
+                    {/* Subtle Decorative Ornamental Cloche & Mandala Accent */}
+                    <svg
+                      viewBox="0 0 120 120"
+                      fill="none"
+                      aria-hidden="true"
+                      className="pointer-events-none select-none absolute -right-5 top-3 w-32 h-32 text-[#F8D76A] opacity-20"
+                    >
+                      <circle cx="60" cy="60" r="46" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
+                      <circle cx="60" cy="60" r="34" stroke="currentColor" strokeWidth="1" />
+                      <circle cx="60" cy="60" r="22" stroke="currentColor" strokeWidth="1" />
+                      <path d="M60 8 L64 28 L84 18 L72 38 L94 42 L74 54 L94 68 L72 72 L82 94 L62 82 L58 106 L52 82 L32 94 L42 72 L20 68 L40 54 L20 42 L42 38 L30 18 L50 28 Z" stroke="currentColor" strokeWidth="0.9" />
+                    </svg>
+
+                    <div className="relative z-10 flex items-center justify-between gap-2 pb-2.5 border-b border-[#D9A323]/30">
+                      <div className="flex items-center gap-2">
+                        <svg width="16" height="14" viewBox="0 0 24 20" fill="none" className="text-[#F8D76A] shrink-0" aria-hidden="true">
+                          <circle cx="12" cy="3.5" r="1.5" fill="currentColor" />
+                          <path d="M4 14C4 9.58172 7.58172 6 12 6C16.4183 6 20 9.58172 20 14H4Z" fill="currentColor" fillOpacity="0.9" />
+                          <path d="M2 16.5H22" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                        </svg>
+                        <span className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-[#F8D76A] font-sans">
                           ORDER SUMMARY
                         </span>
-                        <h3
-                          className="font-serif font-bold text-base sm:text-lg text-[#0B2D23] leading-tight mt-0.5"
-                          style={{
-                            fontFamily: '"Playfair Display", Georgia, serif',
-                          }}
-                        >
-                          {selectedPackage.packageName || "Curated Menu"}
-                        </h3>
-                        <p className="text-[10.5px] text-stone-600 font-medium mt-0.5 truncate">
-                          {caterer.name}
-                        </p>
                       </div>
 
                       {selectedItemsCount > 0 && (
@@ -2863,7 +3348,7 @@ export default function OrderFlow() {
                               setSelectedItems({});
                             }
                           }}
-                          className="text-[9.5px] font-bold text-stone-400 hover:text-rose-600 transition-colors cursor-pointer px-1.5 py-0.5 rounded hover:bg-rose-50"
+                          className="text-[11px] font-medium text-[#FBF7EF]/85 hover:text-[#F8D76A] transition-colors cursor-pointer px-1.5 py-0.5 rounded hover:bg-white/10"
                           title="Clear all selected items"
                         >
                           Clear All
@@ -2871,34 +3356,42 @@ export default function OrderFlow() {
                       )}
                     </div>
 
+                    <div className="relative z-10 mt-2.5">
+                      <h3
+                        className="font-serif font-bold text-xl text-white leading-tight"
+                        style={{
+                          fontFamily: '"Playfair Display", Georgia, serif',
+                        }}
+                      >
+                        {selectedPackage.packageName || "Curated Menu"}
+                      </h3>
+                      <p className="text-xs text-[#D5E6DF] font-medium mt-0.5 truncate">
+                        {caterer.name}
+                      </p>
+                    </div>
+
                     {/* Guest & Base Price Row */}
-                    <div className="mt-2 pt-1.5 border-t border-[#D6B15E]/30 flex items-center justify-between text-[10.5px] font-semibold">
-                      <div className="flex items-center gap-1 text-stone-600">
-                        <Users size={11} className="text-[#D6B15E]" />
-                        <span className="text-[#0B2D23]">{guests} Guests</span>
+                    <div className="relative z-10 mt-3 pt-2.5 border-t border-[#D9A323]/30 flex items-center justify-between text-xs font-semibold tabular-nums">
+                      <div className="flex items-center gap-1.5 text-[#FBF7EF]">
+                        <Users size={13} className="text-[#F8D76A]" />
+                        <span>{guests} Guests</span>
                       </div>
-                      <div className="text-[#0B2D23]">
+                      <div className="text-[#FFFDF8] font-bold">
                         <span>₹{currentPerPlatePrice} / plate</span>
                       </div>
                     </div>
 
                     {/* Category Completion Progress Bar */}
-                    <div className="mt-2 pt-1.5 border-t border-[#D6B15E]/30">
-                      <div className="flex items-center justify-between text-[10.5px] font-bold mb-1">
-                        <span className="text-[#0B2D23]">Menu Completion</span>
-                        <span
-                          className={
-                            doneCategoriesCount === totalCategoriesCount
-                              ? "text-[#0B2D23] font-bold"
-                              : "text-[#B8860B] font-bold"
-                          }
-                        >
+                    <div className="relative z-10 mt-2.5 pt-2.5 border-t border-[#D9A323]/30">
+                      <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+                        <span className="text-[#FBF7EF]">Menu Completion</span>
+                        <span className="text-[#F8D76A] font-bold tabular-nums">
                           {doneCategoriesCount} of {totalCategoriesCount} Categories
                         </span>
                       </div>
-                      <div className="w-full bg-[#FAF4E8] border border-[#D6B15E]/30 h-1.5 rounded-full overflow-hidden">
+                      <div className="w-full bg-[#001D15] border border-[#D9A323]/35 h-2 rounded-full overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-[#D6B15E] to-[#0B2D23] h-full rounded-full transition-all duration-300"
+                          className="bg-gradient-to-r from-[#F8D76A] via-[#ECC044] to-[#D9A323] h-full rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(248,215,106,0.4)]"
                           style={{
                             width: `${Math.round(
                               (doneCategoriesCount /
@@ -2912,13 +3405,13 @@ export default function OrderFlow() {
                   </div>
 
                   {/* Scrollable List of Selected Items grouped by category */}
-                  <div className="flex-1 overflow-y-auto p-2.5 space-y-2 no-scrollbar">
+                  <div className="flex-1 overflow-y-auto p-3.5 space-y-2.5 bg-[#FFFDF8] no-scrollbar">
                     {selectedItemsCount === 0 ? (
-                      <div className="py-6 text-center text-stone-400">
-                        <p className="font-serif text-xs sm:text-sm text-stone-600 font-bold mb-0.5">
+                      <div className="py-6 text-center text-[#6B7E75]">
+                        <p className="font-serif text-sm text-[#002E22] font-bold mb-0.5">
                           Your Menu is Empty
                         </p>
-                        <p className="text-[10.5px] text-stone-500 max-w-[190px] mx-auto leading-relaxed">
+                        <p className="text-[11px] text-[#5C7268] max-w-[200px] mx-auto leading-relaxed">
                           Select dishes from the categories to build your custom catering package.
                         </p>
                       </div>
@@ -2933,32 +3426,50 @@ export default function OrderFlow() {
                         if (itemsInCat.length === 0) return null;
 
                         return (
-                          <div key={cat} className="space-y-1">
-                            <div className="flex items-center justify-between text-[10.5px] font-bold text-stone-600 pb-0.5 border-b border-[#D6B15E]/20">
-                              <span className="uppercase tracking-wider text-[9.5px] text-[#0B2D23] font-sans">
+                          <div key={cat} className="space-y-1.5">
+                            <div className="flex items-center justify-between text-[10.5px] font-bold pb-0.5">
+                              <span className="uppercase tracking-wider text-[10px] text-[#003F2E] font-sans">
                                 {cat}
                               </span>
-                              <span className="text-[9px] text-[#8B6E32]">
+                              <span className="text-[10px] font-semibold text-[#B8860B]">
                                 {itemsInCat.length} selected
                               </span>
                             </div>
-                            <ul className="space-y-0.5">
-                              {itemsInCat.map((item: string) => (
-                                <li
-                                  key={item}
-                                  className="flex items-center justify-between py-0.5 px-2 rounded bg-[#FAF7F2] hover:bg-[#FAF4E8] transition-colors text-[10.5px] font-semibold text-[#0B2D23] border border-[#D6B15E]/20 group"
-                                >
-                                  <span className="truncate pr-1">{item}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleItem(item, cat)}
-                                    className="text-stone-400 hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer shrink-0"
-                                    title={`Remove ${item}`}
+                            <ul className="space-y-1">
+                              {itemsInCat.map((item: string) => {
+                                const itemNonVeg = isItemNonVeg(item, cat);
+                                return (
+                                  <li
+                                    key={item}
+                                    className={cn(
+                                      "flex items-center justify-between py-1.5 px-2.5 rounded-lg transition-colors text-xs font-semibold border group",
+                                      itemNonVeg
+                                        ? "bg-[#FDF3F2] hover:bg-[#FAE7E5] text-[#4A0D09] border-[#8B1E16]/20"
+                                        : "bg-[#EEF7F0] hover:bg-[#E2F1E6] text-[#002E22] border-[#004B35]/15",
+                                    )}
                                   >
-                                    <X size={11} />
-                                  </button>
-                                </li>
-                              ))}
+                                    <div className="flex items-center gap-2 min-w-0 pr-1.5">
+                                      <span
+                                        className={cn(
+                                          "w-4 h-4 rounded-sm text-white flex items-center justify-center shrink-0",
+                                          itemNonVeg ? "bg-[#8B1E16]" : "bg-[#004B35]",
+                                        )}
+                                      >
+                                        <Check size={10} strokeWidth={3} />
+                                      </span>
+                                      <span className="truncate font-sans">{item}</span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleItem(item, cat)}
+                                      className="text-[#4A6459] hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer shrink-0"
+                                      title={`Remove ${item}`}
+                                    >
+                                      <X size={13} />
+                                    </button>
+                                  </li>
+                                );
+                              })}
                             </ul>
                           </div>
                         );
@@ -2967,28 +3478,42 @@ export default function OrderFlow() {
                   </div>
 
                   {/* Panel Footer: Pricing Breakdown & CTA */}
-                  <div className="p-3 pt-2.5 border-t border-[#D6B15E]/30 bg-[#FAF7F2] shrink-0 space-y-2">
+                  <div className="p-3.5 pt-3 border-t border-[#E8C77A]/55 bg-[#FFFDF8] shrink-0 space-y-2.5">
                     {/* Price breakdown */}
-                    <div className="space-y-0.5 text-[10.5px]">
-                      <div className="flex justify-between text-stone-600">
+                    <div className="space-y-1 text-xs tabular-nums">
+                      <div className="flex justify-between text-[#335247]">
                         <span>Package Subtotal ({guests} guests)</span>
-                        <span className="font-semibold text-[#0B2D23]">
+                        <span className="font-bold text-[#002E22]">
                           ₹{(currentPerPlatePrice * guests).toLocaleString("en-IN")}
                         </span>
                       </div>
                       {platformFee > 0 && (
-                        <div className="flex justify-between text-stone-600">
+                        <div className="flex justify-between text-[#335247]">
                           <span>Platform Service Fee</span>
-                          <span className="font-semibold text-[#0B2D23]">
+                          <span className="font-bold text-[#002E22]">
                             ₹{platformFee.toLocaleString("en-IN")}
                           </span>
                         </div>
                       )}
-                      <div className="pt-1 border-t border-[#D6B15E]/30 flex justify-between items-baseline">
-                        <span className="font-bold text-stone-800 text-[11px]">
+                    </div>
+
+                    {/* Highlighted Soft Gold Estimated Total Box */}
+                    <div className="rounded-xl bg-gradient-to-r from-[#FBF0CC] via-[#F7E6B0] to-[#F2D98D] border border-[#D9A323]/65 px-3.5 py-2.5 shadow-2xs">
+                      <div className="flex justify-between items-baseline">
+                        <span
+                          className="font-serif font-bold text-[#002E22] text-[15px]"
+                          style={{
+                            fontFamily: '"Playfair Display", Georgia, serif',
+                          }}
+                        >
                           Estimated Total
                         </span>
-                        <span className="font-serif font-bold text-lg text-[#0B2D23]">
+                        <span
+                          className="font-serif font-extrabold text-xl text-[#002E22] tabular-nums"
+                          style={{
+                            fontFamily: '"Playfair Display", Georgia, serif',
+                          }}
+                        >
                           ₹
                           {(
                             currentPerPlatePrice * guests +
@@ -2996,12 +3521,12 @@ export default function OrderFlow() {
                           ).toLocaleString("en-IN")}
                         </span>
                       </div>
-                      <p className="text-[9px] text-stone-500 text-right">
+                      <p className="text-[10px] font-medium text-[#4D3E12] text-right mt-0.5">
                         Inclusive of taxes & package curation
                       </p>
                     </div>
 
-                    {/* CTA Button */}
+                    {/* CTA Button: Deep Emerald & Gold Premium Treatment */}
                     <button
                       type="button"
                       onClick={() => {
@@ -3022,15 +3547,16 @@ export default function OrderFlow() {
                           );
                         }
                       }}
-                      className="w-full py-2 px-3 bg-[#0B2D23] hover:bg-[#061D16] text-[#FDF8EE] rounded-lg font-bold text-[11px] uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow active:scale-[0.99] border border-[#D6B15E]"
+                      className="w-full py-3 px-4 bg-gradient-to-r from-[#004B35] via-[#003B2A] to-[#00261B] hover:brightness-110 text-[#FFFDF8] rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_rgba(0,75,53,0.28)] active:scale-[0.99] border border-[#D9A323]"
                     >
+                      <Calendar size={15} strokeWidth={2.2} className="text-[#F8D76A]" />
                       <span>Proceed to Booking</span>
-                      <ArrowRight size={13} />
+                      <ArrowRight size={15} strokeWidth={2.5} className="text-[#F8D76A]" />
                     </button>
 
                     {/* Incomplete warning banner */}
                     {!allCategoriesComplete && (
-                      <div className="text-[9.5px] text-[#8B6E32] bg-[#FFFDF7] border border-[#D6B15E]/50 rounded p-1.5 text-center font-medium">
+                      <div className="text-[10px] text-[#8B6A14] bg-[#FFF9EC] border border-[#E8C77A] rounded-lg px-2.5 py-1.5 text-center font-medium">
                         Select required items in all categories to proceed.
                       </div>
                     )}
@@ -3056,8 +3582,8 @@ export default function OrderFlow() {
               className={cn(
                 "fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out flex flex-col overflow-hidden",
                 mobileCartExpanded
-                  ? "h-[85vh] rounded-t-[2rem] bg-[#FFFEFA] border-t border-[#D6B15E]/60 shadow-2xl"
-                  : "h-[56px] bg-[#0B2D23] text-white border-t border-[#D6B15E]/50 shadow-lg",
+                  ? "h-[85vh] rounded-t-[2rem] bg-[#FFFDF8] border-t border-[#D9A323]/70 shadow-2xl"
+                  : "h-[58px] bg-gradient-to-r from-[#004B35] to-[#00261B] text-white border-t border-[#D9A323]/60 shadow-lg",
               )}
             >
               {!mobileCartExpanded ? (
@@ -3067,16 +3593,16 @@ export default function OrderFlow() {
                   onClick={() => setMobileCartExpanded(true)}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span className="text-sm font-bold text-white">
+                    <span className="w-2 h-2 rounded-full bg-[#F8D76A]"></span>
+                    <span className="text-sm font-bold text-white tabular-nums">
                       ₹{(currentPerPlatePrice * guests).toLocaleString("en-IN")}
                     </span>
-                    <span className="text-xs text-[#D6B15E] font-medium">
+                    <span className="text-xs text-[#F8D76A] font-medium">
                       ({selectedItemsCount} {selectedItemsCount === 1 ? "item" : "items"})
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#FDF3D6] uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#F8D76A] uppercase tracking-wider">
                     <span>View Order</span>
                     <ChevronUp size={14} />
                   </div>
@@ -3086,24 +3612,24 @@ export default function OrderFlow() {
                 <div className="flex-1 flex flex-col h-full overflow-hidden">
                   {/* Drawer Handle */}
                   <div
-                    className="w-full py-2.5 flex items-center justify-center cursor-pointer select-none border-b border-[#D6B15E]/30"
+                    className="w-full py-2.5 flex items-center justify-center cursor-pointer select-none border-b border-[#D9A323]/30 bg-[#004B35]"
                     onClick={() => setMobileCartExpanded(false)}
                   >
-                    <div className="w-12 h-1 bg-[#D6B15E]/50 rounded-full" />
+                    <div className="w-12 h-1 bg-[#F8D76A]/60 rounded-full" />
                   </div>
 
                   {/* Drawer Header */}
-                  <div className="px-5 py-3 border-b border-[#D6B15E]/30 flex items-center justify-between bg-[#FAF7F2]">
+                  <div className="px-5 py-3.5 border-b border-[#D9A323]/40 flex items-center justify-between bg-gradient-to-r from-[#004B35] to-[#00261B] text-white">
                     <div>
                       <h3
-                        className="font-serif font-bold text-xl text-[#0B2D23]"
+                        className="font-serif font-bold text-xl text-white"
                         style={{
                           fontFamily: '"Playfair Display", Georgia, serif',
                         }}
                       >
-                        Your Curated Feast
+                        {selectedPackage.packageName || "Order Summary"}
                       </h3>
-                      <p className="text-xs text-stone-500 font-medium">
+                      <p className="text-xs text-[#D5E6DF] font-medium">
                         {guests} Guests • ₹{currentPerPlatePrice} / plate
                       </p>
                     </div>
@@ -3121,7 +3647,7 @@ export default function OrderFlow() {
                               setSelectedItems({});
                             }
                           }}
-                          className="text-xs font-bold text-stone-400 hover:text-rose-600 px-2 py-1"
+                          className="text-xs font-bold text-[#FBF7EF]/85 hover:text-[#F8D76A] px-2 py-1 cursor-pointer"
                         >
                           Clear
                         </button>
@@ -3129,7 +3655,7 @@ export default function OrderFlow() {
                       <button
                         type="button"
                         onClick={() => setMobileCartExpanded(false)}
-                        className="w-8 h-8 rounded-full bg-[#FFFEFA] border border-[#D6B15E]/40 flex items-center justify-center text-[#0B2D23] cursor-pointer"
+                        className="w-8 h-8 rounded-full bg-[#00261B] border border-[#D9A323]/60 flex items-center justify-center text-[#F8D76A] cursor-pointer"
                       >
                         <X size={15} />
                       </button>
@@ -3137,13 +3663,13 @@ export default function OrderFlow() {
                   </div>
 
                   {/* Drawer Items List */}
-                  <div className="flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar">
+                  <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-[#FFFDF8] no-scrollbar">
                     {selectedItemsCount === 0 ? (
-                      <div className="py-12 text-center text-stone-400">
-                        <p className="font-serif text-base text-stone-600 font-bold mb-1">
+                      <div className="py-12 text-center text-[#6B7E75]">
+                        <p className="font-serif text-base text-[#002E22] font-bold mb-1">
                           Your Menu is Empty
                         </p>
-                        <p className="text-xs text-stone-500 max-w-[220px] mx-auto leading-relaxed">
+                        <p className="text-xs text-[#5C7268] max-w-[220px] mx-auto leading-relaxed">
                           Select dishes from the categories to build your custom
                           catering package.
                         </p>
@@ -3160,30 +3686,48 @@ export default function OrderFlow() {
 
                         return (
                           <div key={cat} className="space-y-1.5">
-                            <div className="flex items-center justify-between text-xs font-bold text-stone-600 pb-1 border-b border-[#D6B15E]/20">
-                              <span className="uppercase tracking-wider text-[11px] text-[#0B2D23] font-sans">
+                            <div className="flex items-center justify-between text-xs font-bold pb-1 border-b border-[#E8C77A]/35">
+                              <span className="uppercase tracking-wider text-[11px] text-[#003F2E] font-sans">
                                 {cat}
                               </span>
-                              <span className="text-[10px] text-[#8B6E32]">
+                              <span className="text-[10px] text-[#B8860B]">
                                 {itemsInCat.length} selected
                               </span>
                             </div>
                             <ul className="space-y-1">
-                              {itemsInCat.map((item: string) => (
-                                <li
-                                  key={item}
-                                  className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-[#FAF7F2] text-xs font-semibold text-[#0B2D23] border border-[#D6B15E]/20"
-                                >
-                                  <span className="truncate pr-2">{item}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleItem(item, cat)}
-                                    className="text-stone-400 hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer shrink-0"
+                              {itemsInCat.map((item: string) => {
+                                const itemNonVeg = isItemNonVeg(item, cat);
+                                return (
+                                  <li
+                                    key={item}
+                                    className={cn(
+                                      "flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs font-semibold border",
+                                      itemNonVeg
+                                        ? "bg-[#FDF3F2] text-[#4A0D09] border-[#8B1E16]/20"
+                                        : "bg-[#EEF7F0] text-[#002E22] border-[#004B35]/15",
+                                    )}
                                   >
-                                    <X size={13} />
-                                  </button>
-                                </li>
-                              ))}
+                                    <div className="flex items-center gap-2 min-w-0 pr-2">
+                                      <span
+                                        className={cn(
+                                          "w-4 h-4 rounded-sm text-white flex items-center justify-center shrink-0",
+                                          itemNonVeg ? "bg-[#8B1E16]" : "bg-[#004B35]",
+                                        )}
+                                      >
+                                        <Check size={10} strokeWidth={3} />
+                                      </span>
+                                      <span className="truncate font-sans">{item}</span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleItem(item, cat)}
+                                      className="text-[#4A6459] hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer shrink-0"
+                                    >
+                                      <X size={13} />
+                                    </button>
+                                  </li>
+                                );
+                              })}
                             </ul>
                           </div>
                         );
@@ -3192,12 +3736,12 @@ export default function OrderFlow() {
                   </div>
 
                   {/* Drawer Footer */}
-                  <div className="p-4 border-t border-[#D6B15E]/30 bg-[#FAF7F2] space-y-3">
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">
+                  <div className="p-4 border-t border-[#E8C77A]/55 bg-[#FFFDF8] space-y-3">
+                    <div className="rounded-xl bg-gradient-to-r from-[#FBF0CC] via-[#F7E6B0] to-[#F2D98D] border border-[#D9A323]/65 px-3.5 py-2.5 flex items-baseline justify-between">
+                      <span className="font-serif font-bold text-sm text-[#002E22]">
                         Estimated Total
                       </span>
-                      <span className="font-serif font-bold text-xl text-[#0B2D23]">
+                      <span className="font-serif font-extrabold text-xl text-[#002E22] tabular-nums">
                         ₹
                         {(
                           currentPerPlatePrice * guests +
@@ -3228,10 +3772,11 @@ export default function OrderFlow() {
                           );
                         }
                       }}
-                      className="w-full py-3.5 px-5 bg-[#0B2D23] text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-md border border-[#D6B15E]"
+                      className="w-full py-3.5 px-5 bg-gradient-to-r from-[#004B35] via-[#003B2A] to-[#00261B] text-[#FFFDF8] rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_rgba(0,75,53,0.28)] border border-[#D9A323]"
                     >
+                      <Calendar size={15} strokeWidth={2.2} className="text-[#F8D76A]" />
                       <span>Proceed to Booking</span>
-                      <ArrowRight size={15} />
+                      <ArrowRight size={15} strokeWidth={2.5} className="text-[#F8D76A]" />
                     </button>
                   </div>
                 </div>
@@ -3242,640 +3787,677 @@ export default function OrderFlow() {
       )}
 
       {viewMode === "checkout" && (
-        <div className="flex-1 max-w-7xl mx-auto w-full px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-10 pb-24 md:pb-10 flex flex-col lg:flex-row gap-6 lg:gap-10 items-start">
-          {/* Left Column: Event Details Form */}
-          <div className="flex-1 w-full bg-transparent md:bg-white md:rounded-3xl md:border md:border-stone-200/60 md:shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-0 md:p-8 space-y-5 md:space-y-10 text-left animate-fade-in">
-            
+        <div className="flex-1 max-w-[1380px] mx-auto w-full px-3 xs:px-4 sm:px-6 lg:px-8 pt-2 pb-28 md:pb-12 flex flex-col lg:flex-row gap-6 lg:gap-7 items-start relative z-10">
+          {/* Left Column: Structured Luxury Booking Form with Emerald Section Banners */}
+          <div className="flex-1 w-full bg-[#FFFDF8] rounded-2xl border border-[#D9A323]/75 shadow-[0_12px_34px_rgba(0,46,34,0.08)] divide-y divide-[#E8C77A]/40 text-left animate-fade-in">
+
             {/* Form Section 1: Event Details */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-5 sm:p-8 space-y-6 md:bg-transparent md:border-none md:shadow-none md:p-0">
-              <div className="flex items-start gap-4 border-b border-stone-100 pb-5">
-                {/* Rotated gold squares badge */}
-                <div className="relative w-11 h-11 flex items-center justify-center shrink-0 mt-0.5 select-none">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#C29D38]" fill="currentColor">
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(0 50 50)" />
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(45 50 50)" />
-                  </svg>
-                  <span className="relative z-10 font-serif text-[17px] font-black text-white">1</span>
-                </div>
-                
-                {/* Title & Subtitle */}
-                <div className="flex-1 text-left">
-                  <div className="flex items-center flex-wrap gap-2">
-                    <h2 className="text-2xl sm:text-3xl font-serif font-extrabold text-[#8C6512] tracking-tight leading-tight">
-                      Event Details
-                    </h2>
-                    <svg className="h-3 w-16 sm:w-24 text-[#C29D38]/50 shrink-0" viewBox="0 0 120 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M0,10 Q30,2 60,10 T120,10" />
-                      <path d="M45,10 C50,6 55,6 60,10 C55,14 50,14 45,10" fill="currentColor" />
+            <div className="p-4 sm:p-5 lg:px-6 lg:py-5 flex flex-col lg:grid lg:grid-cols-[315px_1fr] xl:grid-cols-[335px_1fr] gap-5 lg:gap-6 items-start">
+              {/* Emerald-Gold Slanted Banner */}
+              <div className="w-full drop-shadow-[0_6px_14px_rgba(184,134,11,0.22)] select-none">
+                <div
+                  className="rounded-l-xl bg-gradient-to-br from-[#F8D76A] via-[#D9A323] to-[#A6780E] p-[1.5px] pr-[6px] pb-[2.5px]"
+                  style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)" }}
+                >
+                  <div
+                    className="relative rounded-l-[10.5px] bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] pl-4 pr-9 py-3.5 min-h-[82px] flex items-center gap-3.5 overflow-hidden"
+                    style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 21px) 100%, 0 100%)" }}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 100 84" fill="none" className="pointer-events-none absolute right-2 top-0 bottom-0 h-full w-24 text-[#D9A323] opacity-25">
+                      <path d="M90 8 C66 26 48 50 38 78" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M72 24 C60 16 46 18 36 28 C48 34 62 32 72 24 Z" fill="currentColor" fillOpacity="0.45" />
+                      <path d="M58 48 C44 40 30 44 22 56 C36 60 48 56 58 48 Z" fill="currentColor" fillOpacity="0.35" />
+                      <path d="M84 44 C76 58 72 70 74 82 C84 72 88 58 84 44 Z" fill="currentColor" fillOpacity="0.35" />
                     </svg>
+                    <Calendar size={24} strokeWidth={1.75} className="text-[#F8D76A] shrink-0 relative z-10" />
+                    <div className="flex-1 min-w-0 text-left relative z-10">
+                      <h2
+                        className="text-[19px] sm:text-[21px] font-serif font-bold text-white tracking-tight leading-tight"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                      >
+                        Event Details
+                      </h2>
+                      <p className="text-[11.5px] sm:text-xs text-[#E4EFEA] mt-0.5 font-sans font-medium leading-snug">
+                        Specify your occasion and date preferences.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-[14px] sm:text-[15px] text-stone-600 mt-1 font-medium font-sans">
-                    Specify your occasion and date preferences. We support multiple dates.
-                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Occasion Dropdown */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
-                    Select Occasion
-                  </label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setIsOccasionDropdownOpen(!isOccasionDropdownOpen)}
-                      className="w-full flex items-center justify-between border border-stone-200 hover:border-stone-400 bg-white rounded-xl px-5 py-4 shadow-sm transition-all text-left cursor-pointer h-14"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <svg className="w-5 h-5 text-[#C29D38] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <circle cx="9" cy="12" r="4" />
-                          <circle cx="15" cy="12" r="4" />
-                        </svg>
-                        <span className="text-base font-semibold text-stone-800">
-                          {orderForm.type || "Select Occasion"}
-                        </span>
-                      </div>
-                      <ChevronRight className={cn("w-4 h-4 text-stone-400 transition-transform duration-200 shrink-0", isOccasionDropdownOpen ? "transform rotate-90" : "transform rotate-0")} />
-                    </button>
-                    {isOccasionDropdownOpen && (
-                      <div className="absolute left-0 right-0 mt-2 bg-white border border-stone-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                        <div className="p-2.5 border-b border-stone-100 flex items-center gap-2 bg-stone-50">
-                          <Search size={16} className="text-stone-400 shrink-0" />
-                          <input
-                            type="text"
-                            value={occasionSearchQuery}
-                            onChange={(e) => setOccasionSearchQuery(e.target.value)}
-                            placeholder="Search occasion..."
-                            className="w-full bg-transparent border-none text-sm outline-none text-stone-800"
-                            autoFocus
-                          />
-                          {occasionSearchQuery && (
-                            <button onClick={() => setOccasionSearchQuery("")} className="text-stone-400 hover:text-stone-600">
-                              <X size={14} />
-                            </button>
-                          )}
+              <div className="w-full space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Occasion Dropdown */}
+                  <div>
+                    <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
+                      Select Occasion <span className="text-[#C82333]">*</span>
+                    </label>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setIsOccasionDropdownOpen(!isOccasionDropdownOpen)}
+                        className="w-full flex items-center justify-between border border-[#E8C77A] hover:border-[#D9A323] bg-white rounded-xl px-3.5 shadow-[0_2px_6px_rgba(217,163,35,0.08)] transition-all text-left cursor-pointer h-11"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <svg className="w-4.5 h-4.5 text-[#D9A323] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                            <circle cx="9" cy="12" r="4" />
+                            <circle cx="15" cy="12" r="4" />
+                          </svg>
+                          <span className="text-sm font-bold text-[#173D30] truncate">
+                            {orderForm.type || "Select Occasion"}
+                          </span>
                         </div>
-                        <div className="max-h-60 overflow-y-auto py-1">
-                          {OCCASIONS.filter(o => o.toLowerCase().includes(occasionSearchQuery.toLowerCase())).length > 0 ? (
-                            OCCASIONS.filter(o => o.toLowerCase().includes(occasionSearchQuery.toLowerCase())).map((o) => (
+                        <ChevronDown className={cn("w-4 h-4 text-[#003F2E] transition-transform duration-200 shrink-0", isOccasionDropdownOpen && "rotate-180")} />
+                      </button>
+                      {isOccasionDropdownOpen && (
+                        <div className="absolute left-0 right-0 mt-2 bg-[#FFFDF8] border border-[#E8C77A] rounded-xl shadow-xl z-50 overflow-hidden">
+                          <div className="p-2.5 border-b border-[#E8C77A]/40 flex items-center gap-2 bg-[#FBF7EF]">
+                            <Search size={15} className="text-[#8E6211] shrink-0" />
+                            <input
+                              type="text"
+                              value={occasionSearchQuery}
+                              onChange={(e) => setOccasionSearchQuery(e.target.value)}
+                              placeholder="Search occasion..."
+                              className="w-full bg-transparent border-none text-sm outline-none text-[#173D30]"
+                              autoFocus
+                            />
+                            {occasionSearchQuery && (
                               <button
-                                key={o}
                                 type="button"
-                                onClick={() => {
-                                  setOrderForm(prev => ({ ...prev, type: o }));
-                                  setIsOccasionDropdownOpen(false);
-                                  setOccasionSearchQuery("");
-                                }}
-                                className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-[#FAF6EE] text-stone-700 hover:text-[#0F3D2E] transition-all flex items-center justify-between cursor-pointer"
+                                onClick={() => setOccasionSearchQuery("")}
+                                className="text-stone-400 hover:text-[#003F2E] cursor-pointer"
                               >
-                                <span>{o}</span>
-                                {orderForm.type === o && <Check size={14} className="text-[#0F3D2E]" />}
+                                <X size={14} />
                               </button>
-                            ))
-                          ) : (
-                            <div className="text-center py-4 text-xs text-stone-400 italic">
-                              No occasions found
-                            </div>
-                          )}
+                            )}
+                          </div>
+                          <div className="max-h-60 overflow-y-auto py-1">
+                            {OCCASIONS.filter(o => o.toLowerCase().includes(occasionSearchQuery.toLowerCase())).length > 0 ? (
+                              OCCASIONS.filter(o => o.toLowerCase().includes(occasionSearchQuery.toLowerCase())).map((o) => (
+                                <button
+                                  key={o}
+                                  type="button"
+                                  onClick={() => {
+                                    setOrderForm(prev => ({ ...prev, type: o }));
+                                    setIsOccasionDropdownOpen(false);
+                                    setOccasionSearchQuery("");
+                                  }}
+                                  className={cn(
+                                    "w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-[#FBF5E4] transition-all flex items-center justify-between cursor-pointer",
+                                    orderForm.type === o ? "text-[#004B35] font-bold bg-[#EAF7EC]/60" : "text-[#173D30]"
+                                  )}
+                                >
+                                  <span>{o}</span>
+                                  {orderForm.type === o && <Check size={14} className="text-[#004B35]" />}
+                                </button>
+                              ))
+                            ) : (
+                              <div className="text-center py-4 text-xs text-stone-400 italic">
+                                No occasions found
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Event Date Selector */}
+                  <div>
+                    <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
+                      Event Date <span className="text-[#C82333]">*</span>
+                    </label>
+                    <div className="relative z-25">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          console.log("Toggle custom calendar popup:", !isCalendarOpen);
+                          setIsCalendarOpen(!isCalendarOpen);
+                        }}
+                        className="w-full flex items-center justify-between gap-2.5 border border-[#E8C77A] hover:border-[#D9A323] bg-white rounded-xl px-3.5 shadow-[0_2px_6px_rgba(217,163,35,0.08)] transition-all cursor-pointer relative z-10 text-left h-11"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <Calendar size={16} className="text-[#D9A323] shrink-0" />
+                          <span className="text-sm font-bold text-[#173D30] truncate block">
+                            {selectedDates.length > 0 ? selectedDates[0] : "Select Date"}
+                          </span>
+                        </div>
+                        <ChevronDown className={cn("w-4 h-4 text-[#003F2E] transform transition-transform shrink-0", isCalendarOpen && "rotate-180")} />
+                      </button>
+
+                      {/* Background Click dismiss overlay */}
+                      {isCalendarOpen && (
+                        <div
+                          className="fixed inset-0 z-30"
+                          onClick={() => setIsCalendarOpen(false)}
+                        />
+                      )}
+
+                      {/* Premium Custom Calendar Popover */}
+                      {isCalendarOpen && (
+                        <div className="absolute left-0 sm:right-0 sm:left-auto mt-2 bg-[#FFFDF8] border border-[#D9A323]/75 rounded-2xl shadow-2xl z-40 p-4 w-72 sm:w-80 select-none animate-fade-in">
+                          {/* Header: Month Navigation */}
+                          <div className="flex items-center justify-between mb-4">
+                            <button
+                              type="button"
+                              disabled={currentMonth.getFullYear() <= new Date().getFullYear() && currentMonth.getMonth() <= new Date().getMonth()}
+                              onClick={() => {
+                                setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-[#FBF5E4] text-[#173D30] hover:text-[#004B35] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer transition-colors"
+                            >
+                              <ChevronLeft size={18} />
+                            </button>
+
+                            <span className="text-sm font-bold text-[#003F2E] font-serif">
+                              {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-[#FBF5E4] text-[#173D30] hover:text-[#004B35] cursor-pointer transition-colors"
+                            >
+                              <ChevronRight size={18} />
+                            </button>
+                          </div>
+
+                          {/* Weekday Labels Row */}
+                          <div className="grid grid-cols-7 gap-1 text-center mb-1.5">
+                            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((dayName) => (
+                              <span key={dayName} className="text-[11px] font-bold text-[#8E6211] uppercase tracking-wider">
+                                {dayName}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Days Grid */}
+                          <div className="grid grid-cols-7 gap-1 text-center">
+                            {getDaysInMonth(currentMonth).map((date, idx) => {
+                              if (!date) {
+                                return <div key={`empty-${idx}`} />;
+                              }
+
+                              const isSelected = isDateSelected(date);
+                              const isPast = isDatePast(date);
+
+                              return (
+                                <button
+                                  key={date.toISOString()}
+                                  type="button"
+                                  disabled={isPast}
+                                  onClick={() => {
+                                    toggleCalendarDate(date);
+                                  }}
+                                  className={cn(
+                                    "h-8 sm:h-9 text-xs font-semibold rounded-lg flex items-center justify-center transition-all cursor-pointer tabular-nums",
+                                    isPast
+                                      ? "text-stone-300 cursor-not-allowed opacity-40"
+                                      : isSelected
+                                        ? "bg-[#004B35] text-white font-bold shadow-md ring-1 ring-[#D9A323]"
+                                        : "text-[#173D30] hover:bg-[#FBF5E4] hover:text-[#004B35]"
+                                  )}
+                                >
+                                  {date.getDate()}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Footer info/controls */}
+                          <div className="mt-4 pt-3 border-t border-[#E8C77A]/40 flex items-center justify-between text-[11px]">
+                            <span className="text-[#5B6D65] font-semibold">
+                              {selectedDates.length} date{selectedDates.length !== 1 ? "s" : ""} selected
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setIsCalendarOpen(false)}
+                              className="bg-[#004B35] text-white px-3 py-1.5 rounded-lg font-bold hover:bg-[#003A29] transition-colors cursor-pointer"
+                            >
+                              Done
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Event Dates Selector */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
-                    Event Dates
-                  </label>
-                  <div className="relative z-25">
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        console.log("Toggle custom calendar popup:", !isCalendarOpen);
-                        setIsCalendarOpen(!isCalendarOpen);
-                      }}
-                      className="w-full flex items-center gap-3 border border-stone-200 hover:border-stone-400 bg-white rounded-xl px-5 py-4 shadow-sm transition-all cursor-pointer relative z-10 text-left h-14"
-                    >
-                      <svg className="w-5 h-5 text-[#C29D38] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
-                      <div className="flex-1 text-left overflow-hidden">
-                        <span className="text-base font-semibold text-stone-800 truncate block">
-                          {selectedDates.length > 0 ? selectedDates[0] : "Select Date"}
-                        </span>
-                      </div>
-                      <ChevronRight className={cn("w-4 h-4 text-stone-400 transform transition-transform shrink-0", isCalendarOpen ? "rotate-90" : "rotate-0")} />
-                    </button>
+                {/* Selected Dates Chips row */}
+                {selectedDates.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-0.5 animate-fade-in">
+                    {selectedDates.map((d) => (
+                      <span key={d} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF7EC] text-[#004B35] text-xs font-bold border border-[#A3DFB5] shadow-2xs">
+                        <Calendar size={12} className="text-[#004B35]" />
+                        <span>{d}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeDate(d)}
+                          className="text-[#004B35]/60 hover:text-red-600 transition-colors cursor-pointer ml-0.5"
+                          aria-label={`Remove date ${d}`}
+                        >
+                          <X size={13} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
-                    {/* Background Click dismiss overlay */}
-                    {isCalendarOpen && (
-                      <div 
-                        className="fixed inset-0 z-30" 
-                        onClick={() => setIsCalendarOpen(false)}
-                      />
-                    )}
+            {/* Form Section 2: Meal Selection & Timings */}
+            <div className="p-4 sm:p-5 lg:px-6 lg:py-5 flex flex-col lg:grid lg:grid-cols-[315px_1fr] xl:grid-cols-[335px_1fr] gap-5 lg:gap-6 items-start">
+              {/* Emerald-Gold Slanted Banner */}
+              <div className="w-full drop-shadow-[0_6px_14px_rgba(184,134,11,0.22)] select-none">
+                <div
+                  className="rounded-l-xl bg-gradient-to-br from-[#F8D76A] via-[#D9A323] to-[#A6780E] p-[1.5px] pr-[6px] pb-[2.5px]"
+                  style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)" }}
+                >
+                  <div
+                    className="relative rounded-l-[10.5px] bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] pl-4 pr-9 py-3.5 min-h-[82px] flex items-center gap-3.5 overflow-hidden"
+                    style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 21px) 100%, 0 100%)" }}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 100 84" fill="none" className="pointer-events-none absolute right-2 top-0 bottom-0 h-full w-24 text-[#D9A323] opacity-25">
+                      <path d="M90 8 C66 26 48 50 38 78" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M72 24 C60 16 46 18 36 28 C48 34 62 32 72 24 Z" fill="currentColor" fillOpacity="0.45" />
+                      <path d="M58 48 C44 40 30 44 22 56 C36 60 48 56 58 48 Z" fill="currentColor" fillOpacity="0.35" />
+                      <path d="M84 44 C76 58 72 70 74 82 C84 72 88 58 84 44 Z" fill="currentColor" fillOpacity="0.35" />
+                    </svg>
+                    <Utensils size={24} strokeWidth={1.75} className="text-[#F8D76A] shrink-0 relative z-10" />
+                    <div className="flex-1 min-w-0 text-left relative z-10">
+                      <h2
+                        className="text-[19px] sm:text-[21px] font-serif font-bold text-white tracking-tight leading-tight"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                      >
+                        Meal Selection & Timing
+                      </h2>
+                      <p className="text-[11.5px] sm:text-xs text-[#E4EFEA] mt-0.5 font-sans font-medium leading-snug">
+                        Choose which meals will be served.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                    {/* Premium Custom Calendar Popover */}
-                    {isCalendarOpen && (
-                      <div className="absolute left-0 mt-2 bg-white border border-stone-200 rounded-2xl shadow-xl z-40 p-4 w-72 sm:w-80 select-none animate-fade-in">
-                        {/* Header: Month Navigation */}
-                        <div className="flex items-center justify-between mb-4">
-                          <button
-                            type="button"
-                            disabled={currentMonth.getFullYear() <= new Date().getFullYear() && currentMonth.getMonth() <= new Date().getMonth()}
-                            onClick={() => {
-                              setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-                            }}
-                            className="p-1.5 rounded-lg hover:bg-[#FAF6EE] text-stone-600 hover:text-[#0F3D2E] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer transition-colors"
-                          >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                            </svg>
-                          </button>
-                          
-                          <span className="text-sm font-bold text-[#0F3D2E] font-serif">
-                            {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-                          </span>
+              <div className="w-full space-y-3.5">
+                {/* Meal interactive chips */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {["Breakfast", "Lunch", "Evening Snacks", "Dinner"].map((meal) => {
+                    const isSelected = selectedMeals.includes(meal);
+                    return (
+                      <button
+                        key={meal}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            const updated = selectedMeals.filter((m) => m !== meal);
+                            setSelectedMeals(updated);
+                            const updatedTimings = { ...mealTimings };
+                            delete updatedTimings[meal];
+                            setMealTimings(updatedTimings);
+                          } else {
+                            setSelectedMeals([...selectedMeals, meal]);
+                            const defaultTime = meal === "Breakfast" ? "8 AM onwards" : meal === "Lunch" ? "12 PM onwards" : meal === "Evening Snacks" ? "5 PM onwards" : "8 PM onwards";
+                            setMealTimings(prev => ({ ...prev, [meal]: defaultTime }));
+                          }
+                        }}
+                        className={cn(
+                          "flex items-center justify-center gap-2 px-3 py-2 rounded-xl border transition-all font-bold text-xs sm:text-[13px] cursor-pointer min-h-[42px] whitespace-nowrap",
+                          isSelected
+                            ? "bg-gradient-to-r from-[#00513A] to-[#002E22] border-[#D9A323] ring-1 ring-[#F8D76A]/60 text-white shadow-[0_4px_12px_rgba(0,75,53,0.22)]"
+                            : "bg-white border-[#E8C77A] hover:border-[#D9A323] text-[#173D30] hover:bg-[#FFF9E8] shadow-[0_2px_6px_rgba(217,163,35,0.08)]"
+                        )}
+                      >
+                        {meal === "Breakfast" && <Coffee size={15} className={cn("shrink-0", isSelected ? "text-[#F8D76A]" : "text-[#D9A323]")} />}
+                        {meal === "Lunch" && <Utensils size={15} className={cn("shrink-0", isSelected ? "text-[#F8D76A]" : "text-[#D9A323]")} />}
+                        {meal === "Evening Snacks" && <Pizza size={15} className={cn("shrink-0", isSelected ? "text-[#F8D76A]" : "text-[#D9A323]")} />}
+                        {meal === "Dinner" && <Soup size={15} className={cn("shrink-0", isSelected ? "text-[#F8D76A]" : "text-[#D9A323]")} />}
+                        <span>{meal}</span>
+                        {isSelected && <Check size={13} className="text-[#F8D76A] shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-                            }}
-                            className="p-1.5 rounded-lg hover:bg-[#FAF6EE] text-stone-600 hover:text-[#0F3D2E] cursor-pointer transition-colors"
-                          >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Weekday Labels Row */}
-                        <div className="grid grid-cols-7 gap-1 text-center mb-1.5">
-                          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((dayName) => (
-                            <span key={dayName} className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                              {dayName}
-                            </span>
-                          ))}
-                        </div>
-
-                        {/* Days Grid */}
-                        <div className="grid grid-cols-7 gap-1 text-center">
-                          {getDaysInMonth(currentMonth).map((date, idx) => {
-                            if (!date) {
-                              return <div key={`empty-${idx}`} />;
-                            }
-
-                            const isSelected = isDateSelected(date);
-                            const isPast = isDatePast(date);
-
+                {/* Meal Timings options inside warm container */}
+                {selectedMeals.length > 0 && (
+                  <div className="space-y-3 pt-0.5 animate-fade-in">
+                    {selectedMeals.map((meal) => (
+                      <div key={meal} className="space-y-2">
+                        <label className="text-xs font-bold text-[#173D30] flex items-center gap-1.5 font-sans">
+                          <Clock size={14} className="text-[#D9A323] shrink-0" />
+                          <span>{meal} Ready-by Time</span>
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {MEAL_TIME_OPTIONS[meal]?.map((time) => {
+                            const isTimeSelected = mealTimings[meal] === time;
                             return (
                               <button
-                                key={date.toISOString()}
+                                key={time}
                                 type="button"
-                                disabled={isPast}
-                                onClick={() => {
-                                  toggleCalendarDate(date);
-                                }}
+                                onClick={() => setMealTimings(prev => ({ ...prev, [meal]: time }))}
                                 className={cn(
-                                  "h-8 sm:h-9 text-xs font-semibold rounded-lg flex items-center justify-center transition-all cursor-pointer",
-                                  isPast 
-                                    ? "text-stone-300 cursor-not-allowed opacity-40" 
-                                    : isSelected
-                                      ? "bg-[#0F3D2E] text-white font-bold shadow-md"
-                                      : "text-stone-700 hover:bg-[#FAF6EE] hover:text-[#0F3D2E]"
+                                  "px-3 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer min-h-[34px] inline-flex items-center gap-1.5 tabular-nums",
+                                  isTimeSelected
+                                    ? "bg-gradient-to-r from-[#00513A] to-[#002E22] border-[#D9A323] ring-1 ring-[#F8D76A]/50 text-white shadow-sm"
+                                    : "bg-white border-[#E8C77A]/80 hover:border-[#D9A323] text-[#173D30] hover:bg-[#FFF9E8]"
                                 )}
                               >
-                                {date.getDate()}
+                                <span>{time}</span>
+                                {isTimeSelected && <Check size={12} className="text-[#F8D76A] shrink-0" />}
                               </button>
                             );
                           })}
                         </div>
-
-                        {/* Footer info/controls */}
-                        <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-[11px]">
-                          <span className="text-stone-500 font-medium">
-                            {selectedDates.length} date{selectedDates.length !== 1 ? "s" : ""} selected
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setIsCalendarOpen(false)}
-                            className="bg-[#0F3D2E]/10 text-[#0F3D2E] px-3 py-1.5 rounded-lg font-bold hover:bg-[#0F3D2E]/20 transition-colors"
-                          >
-                            Done
-                          </button>
-                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
-                </div>
+                )}
               </div>
-
-              {/* Selected Dates Chips row */}
-              {selectedDates.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-1 animate-fade-in">
-                  {selectedDates.map((d) => (
-                    <span key={d} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EAF2EE] text-[#0F3D2E] text-xs font-bold border border-[#0F3D2E]/10 shadow-sm">
-                      {d}
-                      <button
-                        type="button"
-                        onClick={() => removeDate(d)}
-                        className="text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
-                      >
-                        <X size={14} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Form Section 2: Meal Selection & Timings */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-5 sm:p-8 space-y-6 md:bg-transparent md:border-none md:shadow-none md:p-0 pt-2">
-              <div className="flex items-start gap-4 border-b border-stone-100 pb-5">
-                {/* Rotated gold squares badge */}
-                <div className="relative w-11 h-11 flex items-center justify-center shrink-0 mt-0.5 select-none">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#C29D38]" fill="currentColor">
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(0 50 50)" />
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(45 50 50)" />
-                  </svg>
-                  <span className="relative z-10 font-serif text-[17px] font-black text-white">2</span>
-                </div>
-                
-                {/* Title & Subtitle */}
-                <div className="flex-1 text-left">
-                  <div className="flex items-center flex-wrap gap-2">
-                    <h2 className="text-2xl sm:text-3xl font-serif font-extrabold text-[#8C6512] tracking-tight leading-tight">
-                      Meal Selection & Timing
-                    </h2>
-                    <svg className="h-3 w-16 sm:w-24 text-[#C29D38]/50 shrink-0" viewBox="0 0 120 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M0,10 Q30,2 60,10 T120,10" />
-                      <path d="M45,10 C50,6 55,6 60,10 C55,14 50,14 45,10" fill="currentColor" />
-                    </svg>
-                  </div>
-                  <p className="text-[14px] sm:text-[15px] text-stone-600 mt-1 font-medium font-sans">
-                    Select which meals will be served. You can specify exact times for each meal.
-                  </p>
-                </div>
-              </div>
-
-              {/* Meal interactive chips */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {["Breakfast", "Lunch", "Evening Snacks", "Dinner"].map((meal) => {
-                  const isSelected = selectedMeals.includes(meal);
-                  return (
-                    <button
-                      key={meal}
-                      type="button"
-                      onClick={() => {
-                        if (isSelected) {
-                          const updated = selectedMeals.filter((m) => m !== meal);
-                          setSelectedMeals(updated);
-                          const updatedTimings = { ...mealTimings };
-                          delete updatedTimings[meal];
-                          setMealTimings(updatedTimings);
-                        } else {
-                          setSelectedMeals([...selectedMeals, meal]);
-                          const defaultTime = meal === "Breakfast" ? "8 AM onwards" : meal === "Lunch" ? "12 PM onwards" : meal === "Evening Snacks" ? "5 PM onwards" : "8 PM onwards";
-                          setMealTimings(prev => ({ ...prev, [meal]: defaultTime }));
-                        }
-                      }}
-                      className={cn(
-                        "flex items-center justify-center gap-2.5 px-3 py-4 rounded-xl border transition-all font-bold text-sm cursor-pointer min-h-[48px]",
-                        isSelected
-                          ? "bg-[#0F3D2E] border-transparent text-white shadow-md shadow-[#0F3D2E]/20"
-                          : "bg-white border-stone-200 hover:border-stone-300 text-stone-700"
-                      )}
-                    >
-                      {meal === "Breakfast" && <Coffee size={16} className="shrink-0" />}
-                      {meal === "Lunch" && <Utensils size={16} className="shrink-0" />}
-                      {meal === "Evening Snacks" && <Pizza size={16} className="shrink-0" />}
-                      {meal === "Dinner" && <Soup size={16} className="shrink-0" />}
-                      <span>{meal}</span>
-                      {isSelected && <Check size={12} className="ml-1 text-white shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Meal Timings options inside custom container */}
-              {selectedMeals.length > 0 && (
-                <div className="space-y-5 bg-[#FAF8F5] border border-stone-200/40 rounded-2xl p-4 sm:p-5 animate-fade-in">
-                  {selectedMeals.map((meal) => (
-                    <div key={meal} className="space-y-3">
-                      <label className="block text-sm font-semibold text-[#0F3D2E] uppercase tracking-wider flex items-center gap-1.5 font-sans">
-                        <svg className="w-5 h-5 text-[#C29D38] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        {meal} Ready-By Time
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {MEAL_TIME_OPTIONS[meal]?.map((time) => {
-                          const isTimeSelected = mealTimings[meal] === time;
-                          return (
-                            <button
-                              key={time}
-                              type="button"
-                              onClick={() => setMealTimings(prev => ({ ...prev, [meal]: time }))}
-                              className={cn(
-                                "px-4 py-3 rounded-xl border text-xs sm:text-sm font-bold transition-all cursor-pointer min-h-[40px]",
-                                isTimeSelected
-                                  ? "bg-[#0F3D2E] border-transparent text-white shadow-sm"
-                                  : "bg-white border-stone-200 hover:border-stone-300 text-stone-600"
-                              )}
-                            >
-                              {time}
-                              {isTimeSelected && <Check size={12} className="inline ml-1.5 text-white" />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Form Section 3: Guest Count */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-5 sm:p-8 space-y-6 md:bg-transparent md:border-none md:shadow-none md:p-0 pt-2">
-              <div className="flex items-start gap-4 border-b border-stone-100 pb-5">
-                {/* Rotated gold squares badge */}
-                <div className="relative w-11 h-11 flex items-center justify-center shrink-0 mt-0.5 select-none">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#C29D38]" fill="currentColor">
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(0 50 50)" />
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(45 50 50)" />
-                  </svg>
-                  <span className="relative z-10 font-serif text-[17px] font-black text-white">3</span>
-                </div>
-                
-                {/* Title & Subtitle */}
-                <div className="flex-1 text-left">
-                  <div className="flex items-center flex-wrap gap-2">
-                    <h2 className="text-2xl sm:text-3xl font-serif font-extrabold text-[#8C6512] tracking-tight leading-tight">
-                      Guest Count
-                    </h2>
-                    <svg className="h-3 w-16 sm:w-24 text-[#C29D38]/50 shrink-0" viewBox="0 0 120 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M0,10 Q30,2 60,10 T120,10" />
-                      <path d="M45,10 C50,6 55,6 60,10 C55,14 50,14 45,10" fill="currentColor" />
+            <div className="p-4 sm:p-5 lg:px-6 lg:py-5 flex flex-col lg:grid lg:grid-cols-[315px_1fr] xl:grid-cols-[335px_1fr] gap-5 lg:gap-6 items-start">
+              {/* Emerald-Gold Slanted Banner */}
+              <div className="w-full drop-shadow-[0_6px_14px_rgba(184,134,11,0.22)] select-none">
+                <div
+                  className="rounded-l-xl bg-gradient-to-br from-[#F8D76A] via-[#D9A323] to-[#A6780E] p-[1.5px] pr-[6px] pb-[2.5px]"
+                  style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)" }}
+                >
+                  <div
+                    className="relative rounded-l-[10.5px] bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] pl-4 pr-9 py-3.5 min-h-[82px] flex items-center gap-3.5 overflow-hidden"
+                    style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 21px) 100%, 0 100%)" }}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 100 84" fill="none" className="pointer-events-none absolute right-2 top-0 bottom-0 h-full w-24 text-[#D9A323] opacity-25">
+                      <path d="M90 8 C66 26 48 50 38 78" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M72 24 C60 16 46 18 36 28 C48 34 62 32 72 24 Z" fill="currentColor" fillOpacity="0.45" />
+                      <path d="M58 48 C44 40 30 44 22 56 C36 60 48 56 58 48 Z" fill="currentColor" fillOpacity="0.35" />
+                      <path d="M84 44 C76 58 72 70 74 82 C84 72 88 58 84 44 Z" fill="currentColor" fillOpacity="0.35" />
                     </svg>
+                    <Users size={24} strokeWidth={1.75} className="text-[#F8D76A] shrink-0 relative z-10" />
+                    <div className="flex-1 min-w-0 text-left relative z-10">
+                      <h2
+                        className="text-[19px] sm:text-[21px] font-serif font-bold text-white tracking-tight leading-tight"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                      >
+                        Guest Count
+                      </h2>
+                      <p className="text-[11.5px] sm:text-xs text-[#E4EFEA] mt-0.5 font-sans font-medium leading-snug">
+                        Confirmed headcount for catering & pricing.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-[14px] sm:text-[15px] text-stone-600 mt-1 font-medium font-sans">
-                    Confirmed guest headcount for catering preparation and volume pricing.
-                  </p>
                 </div>
               </div>
 
-              {/* Read-Only Confirmed Guests Card with Change action */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-br from-[#FCFAF7] to-[#F7F2E8] border border-[#DECC9C] rounded-2xl p-4 sm:p-5 w-full max-w-lg select-none shadow-xs">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-[#DECC9C] text-[#8C6D1F] flex items-center justify-center shadow-2xs shrink-0">
-                    <Users size={22} className="text-[#8C6D1F]" />
-                  </div>
-                  <div className="text-left">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-serif text-3xl font-black text-[#123326] leading-none">
-                        {guests}
-                      </span>
-                      <span className="text-xs sm:text-sm font-bold text-stone-600 uppercase tracking-wider font-sans">
-                        Guests Confirmed
+              <div className="w-full grid grid-cols-1 xl:grid-cols-[1.45fr_1fr] gap-3.5 items-stretch">
+                {/* Read-Only Confirmed Guests Card with Change action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-[#FDF6E2] to-[#F9EBC3] border border-[#D9A323]/75 rounded-xl px-4 py-3 select-none shadow-2xs">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-lg bg-[#FFFDF8]/90 border border-[#E8C77A] text-[#C8941A] flex items-center justify-center shrink-0">
+                      <Users size={19} />
+                    </div>
+                    <div className="text-left min-w-0">
+                      <div className="text-sm font-extrabold text-[#173D30] leading-tight tabular-nums">
+                        {guests} Guests Confirmed
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#004B35] mt-0.5 leading-tight">
+                        <Check size={12} className="text-[#108A48] shrink-0" />
+                        <span>Locked for catering estimate & preparation</span>
                       </span>
                     </div>
-                    <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-emerald-800 mt-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block"></span>
-                      Locked for catering estimate & preparation
-                    </span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewMode("package_detail");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FFFDF8] hover:bg-white border border-[#D9A323]/80 hover:border-[#B8860B] text-[#173D30] hover:text-[#003F2E] text-xs font-bold transition-all duration-200 cursor-pointer shadow-2xs self-start sm:self-center shrink-0 active:scale-95 whitespace-nowrap"
+                    title="Modify guest count in package selection"
+                  >
+                    <span>Change Guests</span>
+                    <ArrowRight size={12} className="text-[#C8941A]" />
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewMode("package_detail");
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-stone-50 border border-[#DECC9C] hover:border-[#C29D38] text-[#8C6D1F] hover:text-[#5F460D] text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs self-start sm:self-center shrink-0 active:scale-95"
-                  title="Modify guest count in package selection"
-                >
-                  <span>Change Guests</span>
-                  <ArrowRight size={13} />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-[#0F3D2E] mt-3 bg-[#EAF2EE]/60 border border-[#D4E4DC] rounded-xl p-3 sm:p-3.5 max-w-lg">
-                <span className="inline-flex items-center justify-center w-4.5 h-4.5 rounded-full bg-[#0F3D2E] text-white text-[11px] font-serif font-black select-none shrink-0">i</span>
-                <span>Minimum requirement for {selectedPackage?.packageName || selectedPackage?.name || "this package"} is <span className="font-bold text-[#0F3D2E]">{getPackageMinGuests(selectedPackage)} guests</span>.</span>
+                {/* Package Minimum Guests Info Pill */}
+                <div className="flex items-center gap-2.5 text-xs font-semibold text-[#004B35] bg-[#EAF7EE] border border-[#A5DFB7] rounded-xl px-3.5 py-2.5">
+                  <span className="inline-flex items-center justify-center w-4.5 h-4.5 rounded-full bg-[#004B35] text-white text-[10px] font-serif font-black select-none shrink-0">
+                    i
+                  </span>
+                  <span className="leading-snug">
+                    Minimum requirement for {selectedPackage?.packageName || selectedPackage?.name || "this package"} is{" "}
+                    <span className="font-extrabold text-[#002E22] tabular-nums">{getPackageMinGuests(selectedPackage)} guests.</span>
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Form Section 4: Venue Location & Type */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-5 sm:p-8 space-y-6 md:bg-transparent md:border-none md:shadow-none md:p-0 pt-2">
-              <div className="flex items-start gap-4 border-b border-stone-100 pb-5">
-                {/* Rotated gold squares badge */}
-                <div className="relative w-11 h-11 flex items-center justify-center shrink-0 mt-0.5 select-none">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#C29D38]" fill="currentColor">
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(0 50 50)" />
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(45 50 50)" />
-                  </svg>
-                  <span className="relative z-10 font-serif text-[17px] font-black text-white">4</span>
-                </div>
-                
-                {/* Title & Subtitle */}
-                <div className="flex-1 text-left">
-                  <div className="flex items-center flex-wrap gap-2">
-                    <h2 className="text-2xl sm:text-3xl font-serif font-extrabold text-[#8C6512] tracking-tight leading-tight">
-                      Venue Details
-                    </h2>
-                    <svg className="h-3 w-16 sm:w-24 text-[#C29D38]/50 shrink-0" viewBox="0 0 120 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M0,10 Q30,2 60,10 T120,10" />
-                      <path d="M45,10 C50,6 55,6 60,10 C55,14 50,14 45,10" fill="currentColor" />
+            <div className="p-4 sm:p-5 lg:px-6 lg:py-5 flex flex-col lg:grid lg:grid-cols-[315px_1fr] xl:grid-cols-[335px_1fr] gap-5 lg:gap-6 items-start">
+              {/* Emerald-Gold Slanted Banner */}
+              <div className="w-full drop-shadow-[0_6px_14px_rgba(184,134,11,0.22)] select-none">
+                <div
+                  className="rounded-l-xl bg-gradient-to-br from-[#F8D76A] via-[#D9A323] to-[#A6780E] p-[1.5px] pr-[6px] pb-[2.5px]"
+                  style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)" }}
+                >
+                  <div
+                    className="relative rounded-l-[10.5px] bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] pl-4 pr-9 py-3.5 min-h-[82px] flex items-center gap-3.5 overflow-hidden"
+                    style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 21px) 100%, 0 100%)" }}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 100 84" fill="none" className="pointer-events-none absolute right-2 top-0 bottom-0 h-full w-24 text-[#D9A323] opacity-25">
+                      <path d="M90 8 C66 26 48 50 38 78" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M72 24 C60 16 46 18 36 28 C48 34 62 32 72 24 Z" fill="currentColor" fillOpacity="0.45" />
+                      <path d="M58 48 C44 40 30 44 22 56 C36 60 48 56 58 48 Z" fill="currentColor" fillOpacity="0.35" />
+                      <path d="M84 44 C76 58 72 70 74 82 C84 72 88 58 84 44 Z" fill="currentColor" fillOpacity="0.35" />
                     </svg>
-                  </div>
-                  <p className="text-[14px] sm:text-[15px] text-stone-600 mt-1 font-medium font-sans">
-                    Tell us where the feast takes place.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
-                    Venue Name
-                  </label>
-                  <input
-                    type="text"
-                    value={venueName}
-                    onChange={(e) => setVenueName(e.target.value)}
-                    placeholder="e.g. Kondapur, Taj Krishna, or Residence"
-                    className="w-full border border-stone-200 hover:border-stone-400 rounded-xl px-5 py-4 text-base focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] outline-none transition-all placeholder:text-stone-400 bg-white h-14"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
-                    Google Map Location (Optional)
-                  </label>
-                  <AddressAutocomplete
-                    useTextarea={false}
-                    value={mapLocation}
-                    onChange={(val) => setMapLocation(val)}
-                    onSelect={(data) => {
-                      setVenueLat(data.latitude);
-                      setVenueLng(data.longitude);
-                      setOrderForm({ ...orderForm, venue: data.address });
-                      if (data.address) {
-                        const parts = data.address.split(",");
-                        if (parts.length > 0 && parts[0].trim()) {
-                           setVenueName(parts[0].trim());
-                        }
-                      }
-                      setMapLocation(data.address);
-                    }}
-                    placeholder="Type location or paste link..."
-                    theme="green"
-                    leftIcon={<MapPin className="text-[#0F3D2E] w-4 h-4 hover:text-[#1F5C46] transition-colors" />}
-                    onIconClick={() => setIsVenueMapOpen(true)}
-                    className="w-full border border-stone-200 hover:border-stone-400 rounded-xl py-4 text-base focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] outline-none transition-all placeholder:text-stone-400 bg-white h-14"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 mb-1.5">
-                    <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide">
-                      Venue Address
-                    </label>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <button
-                        type="button"
-                        onClick={handleUseCurrentLocation}
-                        className="text-xs font-bold text-[#0F3D2E]/80 hover:text-[#0F3D2E] hover:underline transition flex items-center gap-0.5 cursor-pointer"
+                    <MapPin size={24} strokeWidth={1.75} className="text-[#F8D76A] shrink-0 relative z-10" />
+                    <div className="flex-1 min-w-0 text-left relative z-10">
+                      <h2
+                        className="text-[19px] sm:text-[21px] font-serif font-bold text-white tracking-tight leading-tight"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
                       >
-                        📍 Use Current Location
-                      </button>
-                      <span className="text-stone-300 text-xs hidden sm:inline">|</span>
-                      <button
-                        type="button"
-                        onClick={() => setIsVenueMapOpen(true)}
-                        className="text-xs font-bold text-[#0F3D2E] hover:underline transition flex items-center gap-0.5 cursor-pointer"
-                      >
-                        🗺️ Select Event Location
-                      </button>
+                        Venue Details
+                      </h2>
+                      <p className="text-[11.5px] sm:text-xs text-[#E4EFEA] mt-0.5 font-sans font-medium leading-snug">
+                        Tell us where the feast takes place.
+                      </p>
                     </div>
                   </div>
-                  <AddressAutocomplete
-                    useTextarea={true}
-                    rows={2}
-                    value={orderForm.venue}
-                    onChange={(val) => setOrderForm({ ...orderForm, venue: val })}
-                    onSelect={(data) => {
-                      setVenueLat(data.latitude);
-                      setVenueLng(data.longitude);
-                      setOrderForm({ ...orderForm, venue: data.address });
-                      if (data.address) {
-                        const parts = data.address.split(",");
-                        if (parts.length > 0 && parts[0].trim()) {
-                          setVenueName(parts[0].trim());
-                        }
-                      }
-                      setMapLocation(data.address);
-                    }}
-                    placeholder="Enter Street Address, Hall No, Landmark in Hyderabad..."
-                    theme="green"
-                    leftIcon={<MapPin className="text-[#0F3D2E] w-4 h-4 hover:text-[#1F5C46] transition-colors" />}
-                    onIconClick={() => setIsVenueMapOpen(true)}
-                    className="w-full border border-stone-200 hover:border-stone-400 rounded-xl px-5 py-4 text-base focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] outline-none transition-all placeholder:text-stone-400 bg-white"
-                  />
-                  <MapPickerModal
-                    isOpen={isVenueMapOpen}
-                    onClose={() => setIsVenueMapOpen(false)}
-                    initialLat={venueLat}
-                    initialLng={venueLng}
-                    initialAddress={orderForm.venue}
-                    onSave={(data) => {
-                      setVenueLat(data.latitude);
-                      setVenueLng(data.longitude);
-                      setOrderForm({ ...orderForm, venue: data.address });
-                      if (data.address) {
-                        const parts = data.address.split(",");
-                        if (parts.length > 0 && parts[0].trim()) {
-                          setVenueName(parts[0].trim());
-                        }
-                      }
-                      setMapLocation(data.address);
-                    }}
-                    title="Select Event Location"
-                  />
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
-                    Venue Type
-                  </label>
-                  <div className="grid grid-cols-2 gap-3 h-auto sm:h-[86px] items-center">
-                    <button
-                      type="button"
-                      onClick={() => setVenueType("Indoor")}
-                      className={cn(
-                        "h-14 flex items-center justify-center gap-2 rounded-xl border text-sm font-bold transition-all cursor-pointer",
-                        venueType === "Indoor"
-                          ? "bg-[#0F3D2E] border-transparent text-white shadow-md shadow-[#0F3D2E]/15"
-                          : "bg-white border-stone-200 hover:border-stone-300 text-stone-700"
-                      )}
-                    >
-                      Indoor Event
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setVenueType("Outdoor")}
-                      className={cn(
-                        "h-14 flex items-center justify-center gap-2 rounded-xl border text-sm font-bold transition-all cursor-pointer",
-                        venueType === "Outdoor"
-                          ? "bg-[#0F3D2E] border-transparent text-white shadow-md shadow-[#0F3D2E]/15"
-                          : "bg-white border-stone-200 hover:border-stone-300 text-stone-700"
-                      )}
-                    >
-                      Outdoor Event
-                    </button>
+              </div>
+
+              <div className="w-full space-y-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
+                      Venue Name <span className="text-[#C82333]">*</span>
+                    </label>
+                    <div className="relative">
+                      <Building2 size={15} className="text-[#D9A323] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={venueName}
+                        onChange={(e) => setVenueName(e.target.value)}
+                        placeholder="e.g. Kondapur, Taj Krishna, or Resort"
+                        className="w-full border border-[#E8C77A] hover:border-[#D9A323] rounded-xl pl-9 pr-4 text-sm focus:border-[#004B35] focus:ring-2 focus:ring-[#004B35]/10 outline-none transition-all placeholder:text-stone-400 bg-white text-[#173D30] h-11 shadow-[0_2px_6px_rgba(217,163,35,0.06)]"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
+                      Google Map Location (Optional)
+                    </label>
+                    <AddressAutocomplete
+                      useTextarea={false}
+                      value={mapLocation}
+                      onChange={(val) => setMapLocation(val)}
+                      onSelect={(data) => {
+                        setVenueLat(data.latitude);
+                        setVenueLng(data.longitude);
+                        setOrderForm({ ...orderForm, venue: data.address });
+                        if (data.address) {
+                          const parts = data.address.split(",");
+                          if (parts.length > 0 && parts[0].trim()) {
+                            setVenueName(parts[0].trim());
+                          }
+                        }
+                        setMapLocation(data.address);
+                      }}
+                      placeholder="Type location or paste link..."
+                      theme="green"
+                      leftIcon={<MapPin className="text-[#D9A323] w-4 h-4 hover:text-[#B8860B] transition-colors" />}
+                      onIconClick={() => setIsVenueMapOpen(true)}
+                      className="w-full border border-[#E8C77A] hover:border-[#D9A323] rounded-xl !py-2.5 text-sm focus:border-[#004B35] focus:ring-2 focus:ring-[#004B35]/10 outline-none transition-all placeholder:text-stone-400 bg-white text-[#173D30] h-11 shadow-[0_2px_6px_rgba(217,163,35,0.06)]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
+                      <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide">
+                        Venue Address <span className="text-[#C82333]">*</span>
+                      </label>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={handleUseCurrentLocation}
+                          className="text-[11px] font-bold text-[#004B35]/85 hover:text-[#003F2E] hover:underline transition flex items-center gap-0.5 cursor-pointer"
+                        >
+                          📍 Use Current Location
+                        </button>
+                        <span className="text-[#E8C77A] text-xs hidden sm:inline">|</span>
+                        <button
+                          type="button"
+                          onClick={() => setIsVenueMapOpen(true)}
+                          className="text-[11px] font-bold text-[#004B35] hover:underline transition flex items-center gap-0.5 cursor-pointer"
+                        >
+                          🗺️ Select Event Location
+                        </button>
+                      </div>
+                    </div>
+                    <AddressAutocomplete
+                      useTextarea={true}
+                      rows={2}
+                      value={orderForm.venue}
+                      onChange={(val) => setOrderForm({ ...orderForm, venue: val })}
+                      onSelect={(data) => {
+                        setVenueLat(data.latitude);
+                        setVenueLng(data.longitude);
+                        setOrderForm({ ...orderForm, venue: data.address });
+                        if (data.address) {
+                          const parts = data.address.split(",");
+                          if (parts.length > 0 && parts[0].trim()) {
+                            setVenueName(parts[0].trim());
+                          }
+                        }
+                        setMapLocation(data.address);
+                      }}
+                      placeholder="Enter Street Address, Hall No, Landmark in Hyderabad..."
+                      theme="green"
+                      leftIcon={<MapPin className="text-[#D9A323] w-4 h-4 hover:text-[#B8860B] transition-colors" />}
+                      onIconClick={() => setIsVenueMapOpen(true)}
+                      className="w-full border border-[#E8C77A] hover:border-[#D9A323] rounded-xl !py-2.5 text-sm focus:border-[#004B35] focus:ring-2 focus:ring-[#004B35]/10 outline-none transition-all placeholder:text-stone-400 bg-white text-[#173D30] shadow-[0_2px_6px_rgba(217,163,35,0.06)]"
+                    />
+                    <MapPickerModal
+                      isOpen={isVenueMapOpen}
+                      onClose={() => setIsVenueMapOpen(false)}
+                      initialLat={venueLat}
+                      initialLng={venueLng}
+                      initialAddress={orderForm.venue}
+                      onSave={(data) => {
+                        setVenueLat(data.latitude);
+                        setVenueLng(data.longitude);
+                        setOrderForm({ ...orderForm, venue: data.address });
+                        if (data.address) {
+                          const parts = data.address.split(",");
+                          if (parts.length > 0 && parts[0].trim()) {
+                            setVenueName(parts[0].trim());
+                          }
+                        }
+                        setMapLocation(data.address);
+                      }}
+                      title="Select Event Location"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
+                      Venue Type <span className="text-[#C82333]">*</span>
+                    </label>
+                    <div className="grid grid-cols-2 gap-2.5 pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setVenueType("Indoor")}
+                        className={cn(
+                          "h-11 flex items-center justify-center gap-1.5 rounded-xl border text-xs sm:text-sm font-bold transition-all cursor-pointer",
+                          venueType === "Indoor"
+                            ? "bg-gradient-to-r from-[#00513A] to-[#002E22] border-[#D9A323] ring-1 ring-[#F8D76A]/60 text-white shadow-sm"
+                            : "bg-white border-[#E8C77A] hover:border-[#D9A323] text-[#173D30] hover:bg-[#FFF9E8]"
+                        )}
+                      >
+                        <span>Indoor Event</span>
+                        {venueType === "Indoor" && <Check size={14} className="text-[#F8D76A] shrink-0" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setVenueType("Outdoor")}
+                        className={cn(
+                          "h-11 flex items-center justify-center gap-1.5 rounded-xl border text-xs sm:text-sm font-bold transition-all cursor-pointer",
+                          venueType === "Outdoor"
+                            ? "bg-gradient-to-r from-[#00513A] to-[#002E22] border-[#D9A323] ring-1 ring-[#F8D76A]/60 text-white shadow-sm"
+                            : "bg-white border-[#E8C77A] hover:border-[#D9A323] text-[#173D30] hover:bg-[#FFF9E8]"
+                        )}
+                      >
+                        <span>Outdoor Event</span>
+                        {venueType === "Outdoor" && <Check size={14} className="text-[#F8D76A] shrink-0" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Form Section 5: Special Instructions */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-5 sm:p-8 space-y-6 md:bg-transparent md:border-none md:shadow-none md:p-0 pt-2">
-              <div className="flex items-start gap-4 border-b border-stone-100 pb-5">
-                {/* Rotated gold squares badge */}
-                <div className="relative w-11 h-11 flex items-center justify-center shrink-0 mt-0.5 select-none">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#C29D38]" fill="currentColor">
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(0 50 50)" />
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(45 50 50)" />
-                  </svg>
-                  <span className="relative z-10 font-serif text-[17px] font-black text-white">5</span>
-                </div>
-                
-                {/* Title & Subtitle */}
-                <div className="flex-1 text-left">
-                  <div className="flex items-center flex-wrap gap-2">
-                    <h2 className="text-2xl sm:text-3xl font-serif font-extrabold text-[#8C6512] tracking-tight leading-tight">
-                      Special Instructions
-                    </h2>
-                    <svg className="h-3 w-16 sm:w-24 text-[#C29D38]/50 shrink-0" viewBox="0 0 120 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M0,10 Q30,2 60,10 T120,10" />
-                      <path d="M45,10 C50,6 55,6 60,10 C55,14 50,14 45,10" fill="currentColor" />
+            <div className="p-4 sm:p-5 lg:px-6 lg:py-5 flex flex-col lg:grid lg:grid-cols-[315px_1fr] xl:grid-cols-[335px_1fr] gap-5 lg:gap-6 items-start">
+              {/* Emerald-Gold Slanted Banner */}
+              <div className="w-full drop-shadow-[0_6px_14px_rgba(184,134,11,0.22)] select-none">
+                <div
+                  className="rounded-l-xl bg-gradient-to-br from-[#F8D76A] via-[#D9A323] to-[#A6780E] p-[1.5px] pr-[6px] pb-[2.5px]"
+                  style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)" }}
+                >
+                  <div
+                    className="relative rounded-l-[10.5px] bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] pl-4 pr-9 py-3.5 min-h-[82px] flex items-center gap-3.5 overflow-hidden"
+                    style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 21px) 100%, 0 100%)" }}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 100 84" fill="none" className="pointer-events-none absolute right-2 top-0 bottom-0 h-full w-24 text-[#D9A323] opacity-25">
+                      <path d="M90 8 C66 26 48 50 38 78" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M72 24 C60 16 46 18 36 28 C48 34 62 32 72 24 Z" fill="currentColor" fillOpacity="0.45" />
+                      <path d="M58 48 C44 40 30 44 22 56 C36 60 48 56 58 48 Z" fill="currentColor" fillOpacity="0.35" />
+                      <path d="M84 44 C76 58 72 70 74 82 C84 72 88 58 84 44 Z" fill="currentColor" fillOpacity="0.35" />
                     </svg>
+                    <ClipboardList size={24} strokeWidth={1.75} className="text-[#F8D76A] shrink-0 relative z-10" />
+                    <div className="flex-1 min-w-0 text-left relative z-10">
+                      <h2
+                        className="text-[19px] sm:text-[21px] font-serif font-bold text-white tracking-tight leading-tight"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                      >
+                        Special Instructions
+                      </h2>
+                      <p className="text-[11.5px] sm:text-xs text-[#E4EFEA] mt-0.5 font-sans font-medium leading-snug">
+                        Any dietary needs, spices, or separate serving request tag filters.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-[14px] sm:text-[15px] text-stone-600 mt-1 font-medium font-sans">
-                    Specify dietary needs, spices, or separate serving request tag filters.
-                  </p>
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="w-full space-y-2.5">
                 <div className="relative">
                   <textarea
                     rows={3}
@@ -3883,13 +4465,13 @@ export default function OrderFlow() {
                     value={orderForm.notes}
                     onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
                     placeholder="Any special requests, preferences or notes for the chef..."
-                    className="w-full border border-stone-200 hover:border-stone-400 rounded-xl px-5 py-4 text-base focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] outline-none transition-all pr-12 placeholder:text-stone-400 bg-white"
+                    className="w-full border border-[#E8C77A] hover:border-[#D9A323] rounded-xl px-4 py-3 text-sm focus:border-[#004B35] focus:ring-2 focus:ring-[#004B35]/10 outline-none transition-all pr-16 placeholder:text-stone-400 bg-white text-[#173D30] shadow-[0_2px_6px_rgba(217,163,35,0.06)]"
                   ></textarea>
-                  <span className="absolute bottom-3 right-4 text-[11px] font-bold font-mono text-stone-400">
-                    {orderForm.notes.length}/250
+                  <span className="absolute bottom-2.5 right-3.5 text-[11px] font-bold font-mono text-[#173D30]/75 tabular-nums">
+                    {orderForm.notes.length} / 250
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-2 select-none">
+                <div className="flex flex-wrap gap-2 select-none">
                   {["No Onion", "Jain Food", "Less Spice", "Kids Menu", "Separate Serving"].map((tag) => {
                     const isTagSelected = orderForm.notes.toLowerCase().includes(tag.toLowerCase());
                     return (
@@ -3899,9 +4481,8 @@ export default function OrderFlow() {
                         onClick={() => {
                           const current = orderForm.notes.trim();
                           const normalizedTag = tag.toLowerCase();
-                          
+
                           if (current.toLowerCase().includes(normalizedTag)) {
-                            // Simple removal logic
                             const regex = new RegExp(`(,\\s*)?${tag}|${tag}(,\\s*)?`, 'gi');
                             let cleaned = current.replace(regex, '').trim();
                             if (cleaned.startsWith(",")) cleaned = cleaned.substring(1).trim();
@@ -3913,10 +4494,10 @@ export default function OrderFlow() {
                           }
                         }}
                         className={cn(
-                          "px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border cursor-pointer min-h-[36px] flex items-center justify-center",
+                          "px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer min-h-[30px] flex items-center justify-center",
                           isTagSelected
-                            ? "bg-[#EAF2EE] border-[#0F3D2E]/20 text-[#0F3D2E]"
-                            : "bg-white border-stone-200 text-stone-600 hover:border-stone-300"
+                            ? "bg-[#EAF7EC] border-[#004B35]/30 text-[#004B35]"
+                            : "bg-white border-[#E8C77A]/70 text-[#173D30] hover:border-[#D9A323] hover:bg-[#FFF9E8]"
                         )}
                       >
                         {isTagSelected ? `× ${tag}` : `+ ${tag}`}
@@ -3928,72 +4509,86 @@ export default function OrderFlow() {
             </div>
 
             {/* Form Section 6: Contact Information */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-5 sm:p-8 space-y-6 md:bg-transparent md:border-none md:shadow-none md:p-0 pt-2">
-              <div className="flex items-start gap-4 border-b border-stone-100 pb-5">
-                {/* Rotated gold squares badge */}
-                <div className="relative w-11 h-11 flex items-center justify-center shrink-0 mt-0.5 select-none">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#C29D38]" fill="currentColor">
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(0 50 50)" />
-                    <rect x="18" y="18" width="64" height="64" rx="10" transform="rotate(45 50 50)" />
-                  </svg>
-                  <span className="relative z-10 font-serif text-[17px] font-black text-white">6</span>
-                </div>
-                
-                {/* Title & Subtitle */}
-                <div className="flex-1 text-left">
-                  <div className="flex items-center flex-wrap gap-2">
-                    <h2 className="text-2xl sm:text-3xl font-serif font-extrabold text-[#8C6512] tracking-tight leading-tight">
-                      Contact Information
-                    </h2>
-                    <svg className="h-3 w-16 sm:w-24 text-[#C29D38]/50 shrink-0" viewBox="0 0 120 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M0,10 Q30,2 60,10 T120,10" />
-                      <path d="M45,10 C50,6 55,6 60,10 C55,14 50,14 45,10" fill="currentColor" />
+            <div className="p-4 sm:p-5 lg:px-6 lg:py-5 flex flex-col lg:grid lg:grid-cols-[315px_1fr] xl:grid-cols-[335px_1fr] gap-5 lg:gap-6 items-start">
+              {/* Emerald-Gold Slanted Banner */}
+              <div className="w-full drop-shadow-[0_6px_14px_rgba(184,134,11,0.22)] select-none">
+                <div
+                  className="rounded-l-xl bg-gradient-to-br from-[#F8D76A] via-[#D9A323] to-[#A6780E] p-[1.5px] pr-[6px] pb-[2.5px]"
+                  style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)" }}
+                >
+                  <div
+                    className="relative rounded-l-[10.5px] bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] pl-4 pr-9 py-3.5 min-h-[82px] flex items-center gap-3.5 overflow-hidden"
+                    style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 21px) 100%, 0 100%)" }}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 100 84" fill="none" className="pointer-events-none absolute right-2 top-0 bottom-0 h-full w-24 text-[#D9A323] opacity-25">
+                      <path d="M90 8 C66 26 48 50 38 78" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M72 24 C60 16 46 18 36 28 C48 34 62 32 72 24 Z" fill="currentColor" fillOpacity="0.45" />
+                      <path d="M58 48 C44 40 30 44 22 56 C36 60 48 56 58 48 Z" fill="currentColor" fillOpacity="0.35" />
+                      <path d="M84 44 C76 58 72 70 74 82 C84 72 88 58 84 44 Z" fill="currentColor" fillOpacity="0.35" />
                     </svg>
+                    <User size={24} strokeWidth={1.75} className="text-[#F8D76A] shrink-0 relative z-10" />
+                    <div className="flex-1 min-w-0 text-left relative z-10">
+                      <h2
+                        className="text-[19px] sm:text-[21px] font-serif font-bold text-white tracking-tight leading-tight"
+                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                      >
+                        Contact Information
+                      </h2>
+                      <p className="text-[11.5px] sm:text-xs text-[#E4EFEA] mt-0.5 font-sans font-medium leading-snug">
+                        Your details for booking confirmation.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-[14px] sm:text-[15px] text-stone-600 mt-1 font-medium font-sans">
-                    How can we contact you regarding customization?
-                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
-                    Your Full Name
+              <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
+                    Your Full Name <span className="text-[#C82333]">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={orderForm.name}
-                    onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })}
-                    placeholder="e.g. Himaja"
-                    className="w-full border border-stone-200 hover:border-stone-400 rounded-xl px-5 py-4 text-base focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] outline-none transition-all placeholder:text-stone-400 bg-white h-14"
-                  />
+                  <div className="relative">
+                    <User size={15} className="text-[#D9A323] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      value={orderForm.name}
+                      onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })}
+                      placeholder="e.g. Charan"
+                      className="w-full border border-[#E8C77A] hover:border-[#D9A323] rounded-xl pl-9 pr-3.5 text-sm focus:border-[#004B35] focus:ring-2 focus:ring-[#004B35]/10 outline-none transition-all placeholder:text-stone-400 bg-white text-[#173D30] h-11 shadow-[0_2px_6px_rgba(217,163,35,0.06)]"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
-                    Phone Number
+                <div>
+                  <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
+                    Phone Number <span className="text-[#C82333]">*</span>
                   </label>
-                  <input
-                    type="tel"
-                    required
-                    value={orderForm.phone}
-                    onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })}
-                    placeholder="e.g. 9180121-281-2"
-                    className="w-full border border-stone-200 hover:border-stone-400 rounded-xl px-5 py-4 text-base focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] outline-none transition-all placeholder:text-stone-400 bg-white h-14"
-                  />
+                  <div className="relative">
+                    <Phone size={15} className="text-[#D9A323] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="tel"
+                      required
+                      value={orderForm.phone}
+                      onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })}
+                      placeholder="e.g. 98765 43210"
+                      className="w-full border border-[#E8C77A] hover:border-[#D9A323] rounded-xl pl-9 pr-3.5 text-sm focus:border-[#004B35] focus:ring-2 focus:ring-[#004B35]/10 outline-none transition-all placeholder:text-stone-400 bg-white text-[#173D30] h-11 shadow-[0_2px_6px_rgba(217,163,35,0.06)]"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-stone-700 font-sans tracking-wide mb-1.5">
+                <div>
+                  <label className="block text-xs font-bold text-[#173D30] font-sans tracking-wide mb-1.5">
                     Email (Optional)
                   </label>
-                  <input
-                    type="email"
-                    value={orderForm.email || ""}
-                    onChange={(e) => setOrderForm({ ...orderForm, email: e.target.value })}
-                    placeholder="e.g. himaja@example.com"
-                    className="w-full border border-stone-200 hover:border-stone-400 rounded-xl px-5 py-4 text-base focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] outline-none transition-all placeholder:text-stone-400 bg-white h-14"
-                  />
+                  <div className="relative">
+                    <Mail size={15} className="text-[#D9A323] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="email"
+                      value={orderForm.email || ""}
+                      onChange={(e) => setOrderForm({ ...orderForm, email: e.target.value })}
+                      placeholder="e.g. charan@example.com"
+                      className="w-full border border-[#E8C77A] hover:border-[#D9A323] rounded-xl pl-9 pr-3.5 text-sm focus:border-[#004B35] focus:ring-2 focus:ring-[#004B35]/10 outline-none transition-all placeholder:text-stone-400 bg-white text-[#173D30] h-11 shadow-[0_2px_6px_rgba(217,163,35,0.06)]"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -4001,135 +4596,147 @@ export default function OrderFlow() {
           </div>
 
           {/* Right Column: Order Summary Card */}
-          <div className="w-full lg:w-[420px] shrink-0 lg:sticky lg:top-24">
-            <div className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-[0_8px_30px_rgba(15,61,46,0.03)] text-left space-y-6">
-              
-              <div>
-                <h3 className="font-serif text-[24px] font-bold text-[#8C6512] text-center">
+          <div className="w-full lg:w-[375px] xl:w-[395px] shrink-0 lg:sticky lg:top-[84px]">
+            <div className="bg-[#FFFDF8] rounded-2xl border-[1.5px] border-[#D9A323]/85 shadow-[0_14px_36px_rgba(0,46,34,0.11)] overflow-hidden text-left">
+              {/* Deep Emerald Header with Gold Cloche Icon & Botanical Branch */}
+              <div className="bg-gradient-to-br from-[#00583F] via-[#003F2E] to-[#00261B] px-6 py-4.5 border-b-2 border-[#D9A323]/75 flex items-center gap-3 relative overflow-hidden">
+                <svg aria-hidden="true" viewBox="0 0 110 70" fill="none" className="pointer-events-none select-none absolute right-2 top-0 bottom-0 h-full w-24 text-[#D9A323] opacity-55">
+                  <path d="M104 62 C78 46 56 32 22 24" stroke="currentColor" strokeWidth="1.2" />
+                  <path d="M84 48 C76 34 80 20 92 12 C94 26 90 38 84 48 Z" fill="currentColor" fillOpacity="0.45" stroke="currentColor" strokeWidth="0.9" />
+                  <path d="M64 38 C56 26 60 14 70 8 C72 20 70 30 64 38 Z" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="0.9" />
+                  <path d="M44 30 C34 22 36 12 44 6 C48 16 48 24 44 30 Z" fill="currentColor" fillOpacity="0.35" stroke="currentColor" strokeWidth="0.9" />
+                  <path d="M62 42 C48 48 36 46 28 38 C40 36 52 38 62 42 Z" fill="currentColor" fillOpacity="0.35" />
+                </svg>
+
+                {/* Gold Catering Cloche Icon */}
+                <svg viewBox="0 0 36 28" fill="none" className="w-8 h-6.5 text-[#F8D76A] shrink-0 relative z-10" aria-hidden="true">
+                  <circle cx="18" cy="4.5" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+                  <path d="M6 19C6 12.3726 11.3726 7 18 7C24.6274 7 30 12.3726 30 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M2.5 22.5H33.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M4.5 19H31.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+                <h3
+                  className="font-serif text-[23px] sm:text-[25px] font-bold text-white tracking-tight leading-none relative z-10"
+                  style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                >
                   Order Summary
                 </h3>
-                
-                {/* Gold Center Swirl Divider */}
-                <div className="flex items-center justify-center gap-3 my-3">
-                  <div className="h-[1px] bg-[#D4AF37]/30 flex-1"></div>
-                  <svg className="w-8 h-4 text-[#C29D38]" viewBox="0 0 40 20" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M10,10 Q20,3 30,10 T40,10" />
-                    <circle cx="20" cy="10" r="3" fill="currentColor" />
-                  </svg>
-                  <div className="h-[1px] bg-[#D4AF37]/30 flex-1"></div>
-                </div>
               </div>
 
-              {/* Package Metadata */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-start text-sm">
-                  <span className="text-stone-500 font-semibold font-sans">Selected Package</span>
-                  <div className="text-right">
-                    <span className="font-serif font-black text-stone-900 block text-[15px] leading-tight">
-                      {selectedPackage?.packageName}
+              <div className="p-5 sm:p-6 space-y-4">
+                {/* Package Metadata */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start text-sm gap-3">
+                    <span className="text-[#5B6D65] font-semibold font-sans">Selected Package</span>
+                    <div className="text-right">
+                      <span className="font-bold text-[#0B1F17] block text-[15px] leading-tight">
+                        {selectedPackage?.packageName}
+                      </span>
+                      <span className="inline-block text-[10px] text-[#8E6211] bg-[#FBF2D8] border border-[#E8C77A] px-2 py-0.5 rounded font-extrabold uppercase tracking-wider mt-1">
+                        {selectedPackage?.vegNonVeg || "Catering Package"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-[#E8C77A]/35" />
+
+                  <div className="flex justify-between items-center text-sm gap-2">
+                    <span className="text-[#5B6D65] font-semibold font-sans">Selected Menu</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-[#0B1F17] tabular-nums">
+                        {Object.keys(selectedItems).filter((k) => selectedItems[k]).length} Items
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setViewMode("custom")}
+                        className="inline-flex items-center gap-1 text-[11px] text-[#8E6211] hover:text-[#003F2E] font-bold cursor-pointer bg-[#FFF9E8] hover:bg-[#F7EBC6] border border-[#D9A323]/70 px-2.5 py-1 rounded-lg transition-colors"
+                      >
+                        <Pencil size={11} className="text-[#C8941A]" />
+                        <span>Edit Menu</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {selectedMeals.length > 0 && (
+                    <div className="flex justify-between items-start text-sm gap-3">
+                      <span className="text-[#5B6D65] font-semibold font-sans">Meals Included</span>
+                      <span className="font-extrabold text-[#0B1F17] text-right max-w-[200px] leading-snug">
+                        {selectedMeals.join(", ")}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center text-sm gap-2">
+                    <span className="text-[#5B6D65] font-semibold font-sans">Guests Sizing</span>
+                    <span className="font-extrabold text-[#0B1F17] tabular-nums">
+                      {guests} Guests
                     </span>
-                    <span className="text-[10px] text-[#B8860B] font-black uppercase tracking-wider block mt-1">
-                      {selectedPackage?.vegNonVeg || "Catering Package"}
+                  </div>
+
+                  <div className="flex justify-between items-center text-sm gap-2">
+                    <span className="text-[#5B6D65] font-semibold font-sans">Est. Price per Plate</span>
+                    <span className="font-extrabold text-[#0B1F17] tabular-nums">
+                      ₹{currentPerPlatePrice}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-stone-500 font-semibold font-sans">Selected Menu</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-stone-900">
-                      {Object.keys(selectedItems).filter((k) => selectedItems[k]).length} Items
+                {/* Platform Fee & Coupons */}
+                <div className="bg-[#FBF6EA] border border-[#E8C77A]/70 rounded-xl p-4 space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-[#173D30] font-bold font-sans flex items-center gap-1">
+                      <span>Platform Fee</span>
+                      <span className="text-[11px] text-[#5B6D65] font-medium">
+                        (₹{platformFeePerPlate}/plate)
+                      </span>
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("custom")}
-                      className="text-xs text-[#8C6512] hover:text-[#0F3D2E] font-black underline cursor-pointer hover:bg-[#FAF6EE] px-2 py-1 rounded-lg transition-colors"
+                    <span
+                      className={cn(
+                        "font-extrabold tabular-nums",
+                        appliedCoupon === "NEW"
+                          ? "text-stone-400 line-through"
+                          : "text-[#0B1F17]"
+                      )}
                     >
-                      Edit Menu
-                    </button>
-                  </div>
-                </div>
-
-                {selectedMeals.length > 0 && (
-                  <div className="flex justify-between items-start text-sm">
-                    <span className="text-stone-500 font-semibold font-sans">Meals Included</span>
-                    <span className="font-bold text-stone-900 text-right max-w-[200px] leading-snug">
-                      {selectedMeals.join(", ")}
+                      ₹{(guests * platformFeePerPlate).toLocaleString()}
                     </span>
                   </div>
-                )}
 
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-stone-500 font-semibold font-sans">Guests Sizing</span>
-                  <span className="font-black text-stone-900">
-                    {guests} Guests
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-stone-500 font-semibold font-sans">Est. Price per Plate</span>
-                  <span className="font-black text-stone-900">
-                    ₹{currentPerPlatePrice}
-                  </span>
-                </div>
-              </div>
-
-              <div className="border-t border-dashed border-stone-200 my-4"></div>
-
-              {/* Platform Fee & Coupons */}
-              <div className="bg-[#FAF8F5] border border-stone-200/40 rounded-2xl p-4.5 space-y-4">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-stone-500 font-semibold font-sans flex items-center gap-1">
-                    Platform Fee
-                    <span className="text-[10px] text-stone-400 font-normal">
-                      (₹{platformFeePerPlate}/plate)
-                    </span>
-                  </span>
-                  <span
-                    className={cn(
-                      "font-black text-stone-900",
-                      appliedCoupon === "NEW"
-                        ? "text-stone-400 line-through"
-                        : "text-stone-900"
-                    )}
-                  >
-                    ₹{(guests * platformFeePerPlate).toLocaleString()}
-                  </span>
-                </div>
-
-                {appliedCoupon !== "NEW" ? (
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      placeholder="Coupon Code? (Try 'NEW')"
-                      className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0F3D2E] uppercase font-bold text-stone-800 h-12"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (couponCode === "NEW") {
-                          setAppliedCoupon("NEW");
-                          toast("Welcome Offer Applied!", "success");
-                        } else {
-                          toast("Invalid coupon code", "error");
-                        }
-                      }}
-                      className="bg-[#0F3D2E] hover:bg-[#0B2F22] text-white px-5 py-3 rounded-xl text-sm font-black transition-colors cursor-pointer shrink-0 h-12 flex items-center justify-center"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex justify-between items-center text-xs text-green-800 bg-green-50 border border-green-100 px-3 py-2.5 rounded-xl">
+                  {appliedCoupon !== "NEW" ? (
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Tag size={14} className="text-[#D9A323] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          placeholder="COUPON CODE? (TRY 'NEW')"
+                          className="w-full bg-white border border-[#E8C77A] rounded-lg pl-8 pr-3 py-2 text-[11px] outline-none focus:border-[#004B35] uppercase font-bold text-[#173D30] placeholder:text-[#5B6D65]/80 h-10"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (couponCode === "NEW") {
+                            setAppliedCoupon("NEW");
+                            toast("Welcome Offer Applied!", "success");
+                          } else {
+                            toast("Invalid coupon code", "error");
+                          }
+                        }}
+                        className="bg-gradient-to-b from-[#00513A] to-[#002E22] hover:brightness-110 text-white border border-[#D9A323]/80 px-4 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 h-10 flex items-center justify-center shadow-2xs"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center text-xs text-[#004B35] bg-[#EAF7EC] border border-[#A3DFB5] px-3 py-2 rounded-lg">
                       <span className="font-bold flex items-center gap-1.5">
-                        <Check size={14} className="text-green-600 shrink-0" />
+                        <Check size={14} className="text-[#108A48] shrink-0" />
                         Code 'NEW' Applied
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className="font-black">
+                        <span className="font-extrabold tabular-nums">
                           -₹{(guests * platformFeePerPlate).toLocaleString()}
                         </span>
                         <button
@@ -4138,36 +4745,38 @@ export default function OrderFlow() {
                             setAppliedCoupon("");
                             setCouponCode("");
                           }}
-                          className="text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                          className="text-stone-400 hover:text-red-600 transition-colors cursor-pointer"
+                          aria-label="Remove coupon"
                         >
                           <X size={14} />
                         </button>
                       </div>
                     </div>
+                  )}
+
+                  <div className="flex justify-between items-center text-xs sm:text-sm pt-2.5 border-t border-[#E8C77A]/50">
+                    <span className="text-[#173D30] font-bold">
+                      Payable Platform Fee
+                    </span>
+                    <span className="font-extrabold text-[#003F2E] tabular-nums">
+                      ₹
+                      {appliedCoupon === "NEW"
+                        ? "0"
+                        : (guests * platformFeePerPlate).toLocaleString()}
+                    </span>
                   </div>
-                )}
-
-                <div className="flex justify-between items-center text-xs sm:text-sm pt-3 border-t border-stone-200/50">
-                  <span className="text-stone-600 font-bold">
-                    Payable Platform Fee
-                  </span>
-                  <span className="font-black text-[#0F3D2E]">
-                    ₹
-                    {appliedCoupon === "NEW"
-                      ? "0"
-                      : (guests * platformFeePerPlate).toLocaleString()}
-                  </span>
                 </div>
-              </div>
 
-              {/* Total Summary Block */}
-              <div className="space-y-2 pt-2">
-                <div className="flex justify-between items-end">
-                  <span className="font-serif text-[18px] sm:text-[20px] font-bold text-[#8C6512] pb-0.5">
-                    Total Estimate
-                  </span>
-                  <div className="text-right">
-                    <span className="font-serif text-3xl sm:text-4xl font-black text-[#0F3D2E] tracking-tight block">
+                {/* Total Summary Highlight Box */}
+                <div className="space-y-2.5">
+                  <div className="rounded-xl bg-gradient-to-r from-[#FCE69B] via-[#F6D572] to-[#E9B941] border border-[#D9A323] shadow-[0_4px_14px_rgba(217,163,35,0.22)] px-4 py-3.5 flex items-center justify-between gap-2">
+                    <span
+                      className="font-serif text-[20px] font-extrabold text-[#0B1F17] leading-none"
+                      style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                    >
+                      Total Estimate
+                    </span>
+                    <span className="font-sans text-[25px] sm:text-[27px] font-extrabold text-[#0B1F17] tracking-tight tabular-nums leading-none">
                       ₹
                       {(
                         currentPerPlatePrice * guests +
@@ -4175,55 +4784,48 @@ export default function OrderFlow() {
                       ).toLocaleString("en-IN")}
                     </span>
                   </div>
+                  <div className="grid grid-cols-2 divide-x divide-[#E8C77A]/60 text-[11px] text-[#354B43] font-semibold">
+                    <div className="flex items-center justify-center gap-1.5 pr-2">
+                      <CheckCircle2 size={13} className="text-[#C8941A] shrink-0" />
+                      <span>Inclusive of Taxes</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1.5 pl-2">
+                      <CheckCircle2 size={13} className="text-[#C8941A] shrink-0" />
+                      <span>No Hidden Charges</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-[10px] sm:text-xs text-stone-500 uppercase tracking-widest font-black pt-1">
-                  <span>Inclusive of taxes</span>
-                  <span>(No hidden charges)</span>
-                </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-3 pt-2">
+                {/* Action Button */}
                 <button
                   type="button"
                   onClick={() => {
                     console.log("[TRACE_LOG #1] Confirm Booking button clicked (isQuote = false)");
                     handleBooking(false);
                   }}
-                  className="w-full bg-[#0F3D2E] hover:bg-[#0B2F22] text-white py-4 rounded-xl font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-[#0F3D2E]/10 select-none text-base min-h-[52px]"
+                  className="w-full bg-gradient-to-r from-[#00513A] via-[#003B2A] to-[#00261B] hover:brightness-110 text-white border-[1.5px] border-[#D9A323] py-3.5 rounded-xl font-bold transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer shadow-[0_6px_18px_rgba(0,75,53,0.30)] select-none text-[16px] min-h-[52px] active:scale-[0.99]"
                 >
-                  Confirm Booking
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
+                  <Calendar size={18} className="text-[#F8D76A] shrink-0" />
+                  <span>Confirm Booking</span>
+                  <ArrowRight size={18} className="shrink-0" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    console.log("[TRACE_LOG #1] Request Quote button clicked (isQuote = true)");
-                    handleBooking(true);
-                  }}
-                  className="w-full bg-white border border-[#C29D38] hover:bg-stone-50 text-[#8C6512] py-4 rounded-xl font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none text-base min-h-[52px]"
-                >
-                  Request Quote
-                </button>
+
+                {/* Security Shield Callout */}
+                <p className="text-center text-[10px] text-[#354B43] uppercase tracking-wider font-extrabold flex items-center justify-center gap-1.5 pt-0.5">
+                  <ShieldCheck size={14} className="text-[#C8941A] shrink-0" />
+                  <span>No payment required today • Failsafe Lock</span>
+                </p>
               </div>
-
-              {/* Security Shield Callout */}
-              <p className="text-center text-[10px] text-stone-400 mt-2 uppercase tracking-widest font-black flex items-center justify-center gap-1.5">
-                <ShieldCheck size={14} className="text-[#0F3D2E]" />
-                No payment required today • Failsafe Lock
-              </p>
-
             </div>
           </div>
 
           {/* Mobile Sticky Booking Bar */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200/60 px-4 py-3.5 z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-between gap-4 animate-slide-up">
+          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#FFFDF8]/95 backdrop-blur-md border-t border-[#E8C77A] px-4 py-2.5 z-30 shadow-[0_-4px_18px_rgba(0,46,34,0.10)] flex items-center justify-between gap-3 animate-slide-up">
             <div className="text-left">
-              <span className="text-[9px] text-stone-400 font-bold uppercase tracking-widest block leading-none mb-1">Total Estimate</span>
-              <span className="font-serif text-lg font-black text-[#0F3D2E]">
+              <span className="text-[9px] text-[#8E6211] font-extrabold uppercase tracking-widest block leading-none mb-1">
+                Total Estimate
+              </span>
+              <span className="font-sans text-lg font-extrabold text-[#0B1F17] tabular-nums">
                 ₹{(currentPerPlatePrice * guests + (appliedCoupon === "NEW" ? 0 : guests * platformFeePerPlate)).toLocaleString("en-IN")}
               </span>
             </div>
@@ -4233,9 +4835,11 @@ export default function OrderFlow() {
                 console.log("[TRACE_LOG #1] Confirm Booking via Sticky Mobile clicked");
                 handleBooking(false);
               }}
-              className="px-5 py-3 bg-[#0F3D2E] hover:bg-[#0B2F22] text-white rounded-xl font-bold text-xs uppercase tracking-wider shadow-md select-none flex-1 max-w-[200px] text-center min-h-[48px] flex items-center justify-center active:scale-95 transition-transform"
+              className="px-4 py-2.5 bg-gradient-to-r from-[#00513A] to-[#002E22] hover:brightness-110 text-white border border-[#D9A323] rounded-xl font-bold text-xs tracking-wide shadow-md select-none flex-1 max-w-[205px] text-center min-h-[44px] flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
             >
-              Confirm Booking
+              <Calendar size={14} className="text-[#F8D76A] shrink-0" />
+              <span>Confirm Booking</span>
+              <ArrowRight size={14} className="shrink-0" />
             </button>
           </div>
 
@@ -4244,22 +4848,22 @@ export default function OrderFlow() {
 
       {/* Login Required Modal */}
       {showLoginModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full relative shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#011610]/60 backdrop-blur-sm">
+          <div className="bg-[#FFFDF8] border border-[#DFC78A] rounded-[24px] p-8 max-w-sm w-full relative shadow-[0_24px_56px_rgba(1,22,16,0.28)]">
             <button
               onClick={() => setShowLoginModal(false)}
-              className="absolute top-4 right-4 p-2 relative text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full transition-colors flex items-center justify-center"
+              className="absolute top-4 right-4 p-2 bg-[#FAF3E2] border border-[#DFC78A] text-[#6B5A38] hover:bg-[#F3E6C6] hover:text-[#083A28] rounded-full transition-colors flex items-center justify-center cursor-pointer"
             >
               <X size={18} />
             </button>
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-gold-50 text-brand-gold-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User size={32} />
+              <div className="w-16 h-16 bg-[#FAF1DA] border border-[#DFC78A] text-[#9C6F11] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <User size={30} />
               </div>
-              <h3 className="text-2xl font-bold font-display text-slate-900 mb-2">
+              <h3 className="text-2xl font-bold font-display text-[#083A28] mb-2">
                 Login Required
               </h3>
-              <p className="text-slate-500 text-sm mb-8">
+              <p className="text-[#5D665F] text-sm mb-8">
                 Please login to continue your{" "}
                 {pendingAction ? "quote request" : "booking"}. Your progress
                 will be saved.
@@ -4267,13 +4871,13 @@ export default function OrderFlow() {
               <div className="space-y-3">
                 <button
                   onClick={handleProceedToLogin}
-                  className="w-full bg-brand-green-900 text-white font-bold py-3.5 rounded-xl hover:bg-brand-green-800 transition-colors shadow-md"
+                  className="w-full bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] font-bold py-3.5 rounded-xl transition-all shadow-[0_6px_16px_rgba(1,34,23,0.2)] cursor-pointer"
                 >
                   Login to Continue
                 </button>
                 <button
                   onClick={() => setShowLoginModal(false)}
-                  className="w-full bg-white text-slate-600 font-bold py-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
+                  className="w-full bg-[#FAF3E2] text-[#132A1F] font-bold py-3.5 rounded-xl border border-[#DFC78A] hover:bg-[#F3E6C6] transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

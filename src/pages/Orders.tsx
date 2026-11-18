@@ -757,7 +757,7 @@ export default function Orders() {
     if (norm === 'cancelled') {
       return {
         badgeText: 'Cancelled',
-        badgeColor: 'bg-stone-100 text-stone-600 border-stone-200',
+        badgeColor: 'bg-[#FAF3E2] text-[#5C5240] border-[#DFC78A]',
         icon: <X size={14} className="stroke-[3]" />,
         subtext: 'Booking Cancelled',
         canRebook: false
@@ -818,67 +818,68 @@ export default function Orders() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FCFBF8] pt-24 sm:pt-28 pb-24 font-sans text-stone-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-
-        {/* ==================================================== */}
-        {/* HERO SECTION: Heading + Subtitle + Need New Booking CTA */}
-        {/* ==================================================== */}
-        <div className="relative rounded-3xl overflow-hidden bg-[#FCFBF8] border border-stone-200/70 p-6 sm:p-8 lg:p-10 shadow-xs">
-          {/* Subtle background food illustration in the top-right corner */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none opacity-20 sm:opacity-25 overflow-hidden flex justify-end items-center">
-            <img 
-              src={heroBg} 
-              alt="Catering Feast" 
-              className="h-full w-auto object-cover object-left mask-radial"
-              style={{
-                maskImage: 'linear-gradient(to right, transparent, black 60%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent, black 60%)'
-              }}
-            />
-          </div>
-
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            {/* Left: Titles */}
-            <div className="space-y-1.5 max-w-xl">
-              <h1 
-                className="font-serif font-bold text-[32px] sm:text-[38px] md:text-[44px] text-stone-900 tracking-tight leading-tight"
-                style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
-              >
-                My Bookings
-              </h1>
-              <p className="font-sans text-[14px] sm:text-[16px] text-stone-600 font-medium">
-                Manage all your catering bookings in one place
-              </p>
-            </div>
-
-            {/* Right: "Need a new booking?" CTA Card */}
-            <div className="bg-white rounded-2xl border border-stone-200/80 p-4 sm:p-5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex items-center justify-between gap-4 sm:gap-6 shrink-0">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#064E3B] flex items-center justify-center shrink-0 border border-emerald-100/80">
-                  <Calendar size={22} className="text-[#064E3B]" />
-                </div>
-                <div>
-                  <h3 className="font-sans font-bold text-[15px] sm:text-[16px] text-stone-900 leading-snug">
-                    Need a new booking?
-                  </h3>
-                  <p className="font-sans text-[13px] sm:text-[14px] text-stone-500 mt-0.5">
-                    Find the perfect caterer for your next event
-                  </p>
-                </div>
-              </div>
-
-              <Link
-                to="/explore"
-                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-[#064E3B] hover:bg-[#043d2e] text-white rounded-xl font-sans font-semibold text-[14px] transition-all duration-200 shadow-sm hover:shadow shrink-0 cursor-pointer"
-              >
-                <span>Explore Caterers</span>
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] pb-24 font-sans text-[#132A1F]">
+      {/* ==================================================== */}
+      {/* HERO SECTION: Emerald & Gold Banner + Need New Booking CTA */}
+      {/* ==================================================== */}
+      <div className="relative overflow-hidden bg-gradient-to-b from-[#01291D] via-[#034431] to-[#01261B] pt-24 pb-10 px-4 sm:px-6 lg:px-8 border-b-2 border-[#D9A323]/60">
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none opacity-20 overflow-hidden flex justify-end items-center">
+          <img 
+            src={heroBg} 
+            alt="Catering Feast" 
+            className="h-full w-auto object-cover object-left"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent, black 60%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 60%)'
+            }}
+          />
         </div>
 
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Left: Titles */}
+          <div className="space-y-1.5 max-w-xl">
+            <span className="inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-[#F8D76A]/15 text-[#F8D76A] border border-[#DFC78A]/35 mb-1">
+              Customer Portal
+            </span>
+            <h1 
+              className="font-serif font-bold text-[32px] sm:text-[38px] md:text-[42px] text-[#FFFDF8] tracking-tight leading-tight"
+              style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+            >
+              My <span className="text-[#F8D76A]">Bookings</span>
+            </h1>
+            <p className="font-sans text-[14px] sm:text-[15px] text-[#DFC78A]/90 font-medium">
+              Manage all your catering bookings in one place
+            </p>
+          </div>
+
+          {/* Right: "Need a new booking?" CTA Card */}
+          <div className="bg-[#FFFDF8]/95 rounded-2xl border border-[#DFC78A] p-4 sm:p-5 shadow-[0_12px_32px_rgba(0,0,0,0.22)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 shrink-0">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-[#FAF1DA] text-[#9C6F11] flex items-center justify-center shrink-0 border border-[#DFC78A]">
+                <Calendar size={22} />
+              </div>
+              <div>
+                <h3 className="font-sans font-bold text-[15px] sm:text-[16px] text-[#083A28] leading-snug">
+                  Need a new booking?
+                </h3>
+                <p className="font-sans text-[13px] text-[#5D665F] mt-0.5">
+                  Find the perfect caterer for your next event
+                </p>
+              </div>
+            </div>
+
+            <Link
+              to="/explore"
+              className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] hover:brightness-105 text-[#042419] border border-[#B57B0C]/35 rounded-xl font-sans font-bold text-[13px] sm:text-[14px] transition-all duration-200 shadow-sm shrink-0 cursor-pointer"
+            >
+              <span>Explore Caterers</span>
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 space-y-6 sm:space-y-8">
         {/* ==================================================== */}
         {/* FILTER CONTROLS: Category Tabs + Search & Filters */}
         {/* ==================================================== */}
@@ -889,10 +890,10 @@ export default function Orders() {
               type="button"
               onClick={() => setActiveFilterTab('all')}
               className={cn(
-                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer",
+                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer border",
                 activeFilterTab === 'all'
-                  ? "bg-[#064E3B] text-white shadow-xs"
-                  : "bg-white text-stone-700 hover:text-stone-900 border border-stone-200/90 hover:border-stone-300"
+                  ? "bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border-[#D4961B]/60 shadow-xs"
+                  : "bg-[#FFFDF8] text-[#132A1F] hover:text-[#083A28] border-[#DFC78A] hover:border-[#D4961B]"
               )}
             >
               All Bookings ({orders.length})
@@ -902,10 +903,10 @@ export default function Orders() {
               type="button"
               onClick={() => setActiveFilterTab('pending')}
               className={cn(
-                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer",
+                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer border",
                 activeFilterTab === 'pending'
-                  ? "bg-[#064E3B] text-white shadow-xs"
-                  : "bg-white text-stone-700 hover:text-stone-900 border border-stone-200/90 hover:border-stone-300"
+                  ? "bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border-[#D4961B]/60 shadow-xs"
+                  : "bg-[#FFFDF8] text-[#132A1F] hover:text-[#083A28] border-[#DFC78A] hover:border-[#D4961B]"
               )}
             >
               Waiting for Approval ({pendingApprovalCount})
@@ -915,10 +916,10 @@ export default function Orders() {
               type="button"
               onClick={() => setActiveFilterTab('active')}
               className={cn(
-                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer",
+                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer border",
                 activeFilterTab === 'active'
-                  ? "bg-[#064E3B] text-white shadow-xs"
-                  : "bg-white text-stone-700 hover:text-stone-900 border border-stone-200/90 hover:border-stone-300"
+                  ? "bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border-[#D4961B]/60 shadow-xs"
+                  : "bg-[#FFFDF8] text-[#132A1F] hover:text-[#083A28] border-[#DFC78A] hover:border-[#D4961B]"
               )}
             >
               Active Orders ({activeOrdersCount})
@@ -928,10 +929,10 @@ export default function Orders() {
               type="button"
               onClick={() => setActiveFilterTab('completed')}
               className={cn(
-                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer",
+                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer border",
                 activeFilterTab === 'completed'
-                  ? "bg-[#064E3B] text-white shadow-xs"
-                  : "bg-white text-stone-700 hover:text-stone-900 border border-stone-200/90 hover:border-stone-300"
+                  ? "bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border-[#D4961B]/60 shadow-xs"
+                  : "bg-[#FFFDF8] text-[#132A1F] hover:text-[#083A28] border-[#DFC78A] hover:border-[#D4961B]"
               )}
             >
               Completed ({completedEventsCount})
@@ -941,10 +942,10 @@ export default function Orders() {
               type="button"
               onClick={() => setActiveFilterTab('rejected')}
               className={cn(
-                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer",
+                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer border",
                 activeFilterTab === 'rejected'
-                  ? "bg-[#064E3B] text-white shadow-xs"
-                  : "bg-white text-stone-700 hover:text-stone-900 border border-stone-200/90 hover:border-stone-300"
+                  ? "bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border-[#D4961B]/60 shadow-xs"
+                  : "bg-[#FFFDF8] text-[#132A1F] hover:text-[#083A28] border-[#DFC78A] hover:border-[#D4961B]"
               )}
             >
               Rejected ({rejectedOrdersCount})
@@ -954,10 +955,10 @@ export default function Orders() {
               type="button"
               onClick={() => setActiveFilterTab('cancelled')}
               className={cn(
-                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer",
+                "px-4 sm:px-5 py-2.5 rounded-xl font-sans text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer border",
                 activeFilterTab === 'cancelled'
-                  ? "bg-[#064E3B] text-white shadow-xs"
-                  : "bg-white text-stone-700 hover:text-stone-900 border border-stone-200/90 hover:border-stone-300"
+                  ? "bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border-[#D4961B]/60 shadow-xs"
+                  : "bg-[#FFFDF8] text-[#132A1F] hover:text-[#083A28] border-[#DFC78A] hover:border-[#D4961B]"
               )}
             >
               Cancelled ({cancelledOrdersCount})
@@ -970,20 +971,20 @@ export default function Orders() {
             <div className="relative flex-1">
               <Search 
                 size={16} 
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" 
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9C7826]" 
               />
               <input
                 type="text"
                 placeholder="Search by event name, caterer name or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2.5 bg-white border border-stone-200/90 rounded-xl text-[14px] text-stone-900 placeholder:text-stone-400 outline-none focus:border-[#D9A62E] focus:ring-1 focus:ring-[#D9A62E]/50 transition-all shadow-2xs"
+                className="w-full pl-9 pr-8 py-2.5 bg-[#FFFDF8] border border-[#DFC78A] rounded-xl text-[14px] text-[#132A1F] placeholder:text-[#8E7D5A] outline-none focus:border-[#D4961B] focus:ring-2 focus:ring-[#D4961B]/25 transition-all shadow-2xs"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8E7D5A] hover:text-[#083A28] cursor-pointer"
                 >
                   <X size={14} />
                 </button>
@@ -998,8 +999,8 @@ export default function Orders() {
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-sans text-[14px] font-semibold border transition-all cursor-pointer shadow-2xs shrink-0",
                   showFiltersModal || filterStartDate || filterEndDate || filterEventType !== 'all' || sortBy !== 'newest'
-                    ? "bg-[#064E3B] text-white border-[#064E3B]"
-                    : "bg-white hover:bg-stone-50 border-stone-200/90 text-stone-700"
+                    ? "bg-gradient-to-b from-[#065239] to-[#012217] text-[#FFFDF8] border-[#D4961B]/60"
+                    : "bg-[#FFFDF8] hover:bg-[#FAF3E2] border-[#DFC78A] text-[#083A28]"
                 )}
               >
                 <Filter size={16} />
@@ -1011,26 +1012,26 @@ export default function Orders() {
 
               {/* Filters Dropdown Card */}
               {showFiltersModal && (
-                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-stone-200 p-5 shadow-xl z-30 space-y-4 animate-fade-in-rapid">
-                  <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-                    <h4 className="font-bold text-[14px] text-stone-900">Filter Bookings</h4>
+                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#FFFDF8] rounded-2xl border border-[#DFC78A] p-5 shadow-[0_18px_45px_rgba(116,84,22,0.16)] z-30 space-y-4 animate-fade-in-rapid">
+                  <div className="flex items-center justify-between border-b border-[#EFE3C4] pb-3">
+                    <h4 className="font-bold text-[14px] text-[#0F241C]">Filter Bookings</h4>
                     <button 
                       type="button"
                       onClick={() => setShowFiltersModal(false)}
-                      className="text-stone-400 hover:text-stone-600"
+                      className="text-[#7D6E52] hover:text-[#0F241C] cursor-pointer"
                     >
                       <X size={16} />
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-[#5C5240] uppercase tracking-wider mb-1.5">
                       Event Type
                     </label>
                     <select
                       value={filterEventType}
                       onChange={(e) => setFilterEventType(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-xs font-medium text-stone-800 outline-none focus:border-[#D9A62E]"
+                      className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-lg p-2 text-xs font-medium text-[#0F241C] outline-none focus:border-[#D4961B]"
                     >
                       <option value="all">All Events</option>
                       <option value="wedding">Wedding</option>
@@ -1042,13 +1043,13 @@ export default function Orders() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-[#5C5240] uppercase tracking-wider mb-1.5">
                       Sort By
                     </label>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-xs font-medium text-stone-800 outline-none focus:border-[#D9A62E]"
+                      className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-lg p-2 text-xs font-medium text-[#0F241C] outline-none focus:border-[#D4961B]"
                     >
                       <option value="newest">Recently Booked</option>
                       <option value="date_asc">Event Date (Soonest first)</option>
@@ -1059,30 +1060,30 @@ export default function Orders() {
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[11px] font-semibold text-stone-500 uppercase mb-1">
+                      <label className="block text-[11px] font-semibold text-[#5C5240] uppercase mb-1">
                         Date From
                       </label>
                       <input
                         type="date"
                         value={filterStartDate}
                         onChange={(e) => setFilterStartDate(e.target.value)}
-                        className="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-xs text-stone-800 outline-none"
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-lg p-2 text-xs text-[#0F241C] outline-none focus:border-[#D4961B]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-stone-500 uppercase mb-1">
+                      <label className="block text-[11px] font-semibold text-[#5C5240] uppercase mb-1">
                         Date To
                       </label>
                       <input
                         type="date"
                         value={filterEndDate}
                         onChange={(e) => setFilterEndDate(e.target.value)}
-                        className="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-xs text-stone-800 outline-none"
+                        className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-lg p-2 text-xs text-[#0F241C] outline-none focus:border-[#D4961B]"
                       />
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-2 border-t border-stone-100">
+                  <div className="flex gap-2 pt-2 border-t border-[#EFE3C4]">
                     <button
                       type="button"
                       onClick={() => {
@@ -1091,14 +1092,14 @@ export default function Orders() {
                         setFilterEventType('all');
                         setSortBy('newest');
                       }}
-                      className="flex-1 py-2 text-xs font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors cursor-pointer"
+                      className="flex-1 py-2 text-xs font-semibold text-[#494032] bg-[#FAF3E2] border border-[#DFC78A] hover:bg-[#F3DFAB] rounded-lg transition-colors cursor-pointer"
                     >
                       Reset
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowFiltersModal(false)}
-                      className="flex-1 py-2 text-xs font-semibold text-white bg-[#064E3B] hover:bg-[#043d2e] rounded-lg transition-colors cursor-pointer"
+                      className="flex-1 py-2 text-xs font-semibold text-[#FFFDF8] bg-gradient-to-b from-[#065239] to-[#012217] border border-[#D4961B]/60 hover:brightness-110 rounded-lg transition-all cursor-pointer"
                     >
                       Apply
                     </button>
@@ -1111,7 +1112,7 @@ export default function Orders() {
             <button
               type="button"
               onClick={() => setShowNotificationsModal(true)}
-              className="relative p-2.5 bg-white border border-stone-200/90 hover:border-stone-300 rounded-xl text-stone-700 transition-all cursor-pointer shadow-2xs shrink-0"
+              className="relative p-2.5 bg-[#FFFDF8] border border-[#DFC78A] hover:bg-[#FAF3E2] rounded-xl text-[#083A28] transition-all cursor-pointer shadow-2xs shrink-0"
               title="Notifications & Updates"
             >
               <Bell size={18} />
@@ -1128,17 +1129,17 @@ export default function Orders() {
         {/* BOOKINGS CARDS LIST */}
         {/* ==================================================== */}
         {filteredOrders.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-stone-200/80 p-12 sm:p-16 text-center max-w-xl mx-auto shadow-xs space-y-4">
-            <div className="w-16 h-16 rounded-2xl bg-[#FCFBF8] border border-[#D9A62E]/30 text-[#D9A62E] flex items-center justify-center mx-auto text-2xl shadow-xs">
+          <div className="bg-[#FFFDF8] rounded-[24px] border border-[#DFC78A] p-12 sm:p-16 text-center max-w-xl mx-auto shadow-[0_14px_38px_rgba(140,105,32,0.1)] space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#FAF1DA] border border-[#DFC78A] text-[#9C6F11] flex items-center justify-center mx-auto text-2xl shadow-xs">
               <Calendar size={28} />
             </div>
             <h3 
-              className="font-serif font-bold text-2xl text-stone-900"
+              className="font-serif font-bold text-2xl text-[#083A28]"
               style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
             >
               No Bookings Found
             </h3>
-            <p className="font-sans text-sm text-stone-500 max-w-md mx-auto">
+            <p className="font-sans text-sm text-[#5D665F] max-w-md mx-auto">
               {searchQuery 
                 ? `No catering orders match "${searchQuery}". Try adjusting your search query or filters.`
                 : "You don't have any catering bookings in this category yet."}
@@ -1154,14 +1155,14 @@ export default function Orders() {
                     setFilterEventType('all');
                     setActiveFilterTab('all');
                   }}
-                  className="px-5 py-2.5 bg-white border border-stone-200 text-stone-700 font-semibold text-sm rounded-xl hover:bg-stone-50 cursor-pointer"
+                  className="px-5 py-2.5 bg-[#FAF3E2] border border-[#DFC78A] text-[#083A28] font-semibold text-sm rounded-xl hover:bg-[#F3E6C6] cursor-pointer"
                 >
                   Clear All Filters
                 </button>
               )}
               <Link
                 to="/explore"
-                className="px-6 py-2.5 bg-[#064E3B] hover:bg-[#043d2e] text-white font-semibold text-sm rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                className="px-6 py-2.5 bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] font-semibold text-sm rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
               >
                 <span>Find a Caterer</span>
                 <ArrowRight size={15} />
@@ -1179,12 +1180,12 @@ export default function Orders() {
               return (
                 <div
                   key={o.id}
-                  className="bg-[#FCFBF8] rounded-2xl border border-[#D9A62E]/30 p-4 sm:p-5 lg:p-6 shadow-[0_2px_12px_rgba(217,166,46,0.06)] hover:shadow-[0_6px_20px_rgba(217,166,46,0.12)] hover:border-[#D9A62E]/60 transition-all duration-200 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 relative"
+                  className="bg-[#FFFDF8] rounded-[20px] border border-[#DFC78A] p-4 sm:p-5 lg:p-6 shadow-[0_10px_28px_rgba(140,105,32,0.08)] hover:shadow-[0_14px_34px_rgba(140,105,32,0.14)] hover:border-[#D4961B] transition-all duration-200 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 relative"
                 >
                   {/* Left Column: Image Thumbnail + Event Details */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 min-w-0 flex-1 lg:max-w-[420px] xl:max-w-[460px]">
                     {/* Thumbnail Image */}
-                    <div className="w-full sm:w-[150px] md:w-[170px] h-[105px] sm:h-[110px] rounded-xl overflow-hidden shrink-0 border border-stone-200/60 bg-stone-100 shadow-2xs">
+                    <div className="w-full sm:w-[150px] md:w-[170px] h-[105px] sm:h-[110px] rounded-xl overflow-hidden shrink-0 border border-[#DFC78A]/70 bg-[#FAF3E2] shadow-2xs">
                       <img
                         src={thumbUrl}
                         alt={o.eventType || "Catering Event"}
@@ -1282,7 +1283,7 @@ export default function Orders() {
                   </div>
 
                   {/* Column 5: Status Badge & Actions */}
-                  <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end justify-between lg:justify-center gap-3 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-stone-200/60">
+                  <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end justify-between lg:justify-center gap-3 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-[#EFE3C4]">
                     {/* Status Badge + Subtitle */}
                     <div className="flex flex-col items-start lg:items-end">
                       <span className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] font-semibold font-sans border", cardStatus.badgeColor)}>
@@ -1299,7 +1300,7 @@ export default function Orders() {
                       <button
                         type="button"
                         onClick={() => setSelectedQuickViewOrder(o)}
-                        className="px-4 sm:px-5 py-2 sm:py-2.5 bg-white hover:bg-stone-50 border border-stone-200 hover:border-stone-400 text-stone-900 rounded-xl font-sans font-semibold text-[14px] transition-all shadow-2xs cursor-pointer"
+                        className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#FFFDF8] hover:bg-[#FAF3E2] border border-[#DFC78A] hover:border-[#D4961B] text-[#083A28] rounded-xl font-sans font-semibold text-[14px] transition-all shadow-2xs cursor-pointer"
                       >
                         View Details
                       </button>
@@ -1312,7 +1313,7 @@ export default function Orders() {
                             e.stopPropagation();
                             setOpenMenuOrderId(isMenuOpen ? null : o.id);
                           }}
-                          className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
+                          className="p-2 text-[#8A754A] hover:text-[#083A28] hover:bg-[#FAF3E2] rounded-lg transition-colors cursor-pointer"
                           title="More options"
                         >
                           <MoreVertical size={18} />
@@ -1321,7 +1322,7 @@ export default function Orders() {
                         {isMenuOpen && (
                           <div 
                             ref={menuRef}
-                            className="absolute right-0 top-full mt-1.5 w-48 bg-white rounded-xl border border-stone-200 py-1.5 shadow-xl z-20 text-xs font-semibold font-sans text-stone-700 animate-fade-in-rapid"
+                            className="absolute right-0 top-full mt-1.5 w-48 bg-[#FFFDF8] rounded-xl border border-[#DFC78A] py-1.5 shadow-[0_14px_34px_rgba(1,22,16,0.16)] z-20 text-xs font-semibold font-sans text-[#142C24] animate-fade-in-rapid"
                           >
                             <button
                               type="button"
@@ -1329,9 +1330,9 @@ export default function Orders() {
                                 setOpenMenuOrderId(null);
                                 setSelectedQuickViewOrder(o);
                               }}
-                              className="w-full text-left px-3.5 py-2 hover:bg-stone-50 flex items-center gap-2 cursor-pointer"
+                              className="w-full text-left px-3.5 py-2 hover:bg-[#FAF3E2] flex items-center gap-2 cursor-pointer"
                             >
-                              <FileText size={14} className="text-[#D9A62E]" />
+                              <FileText size={14} className="text-[#D4961B]" />
                               <span>View Menu Items</span>
                             </button>
 
@@ -1341,9 +1342,9 @@ export default function Orders() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={() => setOpenMenuOrderId(null)}
-                                className="w-full text-left px-3.5 py-2 hover:bg-stone-50 flex items-center gap-2 text-stone-700"
+                                className="w-full text-left px-3.5 py-2 hover:bg-[#FAF3E2] flex items-center gap-2 text-[#142C24]"
                               >
-                                <ExternalLink size={14} className="text-[#D9A62E]" />
+                                <ExternalLink size={14} className="text-[#D4961B]" />
                                 <span>Venue on Map</span>
                               </a>
                             )}
@@ -1378,7 +1379,7 @@ export default function Orders() {
 
                             {(user?.roles?.includes('admin') || user?.roles?.includes('partner')) && (
                               <>
-                                <div className="border-t border-stone-100 my-1" />
+                                <div className="border-t border-[#DFC78A]/50 my-1" />
                                 {normalizeStatus(o.status) === 'pending' && (
                                   <>
                                     <button
@@ -1412,7 +1413,7 @@ export default function Orders() {
                                       setOpenMenuOrderId(null);
                                       updateStatus(o.id, 'completed');
                                     }}
-                                    className="w-full text-left px-3.5 py-2 hover:bg-stone-100 text-stone-900 flex items-center gap-2 cursor-pointer"
+                                    className="w-full text-left px-3.5 py-2 hover:bg-[#FAF3E2] text-[#083A28] flex items-center gap-2 cursor-pointer"
                                   >
                                     <Check size={14} />
                                     <span>Mark Completed</span>
@@ -1438,91 +1439,91 @@ export default function Orders() {
       {/* ==================================================== */}
       <AnimatePresence>
         {selectedQuickViewOrder && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#011610]/60 backdrop-blur-xs">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-[#FCFBF8] rounded-3xl border border-[#D9A62E]/40 max-w-2xl w-full p-6 sm:p-8 shadow-[0_20px_50px_rgba(6,78,59,0.15)] relative max-h-[90vh] overflow-y-auto"
+              className="bg-[#FFFDF8] rounded-[24px] border border-[#DFC78A] max-w-2xl w-full p-6 sm:p-8 shadow-[0_24px_56px_rgba(1,22,16,0.28)] relative max-h-[90vh] overflow-y-auto"
             >
               {/* Close Button */}
               <button 
                 type="button"
                 onClick={() => setSelectedQuickViewOrder(null)}
-                className="absolute right-6 top-6 w-9 h-9 rounded-full bg-white hover:bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-600 transition-colors cursor-pointer"
+                className="absolute right-6 top-6 w-9 h-9 rounded-full bg-[#FAF3E2] hover:bg-[#F3E6C6] border border-[#DFC78A] flex items-center justify-center text-[#6B5A38] transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
 
               {/* Modal Header */}
-              <div className="mb-6 border-b border-[#D9A62E]/30 pb-4">
-                <span className="text-[11px] text-[#D9A62E] font-semibold uppercase tracking-widest block mb-1 font-sans">
+              <div className="mb-6 border-b border-[#DFC78A]/60 pb-4">
+                <span className="text-[11px] text-[#B87D16] font-semibold uppercase tracking-widest block mb-1 font-sans">
                   Booking Reference #{selectedQuickViewOrder.id.substring(0, 8).toUpperCase()}
                 </span>
                 <h3 
-                  className="font-serif font-bold text-2xl sm:text-3xl text-stone-900"
+                  className="font-serif font-bold text-2xl sm:text-3xl text-[#083A28]"
                   style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
                 >
                   {selectedQuickViewOrder.eventType || selectedQuickViewOrder.eventName || "Catering Event"}
                 </h3>
-                <p className="text-xs text-stone-500 mt-1 font-sans">
-                  Status: <span className="font-semibold text-stone-800">{getStatusLabel(selectedQuickViewOrder.status)}</span>
+                <p className="text-xs text-[#6B5A38] mt-1 font-sans">
+                  Status: <span className="font-semibold text-[#083A28]">{getStatusLabel(selectedQuickViewOrder.status)}</span>
                 </p>
               </div>
 
               {/* Order Info Grid */}
               <div className="space-y-5">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#FAF3E2]/55 border border-[#DFC78A]/85 rounded-2xl p-4 shadow-2xs">
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Caterer</p>
-                    <p className="text-xs sm:text-sm font-bold text-[#064E3B] truncate">{selectedQuickViewOrder.catererName || 'Elite Caterer'}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#8A754A] font-semibold">Caterer</p>
+                    <p className="text-xs sm:text-sm font-bold text-[#083A28] truncate">{selectedQuickViewOrder.catererName || 'Elite Caterer'}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Event Date</p>
-                    <p className="text-xs sm:text-sm font-bold text-stone-900">{formatEventDate(selectedQuickViewOrder.eventDate).formatted}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#8A754A] font-semibold">Event Date</p>
+                    <p className="text-xs sm:text-sm font-bold text-[#142C24]">{formatEventDate(selectedQuickViewOrder.eventDate).formatted}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Guests</p>
-                    <p className="text-xs sm:text-sm font-bold text-stone-900">{getOrderGuests(selectedQuickViewOrder)} Pax</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#8A754A] font-semibold">Guests</p>
+                    <p className="text-xs sm:text-sm font-bold text-[#142C24]">{getOrderGuests(selectedQuickViewOrder)} Pax</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Total Price</p>
-                    <p className="text-xs sm:text-sm font-bold text-[#D9A62E]">₹{getOrderTotalAmount(selectedQuickViewOrder).toLocaleString("en-IN")}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#8A754A] font-semibold">Total Price</p>
+                    <p className="text-xs sm:text-sm font-bold text-[#B87D16]">₹{getOrderTotalAmount(selectedQuickViewOrder).toLocaleString("en-IN")}</p>
                   </div>
                 </div>
 
                 {/* Venue */}
-                <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                <div className="bg-[#FFFDF9] border border-[#DFC78A]/85 rounded-2xl p-4 shadow-2xs space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Venue Address</span>
+                    <span className="text-[11px] font-semibold text-[#8A754A] uppercase tracking-wider">Venue Address</span>
                     {(selectedQuickViewOrder.venue || selectedQuickViewOrder.address) && (
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedQuickViewOrder.venue || selectedQuickViewOrder.address)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs font-semibold text-[#064E3B] hover:underline flex items-center gap-1"
+                        className="text-xs font-semibold text-[#083A28] hover:underline flex items-center gap-1"
                       >
-                        <MapPin size={12} className="text-[#D9A62E]" />
+                        <MapPin size={12} className="text-[#D4961B]" />
                         <span>Open in Google Maps</span>
                       </a>
                     )}
                   </div>
-                  <p className="text-xs sm:text-sm font-medium text-stone-800">
+                  <p className="text-xs sm:text-sm font-medium text-[#142C24]">
                     {selectedQuickViewOrder.venue || selectedQuickViewOrder.address || "Hyderabad, Telangana"}
                   </p>
                 </div>
 
                 {/* Selected Menu Items Checklist */}
                 {selectedQuickViewOrder.selectedItems && selectedQuickViewOrder.selectedItems.length > 0 && (
-                  <div className="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
-                    <h4 className="font-serif font-bold text-sm text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-100 pb-2">
-                      <BookOpen size={14} className="text-[#D9A62E]" />
+                  <div className="bg-[#FFFDF9] border border-[#DFC78A]/85 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+                    <h4 className="font-serif font-bold text-sm text-[#083A28] uppercase tracking-wider flex items-center gap-1.5 border-b border-[#DFC78A]/50 pb-2">
+                      <BookOpen size={14} className="text-[#D4961B]" />
                       <span>Curated Menu Items ({selectedQuickViewOrder.selectedItems.length})</span>
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[180px] overflow-y-auto pr-1">
                       {selectedQuickViewOrder.selectedItems.map((item: string, idx: number) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs font-semibold text-stone-800 py-1 px-2.5 rounded-lg bg-stone-50">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#D9A62E]" />
+                        <div key={idx} className="flex items-center gap-2 text-xs font-semibold text-[#142C24] py-1.5 px-2.5 rounded-lg bg-[#FAF3E2]/65 border border-[#DFC78A]/45">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#D4961B]" />
                           <span className="truncate">{item}</span>
                         </div>
                       ))}
@@ -1532,28 +1533,28 @@ export default function Orders() {
 
                 {/* Special Instructions */}
                 {selectedQuickViewOrder.specialNotes && (
-                  <div className="bg-amber-50/60 border border-amber-200/70 rounded-2xl p-4 text-xs space-y-1">
-                    <span className="font-bold text-amber-900 uppercase tracking-wider text-[10px] block">Special Instructions:</span>
-                    <p className="text-amber-950 font-medium whitespace-pre-line">{selectedQuickViewOrder.specialNotes}</p>
+                  <div className="bg-[#FAF1DA]/75 border border-[#DFC78A] rounded-2xl p-4 text-xs space-y-1">
+                    <span className="font-bold text-[#7B5610] uppercase tracking-wider text-[10px] block">Special Instructions:</span>
+                    <p className="text-[#4A3812] font-medium whitespace-pre-line">{selectedQuickViewOrder.specialNotes}</p>
                   </div>
                 )}
 
                 {/* Status Timeline / Audit Trail */}
                 {selectedQuickViewOrder.statusHistory && selectedQuickViewOrder.statusHistory.length > 0 && (
-                  <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs space-y-3">
-                    <span className="font-bold text-stone-500 text-[10px] uppercase tracking-wider block">Audit Trail Logs</span>
+                  <div className="bg-[#FFFDF9] border border-[#DFC78A]/85 rounded-2xl p-4 shadow-2xs space-y-3">
+                    <span className="font-bold text-[#8A754A] text-[10px] uppercase tracking-wider block">Audit Trail Logs</span>
                     <div className="space-y-2.5 max-h-[140px] overflow-y-auto pr-2">
                       {selectedQuickViewOrder.statusHistory.map((h: any, idx: number) => (
-                        <div key={idx} className="border-l-2 border-[#D9A62E] pl-3 py-0.5 text-xs">
-                          <div className="flex items-center gap-2 text-[10px] text-[#064E3B] font-bold uppercase">
+                        <div key={idx} className="border-l-2 border-[#D4961B] pl-3 py-0.5 text-xs">
+                          <div className="flex items-center gap-2 text-[10px] text-[#083A28] font-bold uppercase">
                             <span>{h.action || 'Updated'}</span>
-                            <span className="text-[#D9A62E]">•</span>
+                            <span className="text-[#D4961B]">•</span>
                             <span>{h.actor || 'User'}</span>
                             {h.timestamp && (
-                              <span className="text-stone-400 font-normal ml-auto">{new Date(h.timestamp).toLocaleDateString()}</span>
+                              <span className="text-[#8A754A] font-normal ml-auto">{new Date(h.timestamp).toLocaleDateString()}</span>
                             )}
                           </div>
-                          <p className="text-stone-700 font-medium text-[11px] mt-0.5">{h.note}</p>
+                          <p className="text-[#4E4535] font-medium text-[11px] mt-0.5">{h.note}</p>
                         </div>
                       ))}
                     </div>
@@ -1562,16 +1563,14 @@ export default function Orders() {
               </div>
 
               {/* Modal Actions */}
-              <div className="mt-6 pt-4 border-t border-stone-200/80 flex flex-wrap items-center justify-end gap-2.5">
+              <div className="mt-6 pt-4 border-t border-[#DFC78A]/60 flex flex-wrap items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setSelectedQuickViewOrder(null)}
-                  className="px-5 py-2.5 bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 rounded-xl text-xs font-semibold cursor-pointer"
+                  className="px-5 py-2.5 bg-[#FAF3E2] hover:bg-[#F3E6C6] border border-[#DFC78A] text-[#142C24] rounded-xl text-xs font-semibold cursor-pointer"
                 >
                   Close
                 </button>
-
-                {/* Close action */}
 
                 {(user?.roles?.includes('admin') || user?.roles?.includes('partner')) && (
                   <div className="flex items-center gap-2">
@@ -1580,7 +1579,7 @@ export default function Orders() {
                         <button
                           type="button"
                           onClick={() => updateStatus(selectedQuickViewOrder.id, 'approved')}
-                          className="px-4 py-2.5 bg-[#064E3B] text-white rounded-xl text-xs font-semibold hover:bg-[#043d2e] cursor-pointer"
+                          className="px-4 py-2.5 bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] rounded-xl text-xs font-semibold cursor-pointer"
                         >
                           Approve Booking
                         </button>
@@ -1597,7 +1596,7 @@ export default function Orders() {
                       <button
                         type="button"
                         onClick={() => updateStatus(selectedQuickViewOrder.id, 'completed')}
-                        className="px-4 py-2.5 bg-stone-900 text-white rounded-xl text-xs font-semibold hover:bg-black cursor-pointer"
+                        className="px-4 py-2.5 bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] rounded-xl text-xs font-semibold cursor-pointer"
                       >
                         Mark Completed
                       </button>
@@ -1615,98 +1614,98 @@ export default function Orders() {
       {/* ==================================================== */}
       <AnimatePresence>
         {repeatOrderSource && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#011610]/60 backdrop-blur-xs">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-[#FCFBF8] rounded-3xl border border-[#D9A62E]/40 max-w-lg w-full p-6 sm:p-8 shadow-[0_20px_50px_rgba(6,78,59,0.15)] relative max-h-[90vh] overflow-y-auto"
+              className="bg-[#FFFDF8] rounded-[24px] border border-[#DFC78A] max-w-lg w-full p-6 sm:p-8 shadow-[0_24px_56px_rgba(1,22,16,0.28)] relative max-h-[90vh] overflow-y-auto"
             >
               <button 
                 type="button"
                 onClick={() => setRepeatOrderSource(null)}
-                className="absolute right-6 top-6 w-9 h-9 rounded-full bg-white hover:bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-600 transition-colors cursor-pointer"
+                className="absolute right-6 top-6 w-9 h-9 rounded-full bg-[#FAF3E2] hover:bg-[#F3E6C6] border border-[#DFC78A] flex items-center justify-center text-[#6B5A38] transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
 
-              <div className="mb-6 border-b border-[#D9A62E]/30 pb-4">
-                <span className="text-[11px] text-[#D9A62E] font-semibold uppercase tracking-widest block mb-1 font-sans">
+              <div className="mb-6 border-b border-[#DFC78A]/60 pb-4">
+                <span className="text-[11px] text-[#B87D16] font-semibold uppercase tracking-widest block mb-1 font-sans">
                   Quick Rebooking
                 </span>
                 <h3 
-                  className="font-serif font-bold text-2xl text-stone-900"
+                  className="font-serif font-bold text-2xl text-[#083A28]"
                   style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
                 >
                   Repeat Catering Event
                 </h3>
-                <p className="text-xs text-stone-500 mt-1 font-sans">
+                <p className="text-xs text-[#6B5A38] mt-1 font-sans">
                   Re-submit booking for {repeatOrderSource.catererName}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-[#5C5240] uppercase tracking-wider mb-1">
                     New Event Date
                   </label>
                   <input 
                     type="date" 
                     value={repeatForm.eventDate}
                     onChange={(e) => setRepeatForm({ ...repeatForm, eventDate: e.target.value })}
-                    className="w-full bg-white border border-stone-200/90 rounded-xl px-3.5 py-2.5 text-xs font-bold text-stone-900 outline-none focus:border-[#D9A62E] shadow-2xs"
+                    className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#142C24] outline-none focus:border-[#D4961B] shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-[#5C5240] uppercase tracking-wider mb-1">
                     Guest Count (Pax)
                   </label>
                   <input 
                     type="number" 
                     value={repeatForm.guests || ''}
                     onChange={(e) => setRepeatForm({ ...repeatForm, guests: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-white border border-stone-200/90 rounded-xl px-3.5 py-2.5 text-xs font-bold text-stone-900 outline-none focus:border-[#D9A62E] shadow-2xs"
+                    className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#142C24] outline-none focus:border-[#D4961B] shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-[#5C5240] uppercase tracking-wider mb-1">
                     Venue Address in Hyderabad
                   </label>
                   <textarea 
                     rows={2}
                     value={repeatForm.venue}
                     onChange={(e) => setRepeatForm({ ...repeatForm, venue: e.target.value })}
-                    className="w-full bg-white border border-stone-200/90 rounded-xl px-3.5 py-2.5 text-xs font-medium text-stone-900 outline-none focus:border-[#D9A62E] shadow-2xs"
+                    className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#142C24] outline-none focus:border-[#D4961B] shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-[#5C5240] uppercase tracking-wider mb-1">
                     Special Instructions
                   </label>
                   <textarea 
                     rows={2}
                     value={repeatForm.specialNotes}
                     onChange={(e) => setRepeatForm({ ...repeatForm, specialNotes: e.target.value })}
-                    className="w-full bg-white border border-stone-200/90 rounded-xl px-3.5 py-2.5 text-xs font-medium text-stone-900 outline-none focus:border-[#D9A62E] shadow-2xs"
+                    className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#142C24] outline-none focus:border-[#D4961B] shadow-2xs"
                   />
                 </div>
               </div>
 
-              <div className="mt-7 pt-4 border-t border-stone-200 flex justify-end gap-2.5">
+              <div className="mt-7 pt-4 border-t border-[#DFC78A]/60 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setRepeatOrderSource(null)}
-                  className="px-5 py-2.5 bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 rounded-xl text-xs font-semibold cursor-pointer"
+                  className="px-5 py-2.5 bg-[#FAF3E2] hover:bg-[#F3E6C6] border border-[#DFC78A] text-[#142C24] rounded-xl text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleRepeatBookingConfirm}
-                  className="px-6 py-2.5 bg-[#064E3B] hover:bg-[#043d2e] text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] rounded-xl text-xs font-semibold cursor-pointer shadow-xs"
                 >
                   Confirm Rebook
                 </button>
@@ -1721,23 +1720,23 @@ export default function Orders() {
       {/* ==================================================== */}
       <AnimatePresence>
         {editingOrderId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#011610]/60 backdrop-blur-xs">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#FCFBF8] rounded-3xl border border-[#D9A62E]/40 max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+              className="bg-[#FFFDF8] rounded-[24px] border border-[#DFC78A] max-w-lg w-full p-6 sm:p-8 shadow-[0_24px_56px_rgba(1,22,16,0.28)] relative max-h-[90vh] overflow-y-auto"
             >
               <button 
                 type="button"
                 onClick={() => setEditingOrderId(null)}
-                className="absolute right-6 top-6 w-9 h-9 rounded-full bg-white hover:bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-600 transition-colors cursor-pointer"
+                className="absolute right-6 top-6 w-9 h-9 rounded-full bg-[#FAF3E2] hover:bg-[#F3E6C6] border border-[#DFC78A] flex items-center justify-center text-[#6B5A38] transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
 
               <h3 
-                className="font-serif font-bold text-2xl text-stone-900 mb-4"
+                className="font-serif font-bold text-2xl text-[#083A28] mb-4"
                 style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
               >
                 Edit Booking Details
@@ -1746,32 +1745,32 @@ export default function Orders() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">Event Date</label>
+                    <label className="block text-xs font-semibold text-[#5C5240] uppercase mb-1">Event Date</label>
                     <input 
                       type="date" 
                       value={editForm.eventDate}
                       onChange={(e) => setEditForm({ ...editForm, eventDate: e.target.value })}
-                      className="w-full bg-white border border-stone-200 rounded-xl p-2.5 text-xs font-medium text-stone-900 outline-none focus:border-[#D9A62E]"
+                      className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl p-2.5 text-xs font-medium text-[#142C24] outline-none focus:border-[#D4961B]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">Event Type</label>
+                    <label className="block text-xs font-semibold text-[#5C5240] uppercase mb-1">Event Type</label>
                     <input 
                       type="text" 
                       value={editForm.eventType}
                       onChange={(e) => setEditForm({ ...editForm, eventType: e.target.value })}
-                      className="w-full bg-white border border-stone-200 rounded-xl p-2.5 text-xs font-medium text-stone-900 outline-none focus:border-[#D9A62E]"
+                      className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl p-2.5 text-xs font-medium text-[#142C24] outline-none focus:border-[#D4961B]"
                     />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="block text-xs font-semibold text-stone-500 uppercase">Venue Address</label>
+                    <label className="block text-xs font-semibold text-[#5C5240] uppercase">Venue Address</label>
                     <button
                       type="button"
                       onClick={() => setIsMapOpen(true)}
-                      className="text-xs font-bold text-[#D9A62E] hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-[#B87D16] hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <MapPin size={12} />
                       <span>Select on Map</span>
@@ -1780,7 +1779,7 @@ export default function Orders() {
                   <AddressAutocomplete
                     useTextarea={true}
                     rows={2}
-                    className="w-full bg-white border border-stone-200 rounded-xl p-2.5 text-xs font-medium text-stone-900 outline-none focus:border-[#D9A62E]"
+                    className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl p-2.5 text-xs font-medium text-[#142C24] outline-none focus:border-[#D4961B]"
                     value={editForm.venue}
                     onChange={(val) => setEditForm({ ...editForm, venue: val })}
                     onSelect={(data) => {
@@ -1812,31 +1811,31 @@ export default function Orders() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">Guest Count</label>
+                  <label className="block text-xs font-semibold text-[#5C5240] uppercase mb-1">Guest Count</label>
                   <input 
                     type="number"
                     value={editForm.guests ?? 0}
                     onChange={(e) => setEditForm({ ...editForm, guests: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-white border border-stone-200 rounded-xl p-2.5 text-xs font-medium text-stone-900 outline-none focus:border-[#D9A62E]"
+                    className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl p-2.5 text-xs font-medium text-[#142C24] outline-none focus:border-[#D4961B]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">Notes / Instructions</label>
+                  <label className="block text-xs font-semibold text-[#5C5240] uppercase mb-1">Notes / Instructions</label>
                   <textarea 
                     rows={2}
                     value={editForm.specialNotes}
                     onChange={(e) => setEditForm({ ...editForm, specialNotes: e.target.value })}
-                    className="w-full bg-white border border-stone-200 rounded-xl p-2.5 text-xs font-medium text-stone-900 outline-none focus:border-[#D9A62E]"
+                    className="w-full bg-[#FFFDF9] border border-[#DFC78A] rounded-xl p-2.5 text-xs font-medium text-[#142C24] outline-none focus:border-[#D4961B]"
                   />
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-stone-200 flex justify-end gap-2.5">
+              <div className="mt-6 pt-4 border-t border-[#DFC78A]/60 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setEditingOrderId(null)}
-                  className="px-5 py-2.5 bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 rounded-xl text-xs font-semibold cursor-pointer"
+                  className="px-5 py-2.5 bg-[#FAF3E2] hover:bg-[#F3E6C6] border border-[#DFC78A] text-[#142C24] rounded-xl text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1846,7 +1845,7 @@ export default function Orders() {
                     const ord = orders.find(x => x.id === editingOrderId);
                     if (ord) handleResubmitOrder(editingOrderId, ord.catererId);
                   }}
-                  className="px-6 py-2.5 bg-[#064E3B] hover:bg-[#043d2e] text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 bg-gradient-to-b from-[#065239] to-[#012217] hover:from-[#076043] hover:to-[#022B1E] border border-[#D4961B]/60 text-[#FFFDF8] rounded-xl text-xs font-semibold cursor-pointer shadow-xs"
                 >
                   Resubmit Order
                 </button>
@@ -1861,21 +1860,26 @@ export default function Orders() {
       {/* ==================================================== */}
       <AnimatePresence>
         {showNotificationsModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#011610]/60 backdrop-blur-xs">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#FCFBF8] rounded-3xl border border-[#D9A62E]/40 max-w-lg w-full p-6 shadow-2xl relative max-h-[85vh] flex flex-col"
+              className="bg-[#FFFDF8] rounded-[24px] border border-[#DFC78A] max-w-lg w-full p-6 shadow-[0_24px_56px_rgba(1,22,16,0.28)] relative max-h-[85vh] flex flex-col"
             >
-              <div className="flex items-center justify-between border-b border-stone-200 pb-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#064E3B] flex items-center justify-center">
+              <div className="flex items-center justify-between border-b border-[#DFC78A]/60 pb-4 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-[#FAF1DA] border border-[#DFC78A] text-[#083A28] flex items-center justify-center">
                     <Bell size={18} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-stone-900">Notifications &amp; Activity</h3>
-                    <p className="text-xs text-stone-500">Live booking alerts from caterers</p>
+                    <h3
+                      className="font-bold text-base text-[#083A28]"
+                      style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                    >
+                      Notifications &amp; Activity
+                    </h3>
+                    <p className="text-xs text-[#6B5A38]">Live booking alerts from caterers</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1883,7 +1887,7 @@ export default function Orders() {
                     <button
                       type="button"
                       onClick={handleClearAllCustNotifications}
-                      className="text-xs font-semibold text-stone-500 hover:text-stone-800 px-2 py-1"
+                      className="text-xs font-semibold text-[#B87D16] hover:text-[#083A28] px-2 py-1 cursor-pointer"
                     >
                       Clear
                     </button>
@@ -1891,7 +1895,7 @@ export default function Orders() {
                   <button
                     type="button"
                     onClick={() => setShowNotificationsModal(false)}
-                    className="w-8 h-8 rounded-full bg-white hover:bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-600"
+                    className="w-8 h-8 rounded-full bg-[#FAF3E2] hover:bg-[#F3E6C6] border border-[#DFC78A] flex items-center justify-center text-[#6B5A38] cursor-pointer"
                   >
                     <X size={16} />
                   </button>
@@ -1900,8 +1904,8 @@ export default function Orders() {
 
               <div className="flex-1 overflow-y-auto space-y-2.5 pr-1">
                 {customerNotifications.length === 0 ? (
-                  <div className="py-12 text-center text-stone-400">
-                    <Bell size={24} className="mx-auto mb-2 text-stone-300" />
+                  <div className="py-12 text-center text-[#8A754A]">
+                    <Bell size={24} className="mx-auto mb-2 text-[#DFC78A]" />
                     <p className="text-xs font-medium">No alerts right now</p>
                   </div>
                 ) : (
@@ -1911,14 +1915,14 @@ export default function Orders() {
                       onClick={() => handleMarkCustNotificationRead(n.id)}
                       className={cn(
                         "p-3.5 rounded-xl border text-xs transition-all cursor-pointer",
-                        n.read ? "bg-white border-stone-200 text-stone-600" : "bg-[#FFFDF7] border-[#D9A62E]/40 text-stone-900 font-semibold shadow-2xs"
+                        n.read ? "bg-[#FFFDF9] border-[#DFC78A]/60 text-[#5C5240]" : "bg-[#FAF3E2]/80 border-[#D4961B]/65 text-[#142C24] font-semibold shadow-2xs"
                       )}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <span className="font-bold text-[#064E3B]">{n.title}</span>
-                        {!n.read && <span className="w-2 h-2 rounded-full bg-[#D9A62E] shrink-0 mt-1" />}
+                        <span className="font-bold text-[#083A28]">{n.title}</span>
+                        {!n.read && <span className="w-2 h-2 rounded-full bg-[#D9A323] shrink-0 mt-1" />}
                       </div>
-                      <p className="mt-1 text-stone-600 font-normal leading-relaxed">{n.message}</p>
+                      <p className="mt-1 text-[#5C5240] font-normal leading-relaxed">{n.message}</p>
                     </div>
                   ))
                 )}

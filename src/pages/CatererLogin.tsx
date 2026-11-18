@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ChefHat, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { toast } from '../components/Toast';
 import { getSupabase } from '../lib/supabase';
 import { safeSaveRegistrations } from '../lib/utils';
@@ -209,35 +209,42 @@ export default function CatererLogin() {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-20 bg-brand-green-950 flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold-500/10 blur-[100px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-green-500/20 blur-[100px] rounded-full pointer-events-none"></div>
-      
-      <div className="w-full max-w-md relative z-10 font-poppins">
-        <div className="bg-brand-green-900 rounded-3xl p-8 sm:p-10 shadow-2xl border border-brand-green-800">
-          
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-brand-gold-500/20 text-brand-gold-500 rounded-full flex items-center justify-center mb-4">
-               <ChefHat size={32} />
+    <div className="min-h-screen pt-24 pb-16 md:py-12 bg-gradient-to-b from-[#FBF4E4] via-[#FCF6E9] to-[#F7EDD9] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="w-full max-w-md relative z-10 font-poppins bg-[#FFFDF8] rounded-[24px] shadow-[0_18px_45px_rgba(116,84,22,0.12)] overflow-hidden border border-[#DFC78A]">
+        
+        {/* Emerald & Gold Header */}
+        <div className="bg-gradient-to-br from-[#01291D] via-[#034431] to-[#01291D] px-6 py-7 text-center relative overflow-hidden border-b border-[#D9A323]/45">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(242,190,59,0.16),transparent_65%)] pointer-events-none" />
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="bg-[#011F16]/85 border border-[#DFC78A]/50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-[0_6px_18px_rgba(0,0,0,0.28)]">
+              <img src="/assets/aistudio/image_6ce019e3.png" alt="PlanMyChoice" className="w-10 h-10 object-contain" />
             </div>
-            <h1 className="text-3xl font-display font-bold text-white mb-2">Caterer Login</h1>
-            <p className="text-brand-green-200 text-center text-sm">Access your partner dashboard and manage your orders.</p>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-[#F8D76A]/15 text-[#F8D76A] border border-[#DFC78A]/35 mb-2">
+              Partner Portal
+            </span>
+            <h1 className="text-2xl sm:text-[28px] font-display font-bold text-[#FFFDF8] mb-1">Caterer Login</h1>
+            <p className="text-[#DFC78A]/90 text-center text-xs max-w-xs mx-auto">
+              Access your partner dashboard and manage your orders.
+            </p>
           </div>
+        </div>
 
+        <div className="p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-300 p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2">
-                <AlertCircle size={16} className="shrink-0 text-red-400" />
+              <div className="bg-red-500/10 border border-red-500/30 text-red-700 p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                <AlertCircle size={16} className="shrink-0 text-red-600" />
                 <span>{error}</span>
               </div>
             )}
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-brand-green-200 ml-1">Email, Username or Mobile Number</label>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-[#083A28] uppercase tracking-wide ml-0.5">
+                Email, Username or Mobile Number
+              </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-green-400">
-                  <Mail size={18} />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#9C7826]">
+                  <Mail size={17} />
                 </div>
                 <input 
                   type="text" 
@@ -245,19 +252,19 @@ export default function CatererLogin() {
                   required
                   value={formData.identifier}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3.5 bg-brand-green-950 border border-brand-green-800 rounded-xl text-white placeholder:text-brand-green-700 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 transition-all outline-none text-sm"
+                  className="w-full pl-10 pr-4 py-3 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl text-[#132A1F] placeholder:text-[#8E7D5A] focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white transition-all outline-none text-sm"
                   placeholder="Enter email, username or mobile number"
                 />
               </div>
             </div>
 
-            <div className="space-y-1">
-              <div className="flex justify-between items-center ml-1">
-                 <label className="text-sm font-medium text-brand-green-200 animate-pulse">Password</label>
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center ml-0.5">
+                <label className="block text-xs font-semibold text-[#083A28] uppercase tracking-wide">Password</label>
               </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-green-400">
-                  <Lock size={18} />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#9C7826]">
+                  <Lock size={17} />
                 </div>
                 <input 
                   type="password" 
@@ -265,7 +272,7 @@ export default function CatererLogin() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3.5 bg-brand-green-950 border border-brand-green-800 rounded-xl text-white placeholder:text-brand-green-700 focus:ring-2 focus:ring-brand-gold-500 focus:border-brand-gold-500 transition-all outline-none text-sm"
+                  className="w-full pl-10 pr-4 py-3 bg-[#FFFDF9] border border-[#DFC78A] rounded-xl text-[#132A1F] placeholder:text-[#8E7D5A] focus:ring-2 focus:ring-[#D4961B]/30 focus:border-[#D4961B] focus:bg-white transition-all outline-none text-sm"
                   placeholder="••••••••"
                 />
               </div>
@@ -274,12 +281,11 @@ export default function CatererLogin() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-brand-gold-500 hover:bg-brand-gold-400 text-brand-green-900 font-bold py-3.5 rounded-xl transition-colors shadow-lg shadow-brand-gold-500/20 mt-6 flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-gradient-to-r from-[#FCE07E] via-[#F2BE3B] to-[#D99B16] hover:brightness-105 text-[#042419] border border-[#B57B0C]/35 font-bold py-3.5 rounded-xl transition-all shadow-[0_6px_18px_rgba(217,155,22,0.28)] mt-4 flex items-center justify-center gap-2 text-sm cursor-pointer disabled:opacity-75"
             >
               {loading ? 'Authenticating Partner...' : 'Caterer Check-In'}
             </button>
           </form>
-
         </div>
       </div>
     </div>
